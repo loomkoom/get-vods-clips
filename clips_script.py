@@ -13,7 +13,7 @@ def load_url(url, session):
     return r.status_code
 
 
-def get_clips(streamername, vod_id, time_offset = 99999, output = "separate", title = "title"):
+def get_clips(streamername, vod_id, time_offset = "",workers = 150, output = "separate", title = "title"):
     if time_offset == '':
         time_offset = 99999  # 28hrs
     elif "h" in time_offset:
@@ -27,17 +27,17 @@ def get_clips(streamername, vod_id, time_offset = 99999, output = "separate", ti
 
     start = time.time()
 
-    with concurrent.futures.ThreadPoolExecutor() as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers = workers) as executor:
         with requests.session() as session:
             future_to_url = {executor.submit(load_url, url, session = session): url for url in urls.keys()}
             for future in concurrent.futures.as_completed(future_to_url):
                 url = future_to_url[future]
                 status = future.result()
                 if status == 200:
-                    offset = urls[url]
+                    offset = urls[url] - 24
                     hr = offset // 3600
                     min = (offset % 3600) // 60
-                    sec = (offset % 60) - 24
+                    sec = (offset % 60)
                     offset_time = f"{hr}:{min}:{sec}"
                     output.append((url, offset_time))
                     # print(f"Completed link {i} at: {offset_time} result: {url} \r")

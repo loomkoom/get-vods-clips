@@ -7,7 +7,7 @@ from math import floor
 
 
 def get_vods_clips(streamername, vod_clips, start, output_file = "separate"):
-    start_time = datetime.now().strftime("%m-%d-%Y-, %H.%M.%S")
+    start_time = datetime.now().strftime("%m-%d-%Y, %H.%M.%S")
     stream_data = get_stream_data.get_data(streamername)  # list of streams in format: (date_time, vod_id, minutes, title)
     streams = len(stream_data[start:])
     total_minutes = sum(map(lambda x: int(x[2]), stream_data[start:]))
@@ -15,7 +15,7 @@ def get_vods_clips(streamername, vod_clips, start, output_file = "separate"):
         print(f"{streams} streams found")
     elif vod_clips == "clips":
         print(f"{streams} streams found, {total_minutes} vod minutes \n"
-              f" {timedelta(minutes = total_minutes * 0.0375)} estimated process time")
+              f" {timedelta(minutes = total_minutes * 0.0048)} estimated process time")
 
     for stream in stream_data[start:]:
         date_time = stream[0]
@@ -39,11 +39,11 @@ def get_vods_clips(streamername, vod_clips, start, output_file = "separate"):
 
                 with open(f".\output\\batch\{streamername} data clips {start_time}.txt", "a", encoding = 'utf8') as data_log:
                     for clip in clips:
-                        data_string = f"{clip[0]} time: {clip[1]} ID: {vod_id}, " \
+                        data_string = f"{clip[0]} TIME: {clip[1]} ID: {vod_id}, " \
                                       f"DATE: {date_time}, LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
                                       f"TITLE: {title} \n"
-
                         data_log.write(data_string)
+                    data_log.write("\n")
             else:
                 clips = clips_script.get_clips(streamername, vod_id, minutes, title)
 
@@ -51,7 +51,7 @@ def get_vods_clips(streamername, vod_clips, start, output_file = "separate"):
             log_string = f"{date_time}, {vod_id}, {title} DONE {stream_data.index(stream) + 1}/{len(stream_data)}  \n " \
                          f"{len(clips)} clips found \n "
             time_left_string = f"{floor(((total_minutes - minutes_left) / total_minutes) * 100)}% done " \
-                               f"estimated time left: {timedelta(minutes = minutes_left * 0.0375)} \n \n"
+                               f"estimated time left: {timedelta(minutes = minutes_left * 0.0048)} \n \n"
 
             with open(f".\output\logs\{streamername} Logs {start_time}.txt", "a", encoding = 'utf8') as progress_log:
                 progress_log.write(log_string + time_left_string)
@@ -70,6 +70,7 @@ def main():
     streamername = input("streamer name? >>")
     vod_clips = input("clips or vods? >>")
     start = int(input("start/continue from index? >>"))
+    # workers = 150
     # TO DO date from til
     get_vods_clips(streamername, vod_clips, start, output_file = "local")
 
