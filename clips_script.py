@@ -56,7 +56,7 @@ def get_clips(streamername, vod_id, time_offset = "",workers = 150, output = "se
                     clips.write(url[0] + url[1] + '\n')
         return output
     else:
-        print(f"no valid clips found {streamername} vod id: {vod_id}\n")
+        # print(f"no valid clips found {streamername} vod id: {vod_id}\n")
         return [("no valid clips found,","None")]
 
 

@@ -16,7 +16,7 @@ def download_file(url, streamername):
     return local_filename
 
 
-def get_clips(streamername,filelocation):
+def get_clips(streamername, filelocation):
     with open(filelocation, "r", encoding = 'utf8') as file:
         urls = list()
         streams = list(filter((lambda x: "clips-media-assets2.twitch.tv" in x), file.readlines()))
@@ -38,7 +38,6 @@ def get_clips(streamername,filelocation):
                     title = tag[7:].strip()
                     trans = title.maketrans('<>:"/\\|?*', '         ')
                     title = (title.translate(trans),)
-                print(tag)
             urls.append((date + file_name + url + time + length + title))
 
     for link in urls:
@@ -50,12 +49,12 @@ def get_clips(streamername,filelocation):
         if os.path.isfile(f".\output\downloads\{streamername}\{file}"):
             os.rename(f".\output\downloads\{streamername}\{filename}",
                       f".\output\downloads\{streamername}\{date}__{link[5]}__{time}-{length}_{filename}")
-        print(link)
 
 
 def main():
     streamername = input("streamer name? >>")
-    get_clips(streamername)
+    filelocation = input("file location? >>")
+    get_clips(streamername, filelocation)
 
 
 if __name__ == "__main__":
