@@ -10,7 +10,7 @@ from ratelimit import limits, sleep_and_retry
 # @limits(calls =, period =)
 def load_url(url, session):
     r = session.head(url, allow_redirects = False)
-    return r.status_code
+    return r.ok
 
 
 def get_clips(streamername, vod_id, time_offset = "",workers = 150, output = "separate", title = "title"):
@@ -32,8 +32,7 @@ def get_clips(streamername, vod_id, time_offset = "",workers = 150, output = "se
             future_to_url = {executor.submit(load_url, url, session = session): url for url in urls.keys()}
             for future in concurrent.futures.as_completed(future_to_url):
                 url = future_to_url[future]
-                status = future.result()
-                if status == 200:
+                if future.result():
                     offset = urls[url] - 24
                     hr = offset // 3600
                     min = (offset % 3600) // 60
@@ -48,9 +47,9 @@ def get_clips(streamername, vod_id, time_offset = "",workers = 150, output = "se
                 # print(f"{hr} hrs {min} min {sec} sec left in vod")
 
             runtime = time.time() - start
-            print(f"took {timedelta(seconds = runtime)} seconds or {100 / runtime} links per second")
+            # print(f"took {timedelta(seconds = runtime)} seconds or {100 / runtime} links per second")
     if len(output) > 0:
-        print(f"{len(output)} clips found {streamername} vod id: {vod_id}\n")
+        # print(f"{len(output)} clips found {streamername} vod id: {vod_id}\n")
         if output == "separate":
             with open(f".\output\separate\{streamername} clips-{vod_id}.txt", "w") as clips:
                 for url in output:

@@ -27,9 +27,9 @@ def get_vod(streamername, vod_id, timestamp,output="separate",title="title"):
 
     url = f"https://vod-secure.twitch.tv/{finalformattedstring}/chunked/index-dvr.m3u8"
 
-    if requests.head(url, allow_redirects = False).status_code != 200:
+    if not requests.head(url, allow_redirects = False).ok:
         print(f"no valid link found {vod_id}")
-        return "no clips found"
+        return "no valid link found"
     else:
         print(f"Completed link: {url}")
         if output == "separate":
