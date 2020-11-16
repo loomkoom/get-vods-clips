@@ -1,5 +1,6 @@
 import datetime
 import hashlib
+
 import requests
 
 
@@ -8,7 +9,7 @@ def totimestamp(dt, epoch = datetime.datetime(1970, 1, 1)):
     return (td.microseconds + (td.seconds + td.days * 86400) * 10 ** 6) / 10 ** 6
 
 
-def get_vod(streamername, vod_id, timestamp,output="separate",title="title"):
+def get_vod(streamername, vod_id, timestamp, output = "separate", title = "title"):
     dt = timestamp.split()[0].split('-')
     tm = timestamp.split()[1].split(':')
 
@@ -37,12 +38,14 @@ def get_vod(streamername, vod_id, timestamp,output="separate",title="title"):
                 vod.writelines(url)
         return url
 
+
 def main():
     print("this method should work for any vods less than 60 days old" + "\n" + "[streamer name], [vod id] and [vod time] needed")
     streamername = input("Enter streamer name >> ")
     vod_id = input("Enter vod id >> ")
     timestamp = input("Enter VOD timestamp (YYYY-MM-DD HH:MM:SS) UTC >>  ")
     get_vod(streamername, vod_id, timestamp)
+
 
 if __name__ == "__main__":
     main()

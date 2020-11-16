@@ -1,9 +1,8 @@
-import requests
 import concurrent.futures
 import time
-from datetime import timedelta
 import winsound
-from ratelimit import limits, sleep_and_retry
+
+import requests
 
 
 # @sleep_and_retry
@@ -13,7 +12,7 @@ def load_url(url, session):
     return r.ok
 
 
-def get_clips(streamername, vod_id, time_offset = "",workers = 150, output = "separate", title = "title"):
+def get_clips(streamername, vod_id, time_offset = "", workers = 150, output = "separate", title = "title"):
     if time_offset == '':
         time_offset = 99999  # 28hrs
     elif "h" in time_offset:
@@ -57,7 +56,7 @@ def get_clips(streamername, vod_id, time_offset = "",workers = 150, output = "se
         return output
     else:
         # print(f"no valid clips found {streamername} vod id: {vod_id}\n")
-        return [("no valid clips found,","None")]
+        return [("no valid clips found,", "None")]
 
 
 def main():

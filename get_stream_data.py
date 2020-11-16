@@ -1,5 +1,7 @@
-from bs4 import BeautifulSoup as soup
+from datetime import datetime
+
 import requests
+from bs4 import BeautifulSoup as soup
 
 
 def souper(url):
@@ -10,8 +12,10 @@ def souper(url):
     return soup(html, "html.parser")
 
 
-def get_data(streamername):
+def get_data(streamername, start, end):
     data = list()
+    start_date = datetime.fromisoformat(start).date()
+    end_date = datetime.fromisoformat(end).date()
     url = f"https://twitchtracker.com/{streamername}/streams"
     page_soup = souper(url)
     for tr in page_soup.find("table", id = "streams").tbody.findAll("tr"):
@@ -19,9 +23,9 @@ def get_data(streamername):
         for td in tr.findAll("td"):
             if td.get("data-order"):
                 if td.get("nowrap") == "":
-                    date = td.get("data-order")
+                    date_time = td.get("data-order")
                     vod_id = td.get("data-stream")
-                    stream = (date, vod_id)
+                    stream = (date_time, vod_id)
                     # print(f"date: {date}, vod id: {vod_id}")
                 elif not td.get("class"):
                     minutes = (td.get("data-order"),)
@@ -31,7 +35,9 @@ def get_data(streamername):
                 title = (td.string,)
                 stream += title
                 # print(f"title: {title}")
-        data.append(stream)
+        current_date = datetime.fromisoformat(date_time).date()
+        if current_date >= start_date and current_date <= end_date:
+            data.append(stream)
         # print(stream)
         # print("--------------------------------------------------------")
     return data
@@ -39,9 +45,10 @@ def get_data(streamername):
 
 def main():
     streamername = input("streamername >>")
-    # date from til ...
-    return get_data(streamername)
+    start = input("from date (earliest) YYYY-MM-DD >>")
+    end = input("to date (newest) YYYY-MM-DD >>")
+    return get_data(streamername, start, end)
 
 
 if __name__ == "__main__":
-    main()
+    print(main())

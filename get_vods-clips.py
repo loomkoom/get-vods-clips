@@ -1,23 +1,24 @@
-import get_stream_data
-import vod_script
-import clips_script
-import get_clips
 from datetime import datetime, timedelta
 from math import floor
 
+import clips_script
+import get_clips
+import get_stream_data
+import vod_script
 
-def get_vods_clips(streamername, vod_clips, start, output_file = "separate"):
+
+def get_vods_clips(streamername, vod_clips, index, start, end, output_file = "separate"):
     start_time = datetime.now().strftime("%m-%d-%Y, %H.%M.%S")
-    stream_data = get_stream_data.get_data(streamername)  # list of streams in format: (date_time, vod_id, minutes, title)
-    streams = len(stream_data[start:])
-    total_minutes = sum(map(lambda x: int(x[2]), stream_data[start:]))
+    stream_data = get_stream_data.get_data(streamername, start, end)  # list of streams in format: (date_time, vod_id, minutes, title)
+    streams = len(stream_data[index:])
+    total_minutes = sum(map(lambda x: int(x[2]), stream_data[index:]))
     if vod_clips == "vods":
         print(f"\n{streams} streams found")
     elif vod_clips == "clips":
         print(f"\n{streams} streams found, {total_minutes} vod minutes \n"
               f"{timedelta(minutes = total_minutes * 0.0048)} estimated process time \n")
 
-    for stream in stream_data[start:]:
+    for stream in stream_data[index:]:
         date_time = stream[0]
         vod_id = stream[1]
         minutes = stream[2]
@@ -71,11 +72,13 @@ def download_all_files(streamername, filelocation):
 def main():
     streamername = input("streamer name? >>")
     vod_clips = input("clips or vods? >>")
-    start = int(input("start/continue from index? >>"))
+    index = int(input("start/continue from index? >>"))
+    start = input("from date (earliest) YYYY-MM-DD >>")
+    end = input("to date (newest) YYYY-MM-DD >>")
     download = input("download files yes or no? >>")
     # workers = 150
     # TO DO date from til
-    links = get_vods_clips(streamername, vod_clips, start, output_file = "local")
+    links = get_vods_clips(streamername, vod_clips, index, start, end, output_file = "local")
     if download == "yes":
         download_all_files(streamername, links)
 
