@@ -1,25 +1,24 @@
 from datetime import datetime, timedelta
 from math import floor
 
-
 import clips_script
 import get_clip_files
 import get_stream_data
 import vod_script
 
 
-def get_vods_clips(channel_name, vod_clips, index, start, end):
+def get_vods_clips(channel_name, vod_clips, start, end):
     start_time = datetime.now().strftime("%m-%d-%Y, %H.%M.%S")
     stream_data = get_stream_data.get_data(channel_name, start, end)  # list of streams in format: (date_time, vod_id, minutes, title)
-    streams = len(stream_data[index:])
-    total_minutes = sum(map(lambda x: int(x[2]), stream_data[index:]))
+    streams = len(stream_data)
+    total_minutes = sum(map(lambda x: int(x[2]), stream_data))
     if vod_clips == "vods":
         print(f"\n{streams} streams found")
     elif vod_clips == "clips":
         print(f"\n{streams} streams found, {total_minutes} vod minutes \n"
               f"{timedelta(minutes = total_minutes * 0.0048)} estimated process time \n")
 
-    for stream in stream_data[index:]:
+    for stream in stream_data:
         date_time = stream[0]
         vod_id = stream[1]
         minutes = stream[2]
@@ -29,13 +28,13 @@ def get_vods_clips(channel_name, vod_clips, index, start, end):
             data_string = f"DATE: {date_time}, URL: {vod} , ID: {vod_id}, " \
                           f"LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
                           f"TITLE: {title} \n"
-            with open(f".\\output\\batch\\{start_time} {channel_name} data vods.txt", "a", encoding = 'utf8') as data_log:
+            with open(f".\\output\\batch\\{channel_name} vods {start} - {end}.txt", "a", encoding = 'utf8') as data_log:
                 data_log.write(data_string)
 
         elif vod_clips == "clips":
             clips = clips_script.get_clips(channel_name, vod_id, minutes)
 
-            with open(f".\\output\\batch\\{start_time} {channel_name} data clips.txt", "a", encoding = 'utf8') as data_log:
+            with open(f".\\output\\batch\\{channel_name} clips {start} - {end}.txt", "a", encoding = 'utf8') as data_log:
                 for clip in clips:
                     data_string = f"DATE: {date_time}, URL: {clip[0]} , TIME: {clip[1]} , ID: {vod_id}, " \
                                   f"LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
@@ -58,26 +57,22 @@ def get_vods_clips(channel_name, vod_clips, index, start, end):
         return f".\\output\\batch\\{start_time} {channel_name} data clips.txt"
 
 
-def download_all_files(channel_name, file_location,vod_clips):
+def download_all_files(channel_name, file_location):
     print("starting download")
-    if vod_clips == "clips":
-        get_clip_files.get_clips(channel_name, file_location)
-    else:
-
+    get_clip_files.get_clips(channel_name, file_location)
     print("download finished")
 
 
 def main():
     channel_name = input("streamer name? >>").strip()
     vod_clips = input("clips or vods? >>").strip()
-    index = int(input("start/continue from index? >>").strip())
     start = input("from date (earliest) YYYY-MM-DD >>").strip()
     end = input("to date (newest) YYYY-MM-DD >>").strip()
     download = input("download files yes or no? >>").strip()
     # workers = 150
-    links = get_vods_clips(channel_name, vod_clips, index, start, end)
+    links = get_vods_clips(channel_name, vod_clips, start, end)
     if download == "yes":
-        download_all_files(channel_name, links,vod_clips)
+        download_all_files(channel_name, links, vod_clips)
 
 
 if __name__ == "__main__":

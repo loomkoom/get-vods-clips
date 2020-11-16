@@ -1,10 +1,9 @@
-from time import sleep
+import time
 
 import vlc
 
 
 def play_url(url):
-    played = False
     instance = vlc.Instance()
     instance.log_unset()
 
@@ -12,12 +11,14 @@ def play_url(url):
     player.set_mrl(f"{url}")
     player.audio_set_mute(True)
     player.play()
-    sleep(3)
-
-    if player.is_playing() == 1:
-        played = True
-    player.stop()
-    return played
+    start = time.time()
+    timeout = 5
+    while not player.get_state() == vlc.State.Ended and time.time() - start < timeout:
+        time.sleep(0.1)
+    if int(player.is_playing()):
+        player.pause()
+        player.stop()
+    return player.get_state() == vlc.State.Stopped
 
 
 def test_vods(channel_name, file_location):
@@ -26,11 +27,12 @@ def test_vods(channel_name, file_location):
         streams = list(filter((lambda x: "vod-secure.twitch.tv" in x), file.readlines()))
         for stream in streams:
             data = stream.split(',')
-            url = data[1].strip()
+            url = data[1].strip()[5:]
             played = play_url(url)
+            print(url)
             if played:
                 output.append(stream)
-            print(played,url)
+            print(played, url)
 
     with open(f".\\output\\batch\\{channel_name} valid vods.txt", "w", encoding = 'utf8') as file:
         file.writelines(output)

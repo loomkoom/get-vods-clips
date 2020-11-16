@@ -1,6 +1,6 @@
 import datetime
 import hashlib
-from time import sleep
+import time
 
 import requests
 import vlc
@@ -36,18 +36,20 @@ def get_vod(channel_name, vod_id, timestamp):
 
 
 def play_url(url):
-    played = False
     instance = vlc.Instance()
     instance.log_unset()
     player = instance.media_player_new()
     player.set_mrl(f"{url}")
     player.play()
     player.audio_set_mute(True)
-    sleep(2.5)
-    if player.is_playing() == 1:
-        played = True
-    player.stop()
-    return played
+    start = time.time()
+    timeout = 5
+    while not player.get_state() == vlc.State.Ended and time.time() - start < timeout:
+        time.sleep(0.1)
+    if int(player.is_playing()):
+        player.pause()
+        player.stop()
+    return player.get_state() == vlc.State.Stopped
 
 
 def main():
