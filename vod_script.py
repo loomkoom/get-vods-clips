@@ -51,9 +51,9 @@ def play_url(url):
 
 
 def main():
-    channel_name = input("Enter streamer name >> ")
-    vod_id = input("Enter vod id >> ")
-    timestamp = input("Enter VOD timestamp (YYYY-MM-DD HH:MM:SS) UTC >>  ")
+    channel_name = input("Enter streamer name >> ").strip()
+    vod_id = input("Enter vod id >> ").strip()
+    timestamp = input("Enter VOD timestamp (YYYY-MM-DD HH:MM:SS) UTC >>  ").strip()
     print(get_vod(channel_name, vod_id, timestamp))
 
 

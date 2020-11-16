@@ -12,7 +12,7 @@ def play_url(url):
     player.set_mrl(f"{url}")
     player.audio_set_mute(True)
     player.play()
-    sleep(2.5)
+    sleep(3)
 
     if player.is_playing() == 1:
         played = True
@@ -30,14 +30,15 @@ def test_vods(channel_name, file_location):
             played = play_url(url)
             if played:
                 output.append(stream)
+            print(played,url)
 
     with open(f".\\output\\batch\\{channel_name} valid vods.txt", "w", encoding = 'utf8') as file:
         file.writelines(output)
 
 
 def main():
-    channel_name = input("streamer name? >>")
-    file_location = input("file location? >>")
+    channel_name = input("streamer name? >>").strip()
+    file_location = input("file location? >>").strip()
     test_vods(channel_name, file_location)
 
 

@@ -36,8 +36,8 @@ def get_clips(vod_id, time_offset, workers = 150):
 
 
 def main():
-    vod_id = input("vod id >> ")
-    time_offset = input('vod length in minutes >> ')
+    vod_id = input("vod id >> ").strip()
+    time_offset = input('vod length in minutes >> ').strip()
     print(get_clips(vod_id, time_offset))
     winsound.PlaySound("empty", winsound.MB_OK)
 

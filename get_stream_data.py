@@ -40,9 +40,9 @@ def get_data(channel_name, start, end):
 
 
 def main():
-    channel_name = input("streamer name? >>")
-    start = input("from date (earliest) YYYY-MM-DD UTC >>")
-    end = input("to date (newest) YYYY-MM-DD UTC >>")
+    channel_name = input("streamer name? >>").strip()
+    start = input("from date (earliest) YYYY-MM-DD UTC >>").strip()
+    end = input("to date (newest) YYYY-MM-DD UTC >>").strip()
     print(get_data(channel_name, start, end))
 
 
