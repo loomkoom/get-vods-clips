@@ -9,10 +9,10 @@ def download_file(url, channel_name, file_name,vod_clips):
     else:
         headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36', }
         r = requests.get(url, headers = headers, stream = True)
-        if not os.path.isdir(f"../output/downloads/{channel_name}"):
-            os.mkdir(f"../output/downloads/{channel_name}")
+        if not os.path.isdir(f"../output/files/{channel_name}"):
+            os.mkdir(f"../output/files/{channel_name}")
 
-            with open(f"../output/downloads/{channel_name}/{file_name}.mp4", 'wb') as f:
+            with open(f"../output/files/{channel_name}/{file_name}.mp4", 'wb') as f:
                 for chunk in r.iter_content(chunk_size = 1024):
                     if chunk:  # filter out keep-alive new chunks
                         f.write(chunk)
@@ -56,25 +56,25 @@ def get_clips(channel_name, file_location, vod_clips):
         if vod_clips == "clips":
             offset_time = data[5]
 
-        if (not os.path.exists(f"../output/downloads/{channel_name}/{file_name}")) and (
-                not os.path.exists(f"../output/downloads/{channel_name}/{date}_{title}_{length}_{file_name}")):
+        if (not os.path.exists(f"../output/files/{channel_name}/{file_name}")) and (
+                not os.path.exists(f"../output/files/{channel_name}/{date}_{title}_{length}_{file_name}")):
             file = download_file(url, channel_name, file_name,vod_clips)
             print(file)
         if vod_clips == "clips":
-            if not os.path.exists(f"../output/downloads/{channel_name}/{date}__{title}__{offset_time}-{length}_{file_name}"):
+            if not os.path.exists(f"../output/files/{channel_name}/{date}__{title}__{offset_time}-{length}_{file_name}"):
                 file = download_file(url, channel_name, file_name,vod_clips)
-            if os.path.isfile(f"../output/downloads/{channel_name}/{file}"):
-                os.rename(f"../output/downloads/{channel_name}/{file_name}",
-                          f"../output/downloads/{channel_name}/{date}__{title}__{offset_time}-{length}_{file_name}")
+            if os.path.isfile(f"../output/files/{channel_name}/{file}"):
+                os.rename(f"../output/files/{channel_name}/{file_name}",
+                          f"../output/files/{channel_name}/{date}__{title}__{offset_time}-{length}_{file_name}")
         elif vod_clips == "vods":
             print(file, url)
-            if os.path.isfile(f"../output/downloads/{channel_name}/{file}"):
-                os.rename(f"../output/downloads/{channel_name}/{file_name}",
-                          f"../output/downloads/{channel_name}/{date}_{title}_{length}_{file_name}")
+            if os.path.isfile(f"../output/files/{channel_name}/{file}"):
+                os.rename(f"../output/files/{channel_name}/{file_name}",
+                          f"../output/files/{channel_name}/{date}_{title}_{length}_{file_name}")
 
 
 def main():
-    print("downloads all clips or vods from generated file \n"
+    print("files all clips or vods from generated file \n"
           "input [channel name] [file_location] [vods or clips] \n"
           "outputs files in:\output\downloads\channelname\[clips or vods]")
     channel_name = input("streamer name? >>").strip()

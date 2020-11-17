@@ -7,7 +7,7 @@ def get_muted_playlist(url, filename):
     full_url = url.split("/")
     url_path = "/".join(full_url[0:-1]) + "/"
 
-    with open(f"../output/playlists/{filename}.m3u8", 'r+') as playlist:
+    with open(f"../output/files/playlists/{filename}.m3u8", 'r+') as playlist:
         input_lines = playlist.readlines()
         output_lines = []
         for line in input_lines:
@@ -16,14 +16,14 @@ def get_muted_playlist(url, filename):
             elif line.rstrip().endswith('.ts'):
                 line = url_path + line.rstrip() + "\n"
             output_lines.append(line)
-    with open(f"../output/playlists/{filename}-muted.m3u8", 'w') as playlist:
+    with open(f"../output/files/playlists/{filename}-muted.m3u8", 'w') as playlist:
         playlist.writelines(output_lines)
 
 
 def main():
     print("script will replace unmuted ts files with muted counterparts \n"
           "input [playlist url](m3u8) [filename]"
-          "outputs the playlist file as <filename>-muted.m3u8 in /output/playlists")
+          "outputs the playlist file as <filename>-muted.m3u8 in /output/files/playlists")
     url = input("url >>").strip()
     filename = input("filename to call playlist >>").strip()
     get_muted_playlist(url, filename)
