@@ -64,7 +64,7 @@ def get_vod(channel_name, vod_id, timestamp,test="yes"):
                 if play_url(url):
                     return url, None
             else:
-                muted_vod = get_muted_vod.get_muted_playlist(url, str(vod_id))
+                muted_vod = get_muted_vod.get_muted_playlist(url, f"{channel_name}_vod_{datetime.datetime.date(date_time)}_{vod_id}")
                 if play_url(muted_vod):
                     return url, muted_vod
         elif test == "no":
@@ -73,6 +73,7 @@ def get_vod(channel_name, vod_id, timestamp,test="yes"):
 
 
 def main():
+
     print("\n-returns the playlist link for a vod (m3u8 link) \n"
           "-requires [channel name], [vod id] and [timestamp] \n"
           "-all can be found on twitchtracker (in the streams page inspect element on the date+time link for a timestamp with seconds \n"
