@@ -55,8 +55,8 @@
 ### Prerequisites
 
 * [python](https://www.python.org/downloads/)
-* [VLC media player](https://www.videolan.org/vlc/index.html)
-* [ffmpeg]()
+* [VLC media player](https://www.videolan.org/vlc/index.html) is used to check if urls with a valid url are playable or not
+* [ffmpeg]() if you wish to download the vods
 
 ### Installation
 
