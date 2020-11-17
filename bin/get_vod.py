@@ -5,14 +5,15 @@ import time
 from pathlib import Path
 
 import get_muted_vod
+import m3u8
 import requests
 import vlc
-import m3u8
 
 
 def to_timestamp(date_time, epoch = datetime.datetime(1970, 1, 1)):
     td = date_time - epoch
     return (td.microseconds + (td.seconds + td.days * 86400) * 10 ** 6) / 10 ** 6
+
 
 def is_muted(url):
     playlist_url = m3u8.load(url)
@@ -60,17 +61,19 @@ def get_vod(channel_name, vod_id, timestamp):
     if requests.head(url, allow_redirects = False).ok:
         if not is_muted(url):
             if play_url(url):
-                return url,None
+                return url, None
         else:
             muted_vod = get_muted_vod.get_muted_playlist(url, str(vod_id))
             if play_url(muted_vod):
-                return url,muted_vod
-    return "no valid link",None
+                return url, muted_vod
+    return "no valid link", None
 
 
 def main():
     print("returns the playlist link for a vod (m3u8 link) \n"
-          "requires [channel name], [vod id] and [timestamp] all can be found on twitchtracker \n")
+          "requires [channel name], [vod id] and [timestamp] \n"
+          "all can be found on twitchtracker (in the streams page inspect element on the date+time link for a timestamp with seconds and vod id: "
+          "data-order=\"[YYYY-MM-DD HH:MM:SS]\" data-stream=\"[VOD-ID]\" \n")
     channel_name = input("Enter streamer name >>").strip()
     vod_id = input("Enter vod id >>").strip()
     timestamp = input("Enter VOD timestamp (YYYY-MM-DD HH:MM:SS) UTC >>").strip()
@@ -81,7 +84,6 @@ def main():
               f"Because of that a file has been created at output/files/playlists/{vod[1]} with the muted playlist \n")
     else:
         print(f"\n {vod[0]} has been found \n")
-
 
 
 if __name__ == "__main__":
