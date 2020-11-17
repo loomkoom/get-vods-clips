@@ -66,6 +66,12 @@
 
 <!-- USAGE EXAMPLES -->
 ### Usage
+Using twitches glitchcon eve stream as an example: https://twitchtracker.com/twitch/streams/40468501598
+vod-id = 40468501598
+timestamp = 2020-11-13 19:14:07
+channel name = twitch
+length = 30
+
 
 **get_clips.cmd** returns a list with all clips from a specific vod-id
 
@@ -74,6 +80,7 @@
 **get_muted_vod.cmd** writes a muted vod file in output/files/playlists if you input a url and filename
 
 **get_all_vods_and_clips.cmd** writes a text file with all vods or urls found in a certain time period from channel name and date range
+
 
 
 
