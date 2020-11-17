@@ -72,6 +72,7 @@ timestamp = 2020-11-13 19:14:07 <br>
 channel name = twitch <br>
 length = 30 <br>
 
+__all script executables are located in the scripts folder__
 
 **get_clips.cmd** returns a list with all clips from a specific vod-id
 
@@ -80,6 +81,10 @@ length = 30 <br>
 **get_muted_vod.cmd** writes a muted vod file in output/files/playlists if you input a url and filename
 
 **get_all_vods_and_clips.cmd** writes a text file with all vods or urls found in a certain time period from channel name and date range
+
+**get_stream_data.cmd** returns a list with all stream data in certain time period from channel name and date range with each stream as (timestamp, vod_id, minutes, title)
+
+**test_vods.cmd** test all the vod links (with vlc) in the specified input file in /output/data and writes all succesful links to output file (timestamp, vod_id, minutes, title)
 
 
 
