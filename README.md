@@ -67,10 +67,10 @@
 <!-- USAGE EXAMPLES -->
 ### Usage
 Using twitches glitchcon eve stream as an example: https://twitchtracker.com/twitch/streams/40468501598
-vod-id = 40468501598   return
-timestamp = 2020-11-13 19:14:07   return
-channel name = twitch   return
-length = 30   return
+vod-id = 40468501598 <br>
+timestamp = 2020-11-13 19:14:07 <br>
+channel name = twitch <br>
+length = 30 <br>
 
 
 **get_clips.cmd** returns a list with all clips from a specific vod-id
