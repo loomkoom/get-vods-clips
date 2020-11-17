@@ -1,4 +1,5 @@
 import time
+from datetime import timedelta
 
 import vlc
 
@@ -21,10 +22,11 @@ def play_url(url):
     return player.get_state() == vlc.State.Stopped
 
 
-def test_vods(file_location,file_name):
-    with open(file_location, "r", encoding = 'utf8') as file:
+def test_vods(file_name,new_file_name):
+    with open(f"../output/data/{file_name}.txt", "r", encoding = 'utf8') as file:
         output = list()
         streams = list(filter((lambda x: "vod-secure.twitch.tv" in x), file.readlines()))
+        print(f"estimated run time: {timedelta(seconds=5*len(streams))}")
         for stream in streams:
             data = stream.split(',')
             url = data[1].strip()[5:]
@@ -32,18 +34,18 @@ def test_vods(file_location,file_name):
             if played:
                 output.append(stream)
 
-    with open(f"../{file_location}/{file_name}.txt", "w", encoding = 'utf8') as file:
+    with open(f"../output/data/{new_file_name}.txt", "w", encoding = 'utf8') as file:
         file.writelines(output)
 
 
-def main():
-    print("tests all vod links in file \n"
-          "input [file location] (from project directory) and [file name]  \n")
 
-    channel_name = input("streamer name? >>").strip()
-    file_location = input("file location? (//file path) >>").strip()
-    file_name = input("file name?  >>").strip()
-    test_vods(file_location,file_name)
+def main():
+    print("\n-tests all vod links in file using vlc \n"
+          "-input [input file name] and [output file name] only for files in /output/data/\n")
+
+    input_file = input("input file name?  >>").strip()
+    output_file = input("output file name?  >>").strip()
+    test_vods(input_file,output_file)
 
 
 if __name__ == "__main__":

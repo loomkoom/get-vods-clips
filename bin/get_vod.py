@@ -73,10 +73,10 @@ def get_vod(channel_name, vod_id, timestamp,test="yes"):
 
 
 def main():
-    print("returns the playlist link for a vod (m3u8 link) \n"
-          "requires [channel name], [vod id] and [timestamp] \n"
-          "all can be found on twitchtracker (in the streams page inspect element on the date+time link for a timestamp with seconds \n"
-          "disable testing vod playback with vlc if you get vlc errors")
+    print("\n-returns the playlist link for a vod (m3u8 link) \n"
+          "-requires [channel name], [vod id] and [timestamp] \n"
+          "-all can be found on twitchtracker (in the streams page inspect element on the date+time link for a timestamp with seconds \n"
+          "-disable testing vod playback with vlc if you get vlc errors\n")
     channel_name = input("Enter streamer name >>").strip()
     vod_id = input("Enter vod id >>").strip()
     timestamp = input("Enter VOD timestamp (YYYY-MM-DD HH:MM:SS) UTC >>").strip()

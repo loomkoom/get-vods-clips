@@ -4,8 +4,6 @@ import winsound
 import requests
 
 
-# @sleep_and_retry
-# @limits(calls =, period =)
 def load_url(url, session):
     r = session.head(url, allow_redirects = False)
     return r.ok
@@ -36,9 +34,9 @@ def get_clips(vod_id, time_offset, workers = 150):
 
 
 def main():
-    print("gets all clips from a vod, you can round up vod length as it is just the upper border to search for clips \n"
-          "input [vod id] [vod length](minutes) \n"
-          "outputs a list of valid clips with each clip as (url,offset time)")
+    print("\n-gets all clips from a vod, you can round up vod length as it is just the upper border to search for clips \n"
+          "-input [vod id] [vod length](minutes) \n"
+          "-outputs a list of valid clips with each clip as (url,offset time)\n")
     vod_id = input("vod id >> ").strip()
     time_offset = input('vod length in minutes >> ').strip()
     print(get_clips(vod_id, time_offset))

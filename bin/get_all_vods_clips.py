@@ -64,9 +64,9 @@ def get_vods_clips(channel_name, vod_clips, start, end):
 
 
 def main():
-    print("gets all clips or vod links within time period \n"
-          "input [channel name] [vods or clips] [start date] [end date] [download] \n"
-          "outputs to a file in output/data\n")
+    print("\n-gets all clips or vod links within time period \n"
+          "-input [channel name] [vods or clips] [start date] [end date] [download] \n"
+          "-outputs to a file in output/data\n")
     channel_name = input("streamer name? >>").strip()
     vod_clips = input("clips or vods? >>").strip()
     start = input("from date (earliest) YYYY-MM-DD >>").strip()

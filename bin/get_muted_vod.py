@@ -27,9 +27,9 @@ def get_muted_playlist(url, filename):
 
 
 def main():
-    print("script will replace unmuted ts files with muted counterparts \n"
-          "input [playlist url](m3u8) [filename]"
-          "outputs the playlist file as <filename>-muted.m3u8 in /output/files/playlists\n")
+    print("\n-script will replace unmuted ts files with muted counterparts \n"
+          "-input [playlist url](m3u8) [filename]\n"
+          "-outputs the playlist file as <filename>-muted.m3u8 in /output/files/playlists\n")
     url = input("url >>").strip()
     filename = input("filename to call playlist >>").strip()
     get_muted_playlist(url, filename)
