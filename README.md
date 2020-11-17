@@ -66,7 +66,7 @@
 
 <!-- USAGE EXAMPLES -->
 ### Usage
-Using twitches glitchcon eve stream as an example: https://twitchtracker.com/twitch/streams/40468501598
+Using twitches glitchcon eve stream as an example: https://twitchtracker.com/twitch/streams/40468501598 <br>
 vod-id = 40468501598 <br>
 timestamp = 2020-11-13 19:14:07 <br>
 channel name = twitch <br>
