@@ -69,7 +69,7 @@
 You need to have some data from the stream if you want a specific vod or clips from that vod (for get_all_vods_and_clips.cmd only a date range is needed)
 all data can be found on twitchtracker if you inspect element on the stream link in the streams page https://twitchtracker.com/twitch/streams
 Using twitches glitchcon eve stream as an example: https://twitchtracker.com/twitch/streams/40468501598 <br>
-![tracker image][tracker-url]
+![tracker image][tracker-url] <br>
 ![source image][source-url]
 
 vod-id = 40468501598 <br>
