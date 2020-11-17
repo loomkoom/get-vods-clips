@@ -41,7 +41,7 @@ def play_url(url):
     return player.get_state() == vlc.State.Stopped
 
 
-def get_vod(channel_name, vod_id, timestamp,test):
+def get_vod(channel_name, vod_id, timestamp,test="yes"):
     dt = timestamp.split()[0].split('-')
     tm = timestamp.split()[1].split(':')
 

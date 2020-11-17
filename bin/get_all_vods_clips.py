@@ -13,7 +13,8 @@ def get_vods_clips(channel_name, vod_clips, start, end):
     streams = len(stream_data)
     total_minutes = sum(map(lambda x: int(x[2]), stream_data))
     if vod_clips == "vods":
-        print(f"\n{streams} streams found")
+        print(f"\n{streams} streams found \n"
+              f"processing ... ")
     elif vod_clips == "clips":
         print(f"\n{streams} streams found, {total_minutes} vod minutes \n"
               f"{timedelta(minutes = total_minutes * 0.0048)} estimated process time \n")
@@ -25,11 +26,14 @@ def get_vods_clips(channel_name, vod_clips, start, end):
         title = stream[3]
         if vod_clips == "vods":
             vod = get_vod.get_vod(channel_name, vod_id, date_time)
-            data_string = f"DATE: {date_time}, URL: {vod[0]} , MUTED: {vod[1] if not None else 'No'} ID: {vod_id}, " \
+            data_string = f"found DATE: {date_time}, URL: {vod[0]} , MUTED: {vod[1] if not None else 'No'} ID: {vod_id}, " \
                           f"LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
                           f"TITLE: {title} \n"
+            log_string = f"{date_time}, {vod_id}, {title} \nCHECKED {stream_data.index(stream) + 1}/{len(stream_data)}  \n"
             with open(f"../output/data/{channel_name} vods {start} - {end}.txt", "a", encoding = 'utf8') as data_log:
                 data_log.write(data_string)
+            if vod[0] != "no valid link":
+                print(log_string)
 
         elif vod_clips == "clips":
             clips = get_clips.get_clips(channel_name, vod_id, minutes)
@@ -43,7 +47,7 @@ def get_vods_clips(channel_name, vod_clips, start, end):
                 data_log.write("\n")
 
             minutes_left = sum(map(lambda x: int(x[2]), stream_data[stream_data.index(stream) + 1:]))
-            log_string = f"{date_time}, {vod_id}, {title} DONE {stream_data.index(stream) + 1}/{len(stream_data)}  \n" \
+            log_string = f"{date_time}, {vod_id}, {title} CHECKED {stream_data.index(stream) + 1}/{len(stream_data)}  \n" \
                          f"{len(clips) if clips[0] != '' else 0} clips found \n"
             time_left_string = f"{floor(((total_minutes - minutes_left) / total_minutes) * 100)}% done " \
                                f"estimated time left: {timedelta(minutes = minutes_left * 0.0048)} \n \n"
@@ -53,8 +57,10 @@ def get_vods_clips(channel_name, vod_clips, start, end):
             print(log_string, time_left_string)
         else:
             print("input not valid please try again")
-    print("all links found")
-    return f"links located in /output/data/{start_time} {channel_name} data clips.txt"
+    print("\nFinished")
+    if vod_clips == "clips":
+        return f"clip links located in /output/data/{channel_name} clips {start} - {end}.txt"
+    return f"vod links located in /output/data/{channel_name} vods {start} - {end}.txt"
 
 
 def main():
