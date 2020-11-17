@@ -1,0 +1,1 @@
+DATE: YYYY-MM-SS HH:MM:SS, URL: https://vod-secure.twitch.tv/[HASH]_[CHANNEL-NAME]_[VOD-ID]/chunked/index-dvr.m3u8 , ID: VOD-ID, LENGTH: h min, TITLE: TITLE
