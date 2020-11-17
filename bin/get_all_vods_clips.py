@@ -54,7 +54,7 @@ def get_vods_clips(channel_name, vod_clips, start, end):
         else:
             print("input not valid please try again")
     print("all links found")
-    return f"../output/data/{start_time} {channel_name} data clips.txt"
+    return f"links located in /output/data/{start_time} {channel_name} data clips.txt"
 
 
 def main():
