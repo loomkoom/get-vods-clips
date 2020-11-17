@@ -28,13 +28,13 @@ def get_vods_clips(channel_name, vod_clips, start, end):
             data_string = f"DATE: {date_time}, URL: {vod} , ID: {vod_id}, " \
                           f"LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
                           f"TITLE: {title} \n"
-            with open(f"..\\output\\batch\\{channel_name} vods {start} - {end}.txt", "a", encoding = 'utf8') as data_log:
+            with open(f"../output/data/{channel_name} vods {start} - {end}.txt", "a", encoding = 'utf8') as data_log:
                 data_log.write(data_string)
 
         elif vod_clips == "clips":
             clips = get_clips.get_clips(channel_name, vod_id, minutes)
 
-            with open(f"..\\output\\batch\\{channel_name} clips {start} - {end}.txt", "a", encoding = 'utf8') as data_log:
+            with open(f"../output/data/{channel_name} clips {start} - {end}.txt", "a", encoding = 'utf8') as data_log:
                 for clip in clips:
                     data_string = f"DATE: {date_time}, URL: {clip[0]} , TIME: {clip[1]} , ID: {vod_id}, " \
                                   f"LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
@@ -48,19 +48,19 @@ def get_vods_clips(channel_name, vod_clips, start, end):
             time_left_string = f"{floor(((total_minutes - minutes_left) / total_minutes) * 100)}% done " \
                                f"estimated time left: {timedelta(minutes = minutes_left * 0.0048)} \n \n"
 
-            with open(f"..\\output\\logs\\{start_time} {channel_name} Logs.txt", "a", encoding = 'utf8') as progress_log:
+            with open(f"../output/logs/{start_time} {channel_name} Logs.txt", "a", encoding = 'utf8') as progress_log:
                 progress_log.write(log_string + time_left_string)
             print(log_string, time_left_string)
         else:
             print("input not valid please try again")
         print("all links found")
-        return f"..\\output\\batch\\{start_time} {channel_name} data clips.txt"
+        return f"../output/data/{start_time} {channel_name} data clips.txt"
 
 
 def main():
     print("gets all clips or vod links within time period \n"
           "input [channel name] [vods or clips] [start date] [end date] [download] \n"
-          "outputs to a file in output\\batch")
+          "outputs to a file in output/data")
     channel_name = input("streamer name? >>").strip()
     vod_clips = input("clips or vods? >>").strip()
     start = input("from date (earliest) YYYY-MM-DD >>").strip()

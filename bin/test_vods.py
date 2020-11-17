@@ -32,7 +32,7 @@ def test_vods(file_location,file_name):
             if played:
                 output.append(stream)
 
-    with open(f"..\\{file_location}\\{file_name}.txt", "w", encoding = 'utf8') as file:
+    with open(f"../{file_location}/{file_name}.txt", "w", encoding = 'utf8') as file:
         file.writelines(output)
 
 
@@ -41,7 +41,7 @@ def main():
           "input [file location] (from project directory) and [file name]  \n")
 
     channel_name = input("streamer name? >>").strip()
-    file_location = input("file location? (\\\\file path) >>").strip()
+    file_location = input("file location? (//file path) >>").strip()
     file_name = input("file name?  >>").strip()
     test_vods(file_location,file_name)
 
