@@ -12,7 +12,7 @@ def load_url(url, session):
 
 
 def get_clips(vod_id, time_offset, workers = 150):
-    time_offset = (int(time_offset) + 1) * 60 + 24
+    time_offset = (int(time_offset) + 5) * 60 + 24
     urls = {f"https://clips-media-assets2.twitch.tv/{vod_id}-offset-{str(offset)}.mp4": offset for offset in range(0, time_offset)}
     output = list()
 
@@ -36,6 +36,9 @@ def get_clips(vod_id, time_offset, workers = 150):
 
 
 def main():
+    print("gets all clips from a vod, you can round up vod length as it is just the upper border to search for clips \n"
+          "input [vod id] [vod length](minutes) \n"
+          "outputs a list of valid clips with each clip as (url,offset time)")
     vod_id = input("vod id >> ").strip()
     time_offset = input('vod length in minutes >> ').strip()
     print(get_clips(vod_id, time_offset))

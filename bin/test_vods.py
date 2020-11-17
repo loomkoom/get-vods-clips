@@ -21,7 +21,7 @@ def play_url(url):
     return player.get_state() == vlc.State.Stopped
 
 
-def test_vods(channel_name, file_location):
+def test_vods(file_location,file_name):
     with open(file_location, "r", encoding = 'utf8') as file:
         output = list()
         streams = list(filter((lambda x: "vod-secure.twitch.tv" in x), file.readlines()))
@@ -29,19 +29,21 @@ def test_vods(channel_name, file_location):
             data = stream.split(',')
             url = data[1].strip()[5:]
             played = play_url(url)
-            print(url)
             if played:
                 output.append(stream)
-            print(played, url)
 
-    with open(f".\\output\\batch\\{channel_name} valid vods.txt", "w", encoding = 'utf8') as file:
+    with open(f"..\\{file_location}\\{file_name}.txt", "w", encoding = 'utf8') as file:
         file.writelines(output)
 
 
 def main():
+    print("tests all vod links in file \n"
+          "input [file location] (from project directory) and [file name]  \n")
+
     channel_name = input("streamer name? >>").strip()
-    file_location = input("file location? >>").strip()
-    test_vods(channel_name, file_location)
+    file_location = input("file location? (\\\\file path) >>").strip()
+    file_name = input("file name?  >>").strip()
+    test_vods(file_location,file_name)
 
 
 if __name__ == "__main__":

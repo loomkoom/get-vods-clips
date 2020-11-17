@@ -1,9 +1,6 @@
-beautifulsoup4==4.9.3
 bs4==0.0.1
-certifi==2020.11.8
-chardet==3.0.4
-idna==2.10
-ratelimit==2.2.1
+python-vlc==3.0.11115
 requests==2.25.0
-soupsieve==2.0.1
-urllib3==1.26.2
+m3u8==0.7.1
+
+

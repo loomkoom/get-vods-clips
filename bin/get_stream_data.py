@@ -18,28 +18,27 @@ def get_data(channel_name, start, end):
     page_soup = get_soup(url)
 
     for tr in page_soup.find("table", id = "streams").tbody.findAll("tr"):
-        stream = ()
         for td in tr.findAll("td"):
             if td.get("data-order") and td.get("nowrap") == "":
                 date_time = td.get("data-order")
-                vod_id = td.get("data-stream")
-                stream = (date_time, vod_id)
+                vod_id = (td.get("data-stream"),)
             if td.get("data-order") and not td.get("class"):
                 minutes = (td.get("data-order"),)
-                stream += minutes
             if td.get("class") and "status" in td.get("class"):
                 title = (td.string,)
-                stream += title
 
         current_date = datetime.fromisoformat(date_time).date()
         if start_date <= current_date <= end_date:
-            stream_data.append(stream)
+            data = (date_time,) + vod_id + minutes + title
+            stream_data.append(data)
         elif current_date > end_date:
             break
     return stream_data
 
 
 def main():
+    print("gets stream data between specific time period \n"
+          "returns a list with streams as (timestamp, vod id, length (in minutes),title")
     channel_name = input("streamer name? >>").strip()
     start = input("from date (earliest) YYYY-MM-DD UTC >>").strip()
     end = input("to date (newest) YYYY-MM-DD UTC >>").strip()
