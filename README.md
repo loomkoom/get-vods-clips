@@ -32,13 +32,13 @@
 [![Issues][issues-shield]][issues-url]
 
 <!-- TABLE OF CONTENTS -->
-## Table of Contents
+### Table of Contents
 
 
 * [Built With](#built-with)
-  * [Prerequisites](#prerequisites)
-  * [Installation](#installation)
-  * [Usage](#usage)
+* [Prerequisites](#prerequisites)
+* [Installation](#installation)
+* [Usage](#usage)
 * [Acknowledgements](#acknowledgements)
 
 
@@ -68,7 +68,7 @@ npm install npm@latest -g
 
 
 <!-- USAGE EXAMPLES -->
-## Usage
+### Usage
 
 **get_clips.cmd** returns a list with all clips from a specific vod-id
 
@@ -81,7 +81,7 @@ npm install npm@latest -g
 
 
 <!-- ACKNOWLEDGEMENTS -->
-## Acknowledgements
+### Acknowledgements
 
 * [u/ForgotMyPassword_III](https://www.reddit.com/r/LivestreamFail/comments/js6sf3/geeken_monkaw_deleted_vods_still_accessible/gbxwj0x?utm_source=share&utm_medium=web2x&context=3) on how to get vods
 * [daylamtayari](https://github.com/daylamtayari) on how to get clips
