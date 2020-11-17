@@ -66,11 +66,16 @@
 
 <!-- USAGE EXAMPLES -->
 ### Usage
+You need to have some data from the stream if you want a specific vod or clips from that vod (for get_all_vods_and_clips.cmd only a date range is needed)
+all data can be found on twitchtracker if you inspect element on the stream link in the streams page https://twitchtracker.com/twitch/streams
 Using twitches glitchcon eve stream as an example: https://twitchtracker.com/twitch/streams/40468501598 <br>
+![tracker image][tracker-url]
+![source image][source-url]
+
 vod-id = 40468501598 <br>
 timestamp = 2020-11-13 19:14:07 <br>
 channel name = twitch <br>
-length = 30 <br>
+length = 30 (minutes) <br>
 
 __all script executables are located in the scripts folder__
 
@@ -109,3 +114,5 @@ __all script executables are located in the scripts folder__
 [stars-url]: https://github.com/loomkoom/get-vods-clips/stargazers
 [issues-shield]: https://img.shields.io/github/issues/loomkoom/get-vods-clips.svg?style=flat-square
 [issues-url]: https://github.com/loomkoom/get-vods-clips/issues
+[source-url]: https://i.imgur.com/p1ZN35k.png
+[tracker-url]: https://i.imgur.com/D6E5h0Z.png
