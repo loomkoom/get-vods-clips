@@ -57,9 +57,6 @@
 * [python](https://www.python.org/downloads/)
 * [VLC media player](https://www.videolan.org/vlc/index.html)
 * [ffmpeg]()
-```sh
-npm install npm@latest -g
-```
 
 ### Installation
 
