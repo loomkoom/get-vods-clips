@@ -76,7 +76,7 @@ def get_clips(channel_name, file_location, vod_clips):
 def main():
     print("files all clips or vods from generated file \n"
           "input [channel name] [file_location] [vods or clips] \n"
-          "outputs files in:\output\downloads\channelname\[clips or vods]")
+          "outputs files in:\output\downloads\channelname\[clips or vods]\n")
     channel_name = input("streamer name? >>").strip()
     file_location = input("file location? >>")
     vods_clips = input("vods or clips? >>").strip()

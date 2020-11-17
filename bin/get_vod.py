@@ -1,25 +1,37 @@
 import datetime
 import hashlib
+import os
 import time
+from pathlib import Path
 
+import get_muted_vod
 import requests
 import vlc
+import m3u8
 
 
 def to_timestamp(date_time, epoch = datetime.datetime(1970, 1, 1)):
     td = date_time - epoch
     return (td.microseconds + (td.seconds + td.days * 86400) * 10 ** 6) / 10 ** 6
 
+def is_muted(url):
+    playlist_url = m3u8.load(url)
+    for uri in playlist_url.segments.uri:
+        if uri.endswith("-unmuted.ts"):
+            return True
+    return False
+
 
 def play_url(url):
-    instance = vlc.Instance()
-    instance.log_unset()
-    player = instance.media_player_new()
+    if not url.startswith("http"):
+        url = str(Path(__file__).parents[1]).replace('\\', '/') + f"/output/files/playlists/{url}"
+    os.environ["VLC_VERBOSE"] = "-2"
+    player = vlc.MediaPlayer()
     player.set_mrl(f"{url}")
     player.play()
     player.audio_set_mute(True)
     start = time.time()
-    timeout = 5
+    timeout = 4
     while not player.get_state() == vlc.State.Ended and time.time() - start < timeout:
         time.sleep(0.1)
     if int(player.is_playing()):
@@ -46,19 +58,30 @@ def get_vod(channel_name, vod_id, timestamp):
     url = f"https://vod-secure.twitch.tv/{final_formatted_string}/chunked/index-dvr.m3u8"
 
     if requests.head(url, allow_redirects = False).ok:
-        if play_url(url):
-            return url
-    else:
-        return "no valid link found"
+        if not is_muted(url):
+            if play_url(url):
+                return url,None
+        else:
+            muted_vod = get_muted_vod.get_muted_playlist(url, str(vod_id))
+            if play_url(muted_vod):
+                return url,muted_vod
+    return "no valid link",None
 
 
 def main():
-    print("returns the playlist file for a vod (m3u8 link) \n"
+    print("returns the playlist link for a vod (m3u8 link) \n"
           "requires [channel name], [vod id] and [timestamp] all can be found on twitchtracker \n")
     channel_name = input("Enter streamer name >>").strip()
     vod_id = input("Enter vod id >>").strip()
     timestamp = input("Enter VOD timestamp (YYYY-MM-DD HH:MM:SS) UTC >>").strip()
-    print(get_vod(channel_name, vod_id, timestamp))
+    vod = get_vod(channel_name, vod_id, timestamp)
+    if vod[0] is not None:
+        print(f"\n This vod has been muted following playlist link might not be able to play muted parts \n"
+              f"{vod[0]}\n"
+              f"Because of that a file has been created at output/files/playlists/{vod[1]} with the muted playlist \n")
+    else:
+        print(f"\n {vod[0]} has been found \n")
+
 
 
 if __name__ == "__main__":

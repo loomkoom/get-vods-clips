@@ -25,7 +25,7 @@ def get_vods_clips(channel_name, vod_clips, start, end):
         title = stream[3]
         if vod_clips == "vods":
             vod = get_vod.get_vod(channel_name, vod_id, date_time)
-            data_string = f"DATE: {date_time}, URL: {vod} , ID: {vod_id}, " \
+            data_string = f"DATE: {date_time}, URL: {vod[0]} , MUTED: {vod[1] if not None else 'No'} ID: {vod_id}, " \
                           f"LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
                           f"TITLE: {title} \n"
             with open(f"../output/data/{channel_name} vods {start} - {end}.txt", "a", encoding = 'utf8') as data_log:
@@ -53,25 +53,25 @@ def get_vods_clips(channel_name, vod_clips, start, end):
             print(log_string, time_left_string)
         else:
             print("input not valid please try again")
-        print("all links found")
-        return f"../output/data/{start_time} {channel_name} data clips.txt"
+    print("all links found")
+    return f"../output/data/{start_time} {channel_name} data clips.txt"
 
 
 def main():
     print("gets all clips or vod links within time period \n"
           "input [channel name] [vods or clips] [start date] [end date] [download] \n"
-          "outputs to a file in output/data")
+          "outputs to a file in output/data\n")
     channel_name = input("streamer name? >>").strip()
     vod_clips = input("clips or vods? >>").strip()
     start = input("from date (earliest) YYYY-MM-DD >>").strip()
     end = input("to date (newest) YYYY-MM-DD >>").strip()
-    download = input("download files yes/no? >>").strip()
+    # download = input("download files yes/no? >>").strip()
     # workers = 150
-    links = get_vods_clips(channel_name, vod_clips, start, end)
-    if download == "yes":
-        print("starting download")
-        get_files.get_clips(channel_name, links, vod_clips)
-        print("download finished")
+    print(get_vods_clips(channel_name, vod_clips, start, end))
+    # if download == "yes":
+    #     print("starting download")
+    #     get_files.get_clips(channel_name, links, vod_clips)
+    #     print("download finished")
 
 
 if __name__ == "__main__":
