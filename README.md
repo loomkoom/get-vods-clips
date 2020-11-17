@@ -56,7 +56,7 @@
 
 * [python](https://www.python.org/downloads/)
 * [VLC media player](https://www.videolan.org/vlc/index.html) is used to check if links with a valid url are playable or not
-* [ffmpeg]() if you wish to download the vods
+* [ffmpeg](https://ffmpeg.org/download.html#build-windows) if you wish to download the vods
 
 ### Installation
 
