@@ -29,7 +29,7 @@ def get_vods_clips(channel_name, vod_clips, start, end, workers = 150, test = "y
             data_string = f"DATE: {date_time}, URL: {vod[0]} , MUTED: {vod[1] if vod[1] else 0} , ID: {vod_id}, " \
                           f"LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
                           f"TITLE: {title} \n"
-            log_string = f"{date_time}, {vod_id}, {title} \nCHECKED {stream_data.index(stream) + 1}/{len(stream_data)}  \n"
+            log_string = f"{date_time}, {vod_id}, {title} \nstreams checked {stream_data.index(stream) + 1}/{len(stream_data)}  \n"
             with open(f"../output/data/{channel_name} vods {start} - {end}.txt", "a", encoding = 'utf8') as data_log:
                 data_log.write(data_string)
             if vod[0] != "no valid link":
@@ -47,20 +47,21 @@ def get_vods_clips(channel_name, vod_clips, start, end, workers = 150, test = "y
                 data_log.write("\n")
 
             minutes_left = sum(map(lambda x: int(x[2]), stream_data[stream_data.index(stream) + 1:]))
-            log_string = f"{date_time}, {vod_id}, {title} CHECKED {stream_data.index(stream) + 1}/{len(stream_data)}  \n" \
+            log_string = f"{date_time}, {vod_id}, {title} \nstreams checked {stream_data.index(stream) + 1}/{len(stream_data)}  \n" \
                          f"{len(clips) if clips[0] != '' else 0} clips found \n"
             time_left_string = f"{floor(((total_minutes - minutes_left) / total_minutes) * 100)}% done " \
-                               f"estimated time left: {timedelta(minutes = minutes_left * 0.0048)} \n \n"
+                               f"estimated time left: {timedelta(minutes = minutes_left * 0.0048)}\n"
 
             with open(f"../output/logs/{start_time} {channel_name} Logs.txt", "a", encoding = 'utf8') as progress_log:
                 progress_log.write(log_string + time_left_string)
-            print(log_string, time_left_string)
+            print(log_string + time_left_string)
+
         else:
             print("input not valid please try again")
-    print("\nFinished")
+    print("\nAll retrievable links found")
     if vod_clips == "clips":
-        return f"clip links located in /output/data/{channel_name} clips {start} - {end}.txt"
-    return f"vod links located in /output/data/{channel_name} vods {start} - {end}.txt"
+        return f"{channel_name} clips {start} - {end}.txt"
+    return f"{channel_name} vods {start} - {end}.txt"
 
 
 def main():
@@ -70,25 +71,30 @@ def main():
           "-for downloads outputs in output/downloads (ffmpeg needed for vod downloads\n"
           "-worker count is set to 150 by default try changing it to a lower number"
           " if the script uses too much resources otherwise leave empty \n"
-          "-disable testing vod playback with vlc if you get vlc errors other than those starting with [h264 @ 000001df3c9623e0] \n")
+          "-disable testing vod playback with vlc if you get vlc errors other than those starting with [h264 @ 000001df3c9623e0] \n\n")
 
     channel_name = input("streamer name? >>").strip()
     vod_clips = input("clips or vods? >>").strip()
     start = input("from date (earliest) YYYY-MM-DD >>").strip()
     end = input("to date (newest) YYYY-MM-DD >>").strip()
     download = input("download files yes/no? >>").strip()
+    if download == "yes":
+        rename = input("rename files after donwload?\n"
+                       "     (clips from {ID-offset}.mp4  --->  {date}__{title}__{offset_time}-{length}_{ID-offset}.mp4\n"
+                       "     (vods  from {ID}.mp4  --->  {date}_{title}_{length}_{file}_{muted}.mp4\n[yes/no]?  >>")
     if vod_clips == "clips":
         workers = input("worker count (empty for default) >>").strip()
         if workers == "":
             workers = 150
         file_location = get_vods_clips(channel_name, vod_clips, start, end, workers = workers)
+        print(f"clip links located in '/output/data/{file_location}'\n")
     if vod_clips == "vods":
         test = input("test if vod actually plays with vlc (more reliable but slower) [yes/no]? >>").strip()
         file_location = get_vods_clips(channel_name, vod_clips, start, end, test = test)
-    print(f"{file_location}\n")
+        print(f"vod links located in '/output/data/{file_location}'\n")
     if download == "yes":
         print("starting download")
-        get_files.get_clips(channel_name, file_location, vod_clips)
+        get_files.get_files(file_location,rename)
         print("download finished")
 
 

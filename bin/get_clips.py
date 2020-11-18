@@ -36,7 +36,7 @@ def get_clips(vod_id, time_offset, workers = 150):
 def main():
     print("\n-gets all clips from a vod, you can round up vod length as it is just the upper border to search for clips \n"
           "-input [vod id] [vod length](minutes) \n"
-          "-outputs a list of valid clips with each clip as (url,offset time)\n")
+          "-outputs a list of valid clips with each clip as (url,offset time)\n\n")
     vod_id = input("vod id >> ").strip()
     time_offset = input('vod length in minutes >> ').strip()
     print(get_clips(vod_id, time_offset))

@@ -22,9 +22,9 @@ def is_muted(url):
     return False
 
 
-def play_url(url):
+def play_url(url,channel_name):
     if not url.startswith("http"):
-        url = str(Path(__file__).parents[1]).replace('\\', '/') + f"/output/files/playlists/{url}"
+        url = str(Path(__file__).parents[1]).replace('\\', '/') + f"/output/files/{channel_name}/playlists/{url}"
     instance = vlc.Instance()
     instance.log_unset()
     player = instance.media_player_new()
@@ -61,11 +61,11 @@ def get_vod(channel_name, vod_id, timestamp, test = "yes"):
     if requests.head(url, allow_redirects = False).ok:
         if test == "yes":
             if not is_muted(url):
-                if play_url(url):
+                if play_url(url,channel_name):
                     return url, False
             else:
-                muted_vod = get_muted_vod.get_muted_playlist(url, f"{channel_name}_vod_{datetime.datetime.date(date_time)}_{vod_id}")
-                if play_url(muted_vod):
+                muted_vod = get_muted_vod.get_muted_playlist(url, f"{datetime.datetime.date(date_time)}_{vod_id}")
+                if play_url(muted_vod,channel_name):
                     return url, muted_vod
         elif test == "no":
             return url, False
@@ -76,8 +76,7 @@ def main():
     print("\n-returns the playlist link for a vod (m3u8 link) usually available for any vod within 60 days \n"
           "-requires [channel name], [vod id] and [timestamp] \n"
           "-all can be found on twitchtracker (in the streams page inspect element on the date+time link for a timestamp with seconds \n"
-          "-disable testing vod playback with vlc if you get vlc errors other than those starting with [h264 @ 000001df3c9623e0]\n")
-    print()
+          "-disable testing vod playback with vlc if you get vlc errors other than those starting with [h264 @ 000001df3c9623e0]\n\n")
     channel_name = input("Enter streamer name >>").strip()
     vod_id = input("Enter vod id >>").strip()
     timestamp = input("Enter VOD timestamp (YYYY-MM-DD HH:MM:SS) UTC >>").strip()
@@ -86,12 +85,15 @@ def main():
     if test == "no":
         print("playback has not been tested, no guarantee file works")
     if vod[1]:
-        print(f"\n This vod has been muted following playlist link might not be able to play muted parts \n"
+        print(f"\nThis vod has been muted following playlist link might not be able to play muted parts \n"
               f"{vod[0]}\n"
-              f"Because of that a file has been created at output/files/playlists/{vod[1]} with the muted playlist \n")
+              f"Because of that a file has been created at output/files/{channel_name}/playlists/{vod[1]} with the muted playlist \n")
     else:
         print(f"\nURL: {vod[0]} has been found \n")
 
-
 if __name__ == "__main__":
     main()
+
+
+
+

@@ -1,9 +1,17 @@
 import m3u8
+import os
+import get_vod
 
 
 def get_muted_playlist(url, file_name):
+    if not get_vod.is_muted(url):
+        return "stream has no muted parts"
     file_name = file_name[:-5] if file_name.endswith(".m3u8") else file_name
-    path = "../output/files/playlists"
+    channel_name = url.split("_")[1]
+    path = f"../output/files/{channel_name}/playlists"
+    if not os.path.isdir(f"../output/files/{channel_name}"): os.mkdir(f"../output/files/{channel_name}")
+    if not os.path.isdir(path): os.mkdir(path)
+
     playlist_url = m3u8.load(url)
     playlist_url.dump(f"{path}/{file_name}.m3u8")
     full_url = url.split("/")
@@ -31,10 +39,10 @@ def get_muted_playlist(url, file_name):
 def main():
     print("\n-script will replace unmuted ts files with muted counterparts \n"
           "-input [playlist url](m3u8) [file_name]\n"
-          "-outputs the playlist file as <file_name>-muted.m3u8 in /output/files/playlists\n")
+          "-outputs the playlist file as <file_name>-muted.m3u8 in /output/files/channel-name/playlists\n\n")
     url = input("url >>").strip()
     file_name = input("file name to call playlist >>").strip()
-    get_muted_playlist(url, file_name)
+    print(get_muted_playlist(url, file_name))
 
 
 if __name__ == "__main__":
