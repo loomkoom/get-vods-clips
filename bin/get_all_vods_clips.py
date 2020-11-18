@@ -44,7 +44,6 @@ def get_vods_clips(channel_name, vod_clips, start, end, workers = 150, test = "y
                                   f"LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
                                   f"TITLE: {title} \n"
                     data_log.write(data_string)
-                data_log.write("\n")
 
             minutes_left = sum(map(lambda x: int(x[2]), stream_data[stream_data.index(stream) + 1:]))
             log_string = f"{date_time}, {vod_id}, {title} \nstreams checked {stream_data.index(stream) + 1}/{len(stream_data)}  \n" \
@@ -79,7 +78,7 @@ def main():
     end = input("to date (newest) YYYY-MM-DD >>").strip()
     download = input("download files yes/no? >>").strip()
     if download == "yes":
-        rename = input("rename files after donwload?\n"
+        rename = input("rename files after download?\n"
                        "     (clips from {ID-offset}.mp4  --->  {date}__{title}__{offset_time}-{length}_{ID-offset}.mp4\n"
                        "     (vods  from {ID}.mp4  --->  {date}_{title}_{length}_{file}_{muted}.mp4\n[yes/no]?  >>")
     if vod_clips == "clips":
@@ -94,7 +93,7 @@ def main():
         print(f"vod links located in '/output/data/{file_location}'\n")
     if download == "yes":
         print("starting download")
-        get_files.get_files(file_location,rename)
+        get_files.get_files(file_location, rename)
         print("download finished")
 
 

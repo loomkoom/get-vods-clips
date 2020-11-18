@@ -22,7 +22,7 @@ def is_muted(url):
     return False
 
 
-def play_url(url,channel_name):
+def play_url(url, channel_name):
     if not url.startswith("http"):
         url = str(Path(__file__).parents[1]).replace('\\', '/') + f"/output/files/{channel_name}/playlists/{url}"
     instance = vlc.Instance()
@@ -61,11 +61,11 @@ def get_vod(channel_name, vod_id, timestamp, test = "yes"):
     if requests.head(url, allow_redirects = False).ok:
         if test == "yes":
             if not is_muted(url):
-                if play_url(url,channel_name):
+                if play_url(url, channel_name):
                     return url, False
             else:
                 muted_vod = get_muted_vod.get_muted_playlist(url, f"{datetime.datetime.date(date_time)}_{vod_id}")
-                if play_url(muted_vod,channel_name):
+                if play_url(muted_vod, channel_name):
                     return url, muted_vod
         elif test == "no":
             return url, False
@@ -91,9 +91,6 @@ def main():
     else:
         print(f"\nURL: {vod[0]} has been found \n")
 
+
 if __name__ == "__main__":
     main()
-
-
-
-

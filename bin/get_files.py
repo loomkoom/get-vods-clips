@@ -4,7 +4,7 @@ import subprocess
 import requests
 
 
-def download_file(url, channel_name, file_name, new_name, vods_clips, muted):
+def download_file(url, channel_name, file_name, new_name, vods_clips, muted = None):
     path = f"../output/files/{channel_name}/{vods_clips}"
     muted_path = os.path.abspath(f"../output/files/{channel_name}/playlists").replace("\\", "/")
     if not os.path.isdir(f"../output/files/{channel_name}"):
@@ -97,11 +97,12 @@ def get_files(data_file, rename):
         if vods_clips == "clips":
             offset_time = data[5]
             new_name = f"{date}__{title}__{offset_time}-{length}_{file_name}"
+            download_file(url, channel_name, file_name, new_name, vods_clips)
         if vods_clips == "vods":
             muted = "muted" if len(data[5]) != 1 else "unmuted"
             new_name = f"{date}_{title}_{length}_{file_name}_{muted}"
-        print(url,file_name)
-        download_file(url, channel_name, file_name, new_name, vods_clips, muted)
+            download_file(url, channel_name, file_name, new_name, vods_clips, muted)
+
         if rename == "yes" and os.path.exists(f"{path}/{file_name}.mp4") and not os.path.exists(f"{path}/{new_name}.mp4"):
             os.rename(f"{path}/{file_name}.mp4", f"{path}/{new_name}.mp4")
 

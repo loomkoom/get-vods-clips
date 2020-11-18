@@ -1,6 +1,7 @@
-import m3u8
 import os
+
 import get_vod
+import m3u8
 
 
 def get_muted_playlist(url, file_name):
@@ -9,8 +10,10 @@ def get_muted_playlist(url, file_name):
     file_name = file_name[:-5] if file_name.endswith(".m3u8") else file_name
     channel_name = url.split("_")[1]
     path = f"../output/files/{channel_name}/playlists"
-    if not os.path.isdir(f"../output/files/{channel_name}"): os.mkdir(f"../output/files/{channel_name}")
-    if not os.path.isdir(path): os.mkdir(path)
+    if not os.path.isdir(f"../output/files/{channel_name}"):
+        os.mkdir(f"../output/files/{channel_name}")
+    if not os.path.isdir(path):
+        os.mkdir(path)
 
     playlist_url = m3u8.load(url)
     playlist_url.dump(f"{path}/{file_name}.m3u8")

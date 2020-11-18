@@ -22,11 +22,11 @@ def play_url(url):
     return player.get_state() == vlc.State.Stopped
 
 
-def test_vods(file_name,new_file_name):
+def test_vods(file_name, new_file_name):
     with open(f"../output/data/{file_name}.txt", "r", encoding = 'utf8') as file:
         output = list()
         streams = list(filter((lambda x: "vod-secure.twitch.tv" in x), file.readlines()))
-        print(f"estimated run time: {timedelta(seconds=5*len(streams))}")
+        print(f"estimated run time: {timedelta(seconds = 5 * len(streams))}")
         for stream in streams:
             data = stream.split(',')
             url = data[1].strip()[5:]
@@ -38,14 +38,13 @@ def test_vods(file_name,new_file_name):
         file.writelines(output)
 
 
-
 def main():
     print("\n-tests all vod links in file using vlc \n"
           "-input [input file name] and [output file name] only for files in /output/data/\n")
 
     input_file = input("input file name?  >>").strip()
     output_file = input("output file name?  >>").strip()
-    test_vods(input_file,output_file)
+    test_vods(input_file, output_file)
 
 
 if __name__ == "__main__":
