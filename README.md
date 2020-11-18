@@ -89,7 +89,7 @@ __all script executables are located in the scripts folder__
 
 **get_stream_data.cmd** returns a list with all stream data in certain time period from channel name and date range with each stream as (timestamp, vod_id, minutes, title)
 
-**test_vods.cmd** test all the vod links (with vlc) in the specified input file in /output/data and writes all succesful links to output file (timestamp, vod_id, minutes, title)
+**test_vods.cmd** test all the vod links (with vlc) in the specified input file in /output/data and writes all succesful links to output file
 
 
 
