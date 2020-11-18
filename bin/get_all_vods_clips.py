@@ -7,7 +7,7 @@ import get_stream_data
 import get_vod
 
 
-def get_vods_clips(channel_name, vod_clips, start, end):
+def get_vods_clips(channel_name, vod_clips, start, end, workers = 150, test = "yes"):
     start_time = datetime.now().strftime("%m-%d-%Y, %H.%M.%S")
     stream_data = get_stream_data.get_data(channel_name, start, end)  # list of streams in format: (date_time, vod_id, minutes, title)
     streams = len(stream_data)
@@ -25,8 +25,8 @@ def get_vods_clips(channel_name, vod_clips, start, end):
         minutes = stream[2]
         title = stream[3]
         if vod_clips == "vods":
-            vod = get_vod.get_vod(channel_name, vod_id, date_time)
-            data_string = f"found DATE: {date_time}, URL: {vod[0]} , MUTED: {vod[1] if not None else 'No'} ID: {vod_id}, " \
+            vod = get_vod.get_vod(channel_name, vod_id, date_time, test)
+            data_string = f"DATE: {date_time}, URL: {vod[0]} , MUTED: {vod[1] if vod[1] else 0} , ID: {vod_id}, " \
                           f"LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
                           f"TITLE: {title} \n"
             log_string = f"{date_time}, {vod_id}, {title} \nCHECKED {stream_data.index(stream) + 1}/{len(stream_data)}  \n"
@@ -36,7 +36,7 @@ def get_vods_clips(channel_name, vod_clips, start, end):
                 print(log_string)
 
         elif vod_clips == "clips":
-            clips = get_clips.get_clips(channel_name, vod_id, minutes)
+            clips = get_clips.get_clips(vod_id, minutes, workers)
 
             with open(f"../output/data/{channel_name} clips {start} - {end}.txt", "a", encoding = 'utf8') as data_log:
                 for clip in clips:
@@ -66,18 +66,30 @@ def get_vods_clips(channel_name, vod_clips, start, end):
 def main():
     print("\n-gets all clips or vod links within time period \n"
           "-input [channel name] [vods or clips] [start date] [end date] [download] \n"
-          "-outputs to a file in output/data\n")
+          "-outputs to a file in output/data\n"
+          "-for downloads outputs in output/downloads (ffmpeg needed for vod downloads\n"
+          "-worker count is set to 150 by default try changing it to a lower number"
+          " if the script uses too much resources otherwise leave empty \n"
+          "-disable testing vod playback with vlc if you get vlc errors other than those starting with [h264 @ 000001df3c9623e0] \n")
+
     channel_name = input("streamer name? >>").strip()
     vod_clips = input("clips or vods? >>").strip()
     start = input("from date (earliest) YYYY-MM-DD >>").strip()
     end = input("to date (newest) YYYY-MM-DD >>").strip()
-    # download = input("download files yes/no? >>").strip()
-    # workers = 150
-    print(get_vods_clips(channel_name, vod_clips, start, end))
-    # if download == "yes":
-    #     print("starting download")
-    #     get_files.get_clips(channel_name, links, vod_clips)
-    #     print("download finished")
+    download = input("download files yes/no? >>").strip()
+    if vod_clips == "clips":
+        workers = input("worker count (empty for default) >>").strip()
+        if workers == "":
+            workers = 150
+        file_location = get_vods_clips(channel_name, vod_clips, start, end, workers = workers)
+    if vod_clips == "vods":
+        test = input("test if vod actually plays with vlc (more reliable but slower) [yes/no]? >>").strip()
+        file_location = get_vods_clips(channel_name, vod_clips, start, end, test = test)
+    print(f"{file_location}\n")
+    if download == "yes":
+        print("starting download")
+        get_files.get_clips(channel_name, file_location, vod_clips)
+        print("download finished")
 
 
 if __name__ == "__main__":

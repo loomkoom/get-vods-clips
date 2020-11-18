@@ -41,7 +41,7 @@ def play_url(url):
     return player.get_state() == vlc.State.Stopped
 
 
-def get_vod(channel_name, vod_id, timestamp,test="yes"):
+def get_vod(channel_name, vod_id, timestamp, test = "yes"):
     dt = timestamp.split()[0].split('-')
     tm = timestamp.split()[1].split(':')
 
@@ -62,30 +62,30 @@ def get_vod(channel_name, vod_id, timestamp,test="yes"):
         if test == "yes":
             if not is_muted(url):
                 if play_url(url):
-                    return url, None
+                    return url, False
             else:
                 muted_vod = get_muted_vod.get_muted_playlist(url, f"{channel_name}_vod_{datetime.datetime.date(date_time)}_{vod_id}")
                 if play_url(muted_vod):
                     return url, muted_vod
         elif test == "no":
-            return url, None
-    return "no valid link", None
+            return url, False
+    return "no valid link", False
 
 
 def main():
-
-    print("\n-returns the playlist link for a vod (m3u8 link) \n"
+    print("\n-returns the playlist link for a vod (m3u8 link) usually available for any vod within 60 days \n"
           "-requires [channel name], [vod id] and [timestamp] \n"
           "-all can be found on twitchtracker (in the streams page inspect element on the date+time link for a timestamp with seconds \n"
-          "-disable testing vod playback with vlc if you get vlc errors\n")
+          "-disable testing vod playback with vlc if you get vlc errors other than those starting with [h264 @ 000001df3c9623e0]\n")
+    print()
     channel_name = input("Enter streamer name >>").strip()
     vod_id = input("Enter vod id >>").strip()
     timestamp = input("Enter VOD timestamp (YYYY-MM-DD HH:MM:SS) UTC >>").strip()
-    test = input("disable testing vod playback with vlc to make sure link works yes/no? >>").strip()
-    vod = get_vod(channel_name, vod_id, timestamp,test)
+    test = input("enable testing vod playback with vlc to make sure link works yes/no? >>").strip()
+    vod = get_vod(channel_name, vod_id, timestamp, test)
     if test == "no":
         print("playback has not been tested, no guarantee file works")
-    if vod[1] is not None:
+    if vod[1]:
         print(f"\n This vod has been muted following playlist link might not be able to play muted parts \n"
               f"{vod[0]}\n"
               f"Because of that a file has been created at output/files/playlists/{vod[1]} with the muted playlist \n")
