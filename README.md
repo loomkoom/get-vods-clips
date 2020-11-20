@@ -73,7 +73,7 @@ Using twitches glitchcon eve stream as an example: https://twitchtracker.com/twi
 ![tracker image][tracker-url] <br>
 ![source image][source-url]
 
-vod-id = 40468501598 <br>
+Broadcast-id = 40468501598 <br>
 timestamp = 2020-11-13 19:14:07 <br>
 channel name = twitch <br>
 length = 30 (minutes) <br>
@@ -85,13 +85,13 @@ __all script executables are located in the scripts folder__
 <br>
 **download_all_files.cmd** downloads all links in the text file generated from get_all_vods_and_clips.cmd if you provide the name of the file in output/files/data
 
-**get_clips.cmd** returns a list with all clips from a specific vod-id
+**get_clips.cmd** returns a list with all clips from a specific broadcast-id
 
 **get_vod.cmd** gets the vod from the channel name,timestamp and vod-id if it's still available. If the vod is muted it also writes a muted version in output/files/playlists
 
 **get_muted_vod.cmd** writes a muted vod file in output/files/playlists if you input a url and filename
 
-**get_stream_data.cmd** returns a list with all stream data in certain time period from channel name and date range with each stream as (timestamp, vod_id, minutes, title)
+**get_stream_data.cmd** returns a list with all stream data in certain time period from channel name and date range with each stream as (timestamp, broadcast-id, minutes, title)
 
 **test_vods.cmd** test all the vod links (with vlc) in the specified input file in /output/data and writes all succesful links to output file
 
