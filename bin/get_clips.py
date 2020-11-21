@@ -9,9 +9,9 @@ def load_url(url, session):
     return r.ok
 
 
-def get_clips(vod_id, time_offset, workers = 150):
+def get_clips(broadcast_id, time_offset, workers = 150):
     time_offset = (int(time_offset) + 5) * 60 + 24
-    urls = {f"https://clips-media-assets2.twitch.tv/{vod_id}-offset-{str(offset)}.mp4": offset for offset in range(0, time_offset)}
+    urls = {f"https://clips-media-assets2.twitch.tv/{broadcast_id}-offset-{str(offset)}.mp4": offset for offset in range(0, time_offset)}
     output = list()
 
     with concurrent.futures.ThreadPoolExecutor(max_workers = workers) as executor:
@@ -35,11 +35,11 @@ def get_clips(vod_id, time_offset, workers = 150):
 
 def main():
     print("\n-gets all clips from a vod, you can round up vod length as it is just the upper border to search for clips \n"
-          "-input [vod id] [vod length](minutes) \n"
+          "-input [broadcast id] [vod length](minutes) \n"
           "-outputs a list of valid clips with each clip as (url,offset time)\n\n")
-    vod_id = input("vod id >> ").strip()
+    broadcast_id = input("broadcast id >> ").strip()
     time_offset = input('vod length in minutes >> ').strip()
-    print(get_clips(vod_id, time_offset))
+    print(get_clips(broadcast_id, time_offset))
     winsound.PlaySound("empty", winsound.MB_OK)
 
 

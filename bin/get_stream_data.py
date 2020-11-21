@@ -21,7 +21,7 @@ def get_data(channel_name, start, end):
         for td in tr.findAll("td"):
             if td.get("data-order") and td.get("nowrap") == "":
                 date_time = td.get("data-order")
-                vod_id = (td.get("data-stream"),)
+                broadcast_id = (td.get("data-stream"),)
             if td.get("data-order") and not td.get("class"):
                 minutes = (td.get("data-order"),)
             if td.get("class") and "status" in td.get("class"):
@@ -29,7 +29,7 @@ def get_data(channel_name, start, end):
 
         current_date = datetime.fromisoformat(date_time).date()
         if start_date <= current_date <= end_date:
-            data = (date_time,) + vod_id + minutes + title
+            data = (date_time,) + broadcast_id + minutes + title
             stream_data.append(data)
         elif current_date > end_date:
             break
@@ -38,7 +38,7 @@ def get_data(channel_name, start, end):
 
 def main():
     print("\n-gets stream data between specific time period \n"
-          "-returns a list with streams as (timestamp, vod id, length (in minutes),title\n\n")
+          "-returns a list with streams as (timestamp, broadcast id, length (in minutes),title\n\n")
     channel_name = input("streamer name? >>").strip()
     start = input("from date (earliest) YYYY-MM-DD UTC >>").strip()
     end = input("to date (newest) YYYY-MM-DD UTC >>").strip()

@@ -9,7 +9,7 @@ import get_vod
 
 def get_vods_clips(channel_name, vod_clips, start, end, workers = 150, test = "yes"):
     start_time = datetime.now().strftime("%m-%d-%Y, %H.%M.%S")
-    stream_data = get_stream_data.get_data(channel_name, start, end)  # list of streams in format: (date_time, vod_id, minutes, title)
+    stream_data = get_stream_data.get_data(channel_name, start, end)  # list of streams in format: (date_time, broadcast_id, minutes, title)
     streams = len(stream_data)
     total_minutes = sum(map(lambda x: int(x[2]), stream_data))
     if vod_clips == "vods":
@@ -21,32 +21,32 @@ def get_vods_clips(channel_name, vod_clips, start, end, workers = 150, test = "y
 
     for stream in stream_data:
         date_time = stream[0]
-        vod_id = stream[1]
+        broadcast_id = stream[1]
         minutes = stream[2]
         title = stream[3]
         if vod_clips == "vods":
-            vod = get_vod.get_vod(channel_name, vod_id, date_time, test)
-            data_string = f"DATE: {date_time}, URL: {vod[0]} , MUTED: {vod[1] if vod[1] else 0} , ID: {vod_id}, " \
+            vod = get_vod.get_vod(channel_name, broadcast_id, date_time, test)
+            data_string = f"DATE: {date_time}, URL: {vod[0]} , MUTED: {vod[1] if vod[1] else 0} , ID: {broadcast_id}, " \
                           f"LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
                           f"TITLE: {title} \n"
-            log_string = f"{date_time}, {vod_id}, {title} \nstreams checked {stream_data.index(stream) + 1}/{len(stream_data)}  \n"
+            log_string = f"{date_time}, {broadcast_id}, {title} \nstreams checked {stream_data.index(stream) + 1}/{len(stream_data)}  \n"
             with open(f"../output/data/{channel_name} vods {start} - {end}.txt", "a", encoding = 'utf8') as data_log:
                 data_log.write(data_string)
             if vod[0] != "no valid link":
                 print(log_string)
 
         elif vod_clips == "clips":
-            clips = get_clips.get_clips(vod_id, minutes, workers)
+            clips = get_clips.get_clips(broadcast_id, minutes, workers)
 
             with open(f"../output/data/{channel_name} clips {start} - {end}.txt", "a", encoding = 'utf8') as data_log:
                 for clip in clips:
-                    data_string = f"DATE: {date_time}, URL: {clip[0]} , TIME: {clip[1]} , ID: {vod_id}, " \
+                    data_string = f"DATE: {date_time}, URL: {clip[0]} , TIME: {clip[1]} , ID: {broadcast_id}, " \
                                   f"LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
                                   f"TITLE: {title} \n"
                     data_log.write(data_string)
 
             minutes_left = sum(map(lambda x: int(x[2]), stream_data[stream_data.index(stream) + 1:]))
-            log_string = f"{date_time}, {vod_id}, {title} \nstreams checked {stream_data.index(stream) + 1}/{len(stream_data)}  \n" \
+            log_string = f"{date_time}, {broadcast_id}, {title} \nstreams checked {stream_data.index(stream) + 1}/{len(stream_data)}  \n" \
                          f"{len(clips) if clips[0] != '' else 0} clips found \n"
             time_left_string = f"{floor(((total_minutes - minutes_left) / total_minutes) * 100)}% done " \
                                f"estimated time left: {timedelta(minutes = minutes_left * 0.0048)}\n"

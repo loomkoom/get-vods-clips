@@ -41,7 +41,7 @@ def play_url(url, channel_name):
     return player.get_state() == vlc.State.Stopped
 
 
-def get_vod(channel_name, vod_id, timestamp, test = "yes"):
+def get_vod(channel_name, broadcast_id, timestamp, test = "yes"):
     dt = timestamp.split()[0].split('-')
     tm = timestamp.split()[1].split(':')
 
@@ -51,7 +51,7 @@ def get_vod(channel_name, vod_id, timestamp, test = "yes"):
     date_time = datetime.datetime(y, m, d, hr, mins, sec)
     converted_timestamp = int(to_timestamp(date_time))
 
-    formatted_string = f"{channel_name}_{vod_id}_{str(converted_timestamp)}"
+    formatted_string = f"{channel_name}_{broadcast_id}_{str(converted_timestamp)}"
     hash_string = str(hashlib.sha1(formatted_string.encode('utf-8')).hexdigest())
     required_hash = hash_string[:20]
     final_formatted_string = f"{required_hash}_{formatted_string}"
@@ -64,7 +64,7 @@ def get_vod(channel_name, vod_id, timestamp, test = "yes"):
                 if play_url(url, channel_name):
                     return url, False
             else:
-                muted_vod = get_muted_vod.get_muted_playlist(url, f"{datetime.datetime.date(date_time)}_{vod_id}")
+                muted_vod = get_muted_vod.get_muted_playlist(url, f"{datetime.datetime.date(date_time)}_{broadcast_id}")
                 if play_url(muted_vod, channel_name):
                     return url, muted_vod
         elif test == "no":
@@ -74,14 +74,14 @@ def get_vod(channel_name, vod_id, timestamp, test = "yes"):
 
 def main():
     print("\n-returns the playlist link for a vod (m3u8 link) usually available for any vod within 60 days \n"
-          "-requires [channel name], [vod id] and [timestamp] \n"
+          "-requires [channel name], [broadcast id] and [timestamp] \n"
           "-all can be found on twitchtracker (in the streams page inspect element on the date+time link for a timestamp with seconds \n"
           "-disable testing vod playback with vlc if you get vlc errors other than those starting with [h264 @ 000001df3c9623e0]\n\n")
     channel_name = input("Enter streamer name >>").strip()
-    vod_id = input("Enter vod id >>").strip()
+    broadcast_id = input("Enter broadcast id >>").strip()
     timestamp = input("Enter VOD timestamp (YYYY-MM-DD HH:MM:SS) UTC >>").strip()
     test = input("enable testing vod playback with vlc to make sure link works yes/no? >>").strip()
-    vod = get_vod(channel_name, vod_id, timestamp, test)
+    vod = get_vod(channel_name, broadcast_id, timestamp, test)
     if test == "no":
         print("playback has not been tested, no guarantee file works")
     if vod[1]:

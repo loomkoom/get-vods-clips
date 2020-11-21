@@ -57,7 +57,7 @@ def get_link_data(data_file, vods_clips):
                     if vods_clips == "clips":
                         file_name = (tag[43:-4].strip(),)
                 if tag.startswith("ID") and vods_clips == "vods":
-                    vod_id = (tag[3:].strip(),)
+                    broadcast_id = (tag[3:].strip(),)
                 if tag.startswith("DATE"):
                     date = (tag[6:-9].strip(),)
                 if tag.startswith("TIME"):
@@ -74,7 +74,7 @@ def get_link_data(data_file, vods_clips):
             if vods_clips == "clips":
                 data = (date + file_name + url + length + title + offset_time)
             elif vods_clips == "vods":
-                file_name = (f"{date[0]}_{vod_id[0]}",)
+                file_name = (f"{date[0]}_{broadcast_id[0]}",)
                 data = (date + file_name + url + length + title + muted_url)
             url_data.append(data)
     return url_data, vods_clips
