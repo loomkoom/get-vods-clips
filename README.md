@@ -1,10 +1,5 @@
 # get-vods-clips #
 
-
-
-
-
-
 <!-- PROJECT SHIELDS -->
 <!--
 *** Using markdown "reference style" links for readability.
