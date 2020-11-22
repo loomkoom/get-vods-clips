@@ -58,7 +58,7 @@ all data can be found on twitchtracker if you inspect element on the stream link
 Using twitches glitchcon eve stream as an example: https://twitchtracker.com/twitch/streams/40468501598 <br>
 (dates/times are always in UTC format!) <br>
 ![tracker image][tracker-url] <br>
-![source image][source-url]
+![source image][source-url] <br>
 
 Broadcast-id = 40468501598 <br>
 timestamp = 2020-11-13 19:14:07 <br>
