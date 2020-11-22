@@ -8,6 +8,7 @@
 *** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
 *** https://www.markdownguide.org/basic-syntax/#reference-style-links
 -->
+[![CodeFactor][codefactor-shield]][codefactor-url]
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
@@ -92,6 +93,8 @@ __all script executables are located in the scripts folder__
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
+[codefactor-shield]: https://www.codefactor.io/repository/github/loomkoom/get-vods-clips/badge
+[codefactor-url]: https://www.codefactor.io/repository/github/loomkoom/get-vods-clips
 [contributors-shield]: https://img.shields.io/github/contributors/loomkoom/get-vods-clips.svg?style=flat-square
 [contributors-url]: https://github.com/loomkoomget-vods-clips/graphs/contributors
 [forks-shield]: https://img.shields.io/github/forks/loomkoom/get-vods-clips.svg?style=flat-square
