@@ -1,5 +1,5 @@
-import get_vod
 import get_stream_data
+import get_vod
 
 
 def get_vods(channel_name,date,test):
@@ -15,6 +15,7 @@ def get_vods(channel_name,date,test):
                       f"LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
                       f"TITLE: {title} \n"
         vods.append(data_string)
+    return vods
 
 
 def main():
@@ -25,7 +26,7 @@ def main():
     channel_name = input("Enter streamer name >>").strip()
     date = input("date (YYYY-MM-DD UTC) >>").strip()
     test = input("enable testing vod playback with mpv to make sure link works yes/no? >>").strip()
-    get_vods(channel_name,date,test)
+    print(get_vods(channel_name, date, test))
 
 
 if __name__ == "__main__":
