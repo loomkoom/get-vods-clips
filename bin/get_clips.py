@@ -1,6 +1,7 @@
 import concurrent.futures
 import winsound
 
+import time
 import requests
 
 
@@ -28,6 +29,7 @@ def get_clips(broadcast_id, time_offset, workers = 150):
                     output.append((url, offset_time))
 
     if len(output) > 0:
+        output.sort(key = lambda x: x[57:-4])
         return output
     else:
         return [("no valid clips found,", "None")]

@@ -4,11 +4,11 @@ import subprocess
 import requests
 
 
-def download_file(url, channel_name, file_name, new_name, vods_clips, muted = None):
-    path = f"../output/files/{channel_name}/{vods_clips}"
-    muted_path = os.path.abspath(f"../output/files/{channel_name}/playlists").replace("\\", "/")
-    if not os.path.isdir(f"../output/files/{channel_name}"):
-        os.mkdir(f"../output/files/{channel_name}")
+def download_file(url, channel_name, file_name, new_name, vods_clips, filepath = "../output/files", muted = None):
+    path = f"{filepath}/{channel_name}/{vods_clips}"
+    muted_path = os.path.abspath(f"{filepath}/{channel_name}/playlists").replace("\\", "/")
+    if not os.path.isdir(f"{filepath}/{channel_name}"):
+        os.mkdir(f"{filepath}/{channel_name}")
     if not os.path.isdir(path):
         os.mkdir(path)
 
@@ -42,8 +42,8 @@ def download_file(url, channel_name, file_name, new_name, vods_clips, muted = No
             print("please check if any errors are display and verify your input\n")
 
 
-def get_link_data(data_file, vods_clips):
-    path = "../output/data"
+def get_link_data(data_file, vods_clips, datapath):
+    path = datapath
     data_file = data_file[:-4] if data_file.endswith(".txt") else data_file
     with open(f"{path}/{data_file}.txt", "r", encoding = 'utf8') as file:
         url_data = list()
@@ -80,14 +80,15 @@ def get_link_data(data_file, vods_clips):
     return url_data, vods_clips
 
 
-def get_files(data_file, rename):
+def get_files(data_file, rename, datapath = "../output/data", filepath = "../output/files"):
     channel_name = data_file.split(" ")[0]
     vods_clips = data_file.split(" ")[1]
+    file_names = []
     if vods_clips == "vods":
         try_muted = input("Download muted version when available [yes/no]? >>").strip()
-    link_data = get_link_data(data_file, vods_clips)
+    link_data = get_link_data(data_file, vods_clips, datapath)
     vods_clips = link_data[1]
-    path = f"../output/files/{channel_name}/{vods_clips}"
+    path = f"{filepath}/{channel_name}/{vods_clips}"
     for data in link_data[0]:
         date, file_name, url, length, title = data[0], data[1], data[2], data[3], data[4]
         if vods_clips == "vods" and try_muted == "yes" and len(data[5]) != 1:
@@ -97,14 +98,18 @@ def get_files(data_file, rename):
         if vods_clips == "clips":
             offset_time = data[5]
             new_name = f"{date}__{title}__{offset_time}-{length}_{file_name}"
-            download_file(url, channel_name, file_name, new_name, vods_clips)
+            download_file(url, channel_name, file_name, new_name, vods_clips, filepath)
         if vods_clips == "vods":
             muted = "muted" if len(data[5]) != 1 else "unmuted"
             new_name = f"{date}_{title}_{length}_{file_name}_{muted}"
-            download_file(url, channel_name, file_name, new_name, vods_clips, muted)
+            download_file(url, channel_name, file_name, new_name, vods_clips, filepath, muted)
 
         if rename == "yes" and os.path.exists(f"{path}/{file_name}.mp4") and not os.path.exists(f"{path}/{new_name}.mp4"):
             os.rename(f"{path}/{file_name}.mp4", f"{path}/{new_name}.mp4")
+            file_names.append(new_name)
+        else:
+            file_names.append(file_name)
+    return file_names
 
 
 def main():

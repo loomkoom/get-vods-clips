@@ -5,8 +5,8 @@ from pathlib import Path
 
 import get_muted_vod
 import m3u8
+import mpv
 import requests
-import vlc
 
 
 def to_timestamp(date_time, epoch = datetime.datetime(1970, 1, 1)):
@@ -25,23 +25,19 @@ def is_muted(url):
 def play_url(url, channel_name):
     if not url.startswith("http"):
         url = str(Path(__file__).parents[1]).replace('\\', '/') + f"/output/files/{channel_name}/playlists/{url}"
-    instance = vlc.Instance()
-    instance.log_unset()
-    player = instance.media_player_new()
-    player.set_mrl(f"{url}")
-    player.play()
-    player.audio_set_mute(True)
+    player = mpv.MPV(window_minimized = "yes", osc = "no", load_osd_console = "no", load_stats_overlay = "no", profile = "low-latency",
+                     frames = "1", untimed = "yes", demuxer = "lavf", demuxer_lavf_format = "hls", demuxer_thread = "no", cache = "no",
+                     ytdl = "no", load_scripts = "no", audio = "no", demuxer_lavf_o = '"protocol_whitelist"="file,https,http,tls,tcp"')
+    player.play(url)
+    timeout = 2
     start = time.time()
-    timeout = 4
-    while not player.get_state() == vlc.State.Ended and time.time() - start < timeout:
-        time.sleep(0.1)
-    if int(player.is_playing()):
-        player.pause()
-        player.stop()
-    return player.get_state() == vlc.State.Stopped
+    player.wait_until_playing(timeout)
+    time_taken = time.time() - start
+    return not (time_taken >= 2), time_taken
 
 
-def get_vod(channel_name, broadcast_id, timestamp, test = "yes"):
+def get_vod(channel_name, broadcast_id, timestamp, test = "no"):
+    channel_name = channel_name.lower()
     dt = timestamp.split()[0].split('-')
     tm = timestamp.split()[1].split(':')
 
@@ -76,11 +72,11 @@ def main():
     print("\n-returns the playlist link for a vod (m3u8 link) usually available for any vod within 60 days \n"
           "-requires [channel name], [broadcast id] and [timestamp] \n"
           "-all can be found on twitchtracker (in the streams page inspect element on the date+time link for a timestamp with seconds \n"
-          "-disable testing vod playback with vlc if you get vlc errors other than those starting with [h264 @ 000001df3c9623e0]\n\n")
+          "-enable testing vod playback with vlc if you non working links (no false positives) takes a little longer and less stable\n\n")
     channel_name = input("Enter streamer name >>").strip()
     broadcast_id = input("Enter broadcast id >>").strip()
     timestamp = input("Enter VOD timestamp (YYYY-MM-DD HH:MM:SS) UTC >>").strip()
-    test = input("enable testing vod playback with vlc to make sure link works yes/no? >>").strip()
+    test = input("enable testing vod playback with mpv to make sure link works yes/no? >>").strip()
     vod = get_vod(channel_name, broadcast_id, timestamp, test)
     if test == "no":
         print("playback has not been tested, no guarantee file works")

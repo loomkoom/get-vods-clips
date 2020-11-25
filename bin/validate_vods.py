@@ -1,28 +1,22 @@
 import time
 from datetime import timedelta
 
-import vlc
+import mpv
 
 
 def play_url(url):
-    instance = vlc.Instance()
-    instance.log_unset()
-
-    player = instance.media_player_new()
-    player.set_mrl(f"{url}")
-    player.audio_set_mute(True)
-    player.play()
+    player = mpv.MPV(window_minimized = "yes", osc = "no", load_osd_console = "no", load_stats_overlay = "no", profile = "low-latency",
+                     frames = "1", untimed = "yes", demuxer = "lavf", demuxer_lavf_format = "hls", demuxer_thread = "no", cache = "no",
+                     ytdl = "no", load_scripts = "no", audio = "no", demuxer_lavf_o = '"protocol_whitelist"="file,https,http,tls,tcp"')
+    player.play(url)
+    timeout = 2
     start = time.time()
-    timeout = 5
-    while not player.get_state() == vlc.State.Ended and time.time() - start < timeout:
-        time.sleep(0.1)
-    if int(player.is_playing()):
-        player.pause()
-        player.stop()
-    return player.get_state() == vlc.State.Stopped
+    player.wait_until_playing(timeout)
+    time_taken = time.time() - start
+    return not (time_taken >= 2), time_taken
 
 
-def test_vods(file_name, new_file_name):
+def validate_vods(file_name, new_file_name):
     with open(f"../output/data/{file_name}.txt", "r", encoding = 'utf8') as file:
         output = list()
         streams = list(filter((lambda x: "vod-secure.twitch.tv" in x), file.readlines()))
@@ -44,7 +38,7 @@ def main():
 
     input_file = input("input file name?  >>").strip()
     output_file = input("output file name?  >>").strip()
-    test_vods(input_file, output_file)
+    validate_vods(input_file, output_file)
 
 
 if __name__ == "__main__":
