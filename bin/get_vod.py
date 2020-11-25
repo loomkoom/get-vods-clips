@@ -5,7 +5,7 @@ from pathlib import Path
 
 import get_muted_vod
 import m3u8
-import mpv
+import mpv_py
 import requests
 
 
@@ -25,9 +25,9 @@ def is_muted(url):
 def play_url(url, channel_name):
     if not url.startswith("http"):
         url = str(Path(__file__).parents[1]).replace('\\', '/') + f"/output/files/{channel_name}/playlists/{url}"
-    player = mpv.MPV(window_minimized = "yes", osc = "no", load_osd_console = "no", load_stats_overlay = "no", profile = "low-latency",
-                     frames = "1", untimed = "yes", demuxer = "lavf", demuxer_lavf_format = "hls", demuxer_thread = "no", cache = "no",
-                     ytdl = "no", load_scripts = "no", audio = "no", demuxer_lavf_o = '"protocol_whitelist"="file,https,http,tls,tcp"')
+    player = mpv_py.MPV(window_minimized = "yes", osc = "no", load_osd_console = "no", load_stats_overlay = "no", profile = "low-latency",
+                        frames = "1", untimed = "yes", demuxer = "lavf", demuxer_lavf_format = "hls", demuxer_thread = "no", cache = "no",
+                        ytdl = "no", load_scripts = "no", audio = "no", demuxer_lavf_o = '"protocol_whitelist"="file,https,http,tls,tcp"')
     player.play(url)
     timeout = 2
     start = time.time()

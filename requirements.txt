@@ -1,5 +1,5 @@
 bs4==0.0.1
-python-vlc==3.0.11115
+Brotli==1.0.9
 requests==2.25.0
 m3u8==0.7.1
 
