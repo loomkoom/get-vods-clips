@@ -27,7 +27,7 @@
 
 ### Built With
 
-* [python 3+](https://www.python.org/downloads/)
+* [python 3.5+](https://www.python.org/downloads/)
 * packages used:
   * [beautifulsoup4](https://pypi.org/project/beautifulsoup4/)
   * [python-vlc](https://pypi.org/project/python-vlc/)
