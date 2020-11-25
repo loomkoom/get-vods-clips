@@ -1,7 +1,5 @@
 import concurrent.futures
-import winsound
 
-import time
 import requests
 
 
@@ -42,7 +40,6 @@ def main():
     broadcast_id = input("broadcast id >> ").strip()
     time_offset = input('vod length in minutes >> ').strip()
     print(get_clips(broadcast_id, time_offset))
-    winsound.PlaySound("empty", winsound.MB_OK)
 
 
 if __name__ == "__main__":
