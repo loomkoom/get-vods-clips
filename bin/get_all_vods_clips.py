@@ -8,13 +8,14 @@ import get_vod
 
 
 def get_vods_clips(channel_name, vods_clips, start, end, download, rename, workers = 150, test = "yes",
-                   datapath = "../output/data",filepath = "../output/files",logpath="../output/logs"):
-    start_time = datetime.now().strftime("%m-%d-%Y, %H.%M.%S")
-    stream_data = get_stream_data.get_data(channel_name, start, end)  # list of streams in format: (date_time, broadcast_id, minutes, title)
+                   datapath = "../output/data", filepath = "../output/files", logpath = "../output/logs"):
+    start_time = datetime.utcnow().strftime("%m-%d-%Y, %H.%M.%S")
+    stream_data = get_stream_data.get_data(channel_name, start,
+                                           end)  # list of streams in format: (date_time, broadcast_id, minutes, categories)
     streams = len(stream_data)
     file_name = f"{channel_name} {vods_clips} {start} - {end}.txt"
     total_minutes = sum(map(lambda x: int(x[2]), stream_data))
-    time_now = datetime.now().time().strftime("%H:%M:%S")
+    time_now = datetime.utcnow().time().strftime("%H:%M:%S")
     if vods_clips == "vods":
         print(f"\n[{time_now}]: {streams} streams found \n"
               f"processing ... ")
@@ -27,12 +28,13 @@ def get_vods_clips(channel_name, vods_clips, start, end, download, rename, worke
         broadcast_id = stream[1]
         minutes = stream[2]
         title = stream[3]
+        categories = stream[4]
         if vods_clips == "vods":
             vod = get_vod.get_vod(channel_name, broadcast_id, date_time, test)
             data_string = f"DATE: {date_time}, URL: {vod[0]} , MUTED: {vod[1] if vod[1] else 0} , ID: {broadcast_id}, " \
                           f"LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
-                          f"TITLE: {title} \n"
-            time_now = datetime.now().time().strftime("%H:%M:%S")
+                          f"TITLE: {title} , CATEGORIES: {categories} \n"
+            time_now = datetime.utcnow().time().strftime("%H:%M:%S")
             log_string = f"[{time_now}]: {date_time}, {broadcast_id}, {title} \n" \
                          f"streams checked {stream_data.index(stream) + 1}/{len(stream_data)}  \n"
             with open(f"{datapath}/{file_name}", "a", encoding = 'utf8') as data_log:
@@ -47,11 +49,11 @@ def get_vods_clips(channel_name, vods_clips, start, end, download, rename, worke
                 for clip in clips:
                     data_string = f"DATE: {date_time}, URL: {clip[0]} , TIME: {clip[1]} , ID: {broadcast_id}, " \
                                   f"LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
-                                  f"TITLE: {title} \n"
+                                  f"TITLE: {title} , CATEGORIES: {categories} \n"
                     data_log.write(data_string)
 
             minutes_left = sum(map(lambda x: int(x[2]), stream_data[stream_data.index(stream) + 1:]))
-            time_now = datetime.now().time().strftime("%H:%M:%S")
+            time_now = datetime.utcnow().time().strftime("%H:%M:%S")
             log_string = f"[{time_now}]: {date_time}, {broadcast_id}, {title} \n" \
                          f"streams checked {stream_data.index(stream) + 1}/{len(stream_data)}  \n" \
                          f"[{time_now}]: {len(clips) if clips[0] != '' else 0} clips found \n"
@@ -82,7 +84,7 @@ def main():
           " if the script uses too much resources otherwise leave empty \n"
           "-disable testing vod playback with mpv if you get mpv errors\n\n")
 
-    channel_name = input("streamer name? >>").strip().lower()
+    channel_name = input("channel name? >>").strip().lower()
     vods_clips = input("clips or vods? >>").strip().lower()
     start = input("from date (earliest) YYYY-MM-DD >>").strip()
     end = input("to date (newest) YYYY-MM-DD >>").strip()

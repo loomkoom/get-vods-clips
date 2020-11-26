@@ -35,10 +35,14 @@ def get_data(channel_name, start, end):
                 minutes = (td.get("data-order"),)
             if td.get("class") and "status" in td.get("class"):
                 title = (td.string,)
+            if td.get("class") and "games" in td.get("class"):
+                categories = ()
+                for img in td.findAll("img"):
+                    categories += (img.get("title"),)
 
         current_date = datetime.fromisoformat(date_time).date()
         if start_date <= current_date <= end_date:
-            data = (date_time,) + broadcast_id + minutes + title
+            data = (date_time,) + broadcast_id + minutes + title + categories
             stream_data.append(data)
         elif current_date > end_date:
             break
