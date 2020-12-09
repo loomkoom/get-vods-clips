@@ -49,6 +49,14 @@
 
 <!-- USAGE EXAMPLES -->
 ### Usage
+
+**Disclaimer this uses undocumented twitch end points and may break at any point in time** <br> 
+
+**info:** <br> 
+- Vods are only retrievable for the last 60days with some exceptions <br> 
+- If a vod goes down or is restarted resulting in multiple vods for the same stream in twitchtracker, only the 1st vod part will be found. <br> 
+- for clips most are retrievable for an unlimited amount of time but not 100% are found. <br> 
+
 You need to have some data from the stream if you want a specific vod or clips from that vod (for get_all_vods_and_clips.cmd only a date range is needed) <br>
 all data can be found on twitchtracker if you inspect element on the stream link in the streams page https://twitchtracker.com/twitch/streams
 Using twitches glitchcon eve stream as an example: https://twitchtracker.com/twitch/streams/40468501598 <br>
