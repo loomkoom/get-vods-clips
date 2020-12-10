@@ -72,12 +72,19 @@ timestamp = 2020-11-13 19:14:07 <br>
 channel name = twitch <br>
 length = 30 (minutes) <br>
 
-__all script executables are located in the scripts folder__
+**<ins>all script executables are located in the scripts folder </ins>** <br>
+**<ins>main scripts</ins>**
 
-**get_all_vods_and_clips.cmd** writes a text file with all vods or urls found in a certain time period from channel name and date range and allows you to download everything it finds (*only script needed if you want to bulk search clips/vods for a channel*)
+**get_all_vods_and_clips.cmd** writes a text file with all vods or urls found in a certain time period from channel name and date range and allows you to download everything it finds (*only thing you need to run if you want to bulk search clips/vods for a channel*)
 <br>
 <br>
-**download_all_files.cmd** downloads all links in the text file generated from get_all_vods_and_clips.cmd if you provide the name of the file in output/files/data
+**download_all_files.cmd** downloads all links in the text file generated from get_all_vods_and_clips.cmd if you provide the name of the file in output/files/data (*use if you chose not to download at first in get_all_vods_and_clips but want to do it afterwards*)
+
+**get_vods_date.cmd** retrieves all vods from a specific day on a channel
+
+**get_clips_date.cmd** retrieves all clips from a specific day on a channel
+
+**<ins>extra scripts</ins>** <br>
 
 **get_clips.cmd** returns a list with all clips from a specific broadcast-id
 
@@ -87,7 +94,7 @@ __all script executables are located in the scripts folder__
 
 **get_stream_data.cmd** returns a list with all stream data in certain time period from channel name and date range with each stream as (timestamp, broadcast-id, minutes, title)
 
-**test_vods.cmd** test all the vod links (with vlc) in the specified input file in /output/data and writes all succesful links to output file
+**test_vods.cmd** test all the vod links (with mpv) in the specified input file in /output/data and writes all succesful links to output file
 
 
 <!-- ROADMAP -->
