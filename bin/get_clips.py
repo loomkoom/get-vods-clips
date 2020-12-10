@@ -1,15 +1,18 @@
+# encoding: utf-8
 import concurrent.futures
-import winsound
 
 import requests
 
 
 def load_url(url, session):
-    r = session.head(url, allow_redirects = False)
+    headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36 OPR/71.0.3770.323',
+            }
+    r = session.head(url, allow_redirects = False, headers = headers)
     return r.ok
 
 
-def get_clips(broadcast_id, time_offset, workers = 150):
+def get_clips(broadcast_id, time_offset,file="no", workers = 150):
     time_offset = (int(time_offset) + 5) * 60 + 24
     urls = {f"https://clips-media-assets2.twitch.tv/{broadcast_id}-offset-{str(offset)}.mp4": offset for offset in range(0, time_offset)}
     output = list()
@@ -28,6 +31,14 @@ def get_clips(broadcast_id, time_offset, workers = 150):
                     output.append((url, offset_time))
 
     if len(output) > 0:
+        output.sort(key = lambda x: x[57:-4])
+        if file == "yes":
+            data_path = "../output/data"
+            file_name = f"{broadcast_id}_clips"
+            with open(f"{data_path}/{file_name}", "w", encoding = 'utf8') as data_log:
+                for clip in output:
+                    data_string = f"URL: {clip[0]} , TIME: {clip[1]}"
+                    data_log.write(data_string)
         return output
     else:
         return [("no valid clips found,", "None")]
@@ -35,12 +46,20 @@ def get_clips(broadcast_id, time_offset, workers = 150):
 
 def main():
     print("\n-gets all clips from a vod, you can round up vod length as it is just the upper border to search for clips \n"
+          "-worker count is set to 150 by default try changing it to a lower number"
+          " if the script uses too much resources (will be slower) otherwise leave empty \n"
           "-input [broadcast id] [vod length](minutes) \n"
           "-outputs a list of valid clips with each clip as (url,offset time)\n\n")
     broadcast_id = input("broadcast id >> ").strip()
-    time_offset = input('vod length in minutes >> ').strip()
-    print(get_clips(broadcast_id, time_offset))
-    winsound.PlaySound("empty", winsound.MB_OK)
+    time_offset = input("vod length in minutes >> ").strip()
+    file = input("save output to file? [yes/no] >> ").strip()
+    workers = input("worker count (empty for default) >> ").strip()
+    if workers == "":
+        workers = 150
+    clips = get_clips(broadcast_id, time_offset,file, workers)
+
+    for clip in clips:
+        print(clip)
 
 
 if __name__ == "__main__":
