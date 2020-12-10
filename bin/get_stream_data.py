@@ -1,4 +1,4 @@
-#encoding: utf-8
+# encoding: utf-8
 from datetime import datetime
 
 import requests
@@ -16,13 +16,25 @@ def get_soup(url):
             'referer'                  : f'{"/".join(url.split("/")[:-1])}',
             'User-Agent'               : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36 OPR/71.0.3770.323',
             }
-    html = requests.get(url, headers = headers).content
+    html = requests.get(url, headers = headers, allow_redirects = False).content
     return soup(html, "html.parser")
 
 
-def get_data(channel_name, start = None, end = None):
-    start_date = datetime.fromisoformat(start).date() if start is not None else None
-    end_date = datetime.fromisoformat(end).date() if end is not None else None
+def get_data(channel_name, start = "", end = ""):
+    if len(channel_name) < 4 \
+            or (start != "" and len(start) != 10) \
+            or (end != "" and len(end) != 10):
+        print("\ninvalid input data, check that date is in the correct format (YYYY-MM-DD)")
+        return
+
+    try:
+        start_date = datetime.fromisoformat(start).date()
+    except ValueError:
+        start_date = ""
+    try:
+        end_date = datetime.fromisoformat(end).date()
+    except ValueError:
+        end_date = ""
 
     stream_data = list()
     url = f"https://twitchtracker.com/{channel_name}/streams"
@@ -33,7 +45,7 @@ def get_data(channel_name, start = None, end = None):
         for tr in page_soup.find("table", id = "streams").tbody.findAll("tr"):
             for td in tr.findAll("td"):
                 if td.get("data-order") and td.get("nowrap") == "":
-                    date_time = td.get("data-order")
+                    date_time = (td.get("data-order"),)
                     broadcast_id = (td.get("data-stream"),)
                 if td.get("data-order") and not td.get("class"):
                     minutes = (td.get("data-order"),)
@@ -47,16 +59,17 @@ def get_data(channel_name, start = None, end = None):
                     for img in td.findAll("img"):
                         if img.get("title"):
                             categories += (img.get("title").strip(),)
-
-            if (start is not None) and (end is not None):
-                current_date = datetime.fromisoformat(date_time).date()
-                if start_date <= current_date <= end_date:
-                    data = (date_time,) + broadcast_id + minutes + title + categories
+            data = date_time + broadcast_id + minutes + title + categories
+            current_date = datetime.fromisoformat(date_time[0]).date()
+            if start != "":
+                if start_date <= current_date:
                     stream_data.append(data)
-                elif current_date > end_date:
+            elif end != "":
+                if current_date <= end_date:
+                    stream_data.append(data)
+                else:
                     break
             else:
-                data = (date_time,) + broadcast_id + minutes + title + categories
                 stream_data.append(data)
     else:
         print(f"{channel_name} has no recorded stream history")
@@ -70,13 +83,11 @@ def main():
     channel_name = input("streamer name? >> ").strip()
     start = input("from date (earliest) YYYY-MM-DD UTC >> ").strip()
     end = input("to date (newest) YYYY-MM-DD UTC >> ").strip()
-    if start == "" or end == "":
-        data = get_data(channel_name)
-    else:
-        data = get_data(channel_name, start, end)
+    data = get_data(channel_name, start, end)
 
-    for stream in data:
-        print(stream)
+    if data is not None:
+        for stream in data:
+            print(stream)
 
 
 if __name__ == "__main__":
