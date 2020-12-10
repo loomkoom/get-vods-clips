@@ -27,7 +27,8 @@ def main():
     channel_name = input("Enter streamer name >> ").strip()
     date = input("date (YYYY-MM-DD UTC) >> ").strip()
     test = input("enable testing vod playback with mpv to make sure link works yes/no? >> ").strip()
-    print(get_vods(channel_name, date, test))
+    for tag in vods:
+        print(tag)
 
 
 if __name__ == "__main__":
