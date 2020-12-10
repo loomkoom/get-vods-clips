@@ -40,8 +40,7 @@ def get_clips(broadcast_id, time_offset,file="no", workers = 150):
                     data_string = f"URL: {clip[0]} , TIME: {clip[1]}"
                     data_log.write(data_string)
         return output
-    else:
-        return [("no valid clips found,", "None")]
+    return [("no valid clips found,", "None")]
 
 
 def main():

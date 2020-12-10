@@ -21,9 +21,10 @@ def get_soup(url):
 
 
 def get_data(channel_name, start = None, end = None):
-    stream_data = list()
     start_date = datetime.fromisoformat(start).date() if start is not None else None
     end_date = datetime.fromisoformat(end).date() if end is not None else None
+
+    stream_data = list()
     url = f"https://twitchtracker.com/{channel_name}/streams"
     page_soup = get_soup(url)
 

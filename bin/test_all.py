@@ -68,4 +68,3 @@ def test_get_all_vods_clips(get_data_stream, vods_clips, tmpdir,monkeypatch):
     assert os.path.isfile(f"{data_path}/{channel_name} {vods_clips} {date} - {date}.txt")
     with open(f"{data_path}/{channel_name} {vods_clips} {date} - {date}.txt", "r", encoding = "utf8") as file:
         assert len(file.readline().split(",")) == 6, "data file not correctly formatted"
-

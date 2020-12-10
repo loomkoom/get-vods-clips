@@ -23,7 +23,6 @@ def get_vods_clips(channel_name, vods_clips, index = 0, start = None, end = None
     check_dirs(data_path)
     check_dirs(file_path)
     check_dirs(log_path)
-
     start_time = datetime.utcnow().strftime("%m-%d-%Y, %H.%M.%S")
 
     if (len(channel_name) < 4) \

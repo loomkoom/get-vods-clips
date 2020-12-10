@@ -1,12 +1,19 @@
-#encoding: utf-8
+# encoding: utf-8
 import os
 
-import get_vod
 import m3u8
 
 
-def get_muted_playlist(url, file_name,file_path="../output/files"):
-    if not get_vod.is_muted(url):
+def is_muted(url):
+    playlist_url = m3u8.load(url)
+    for uri in playlist_url.segments.uri:
+        if uri.endswith("-unmuted.ts"):
+            return True
+    return False
+
+
+def get_muted_playlist(url, file_name, file_path = "../output/files"):
+    if not is_muted(url):
         return "stream has no muted parts"
     file_name = file_name[:-5] if file_name.endswith(".m3u8") else file_name
     channel_name = url.split("_")[1]
@@ -33,7 +40,8 @@ def get_muted_playlist(url, file_name,file_path="../output/files"):
                 new_line = output_line = url_path + line.rstrip() + "\n"
             new_lines.append(new_line)
             output_lines.append(output_line)
-        playlist.truncate(0), playlist.seek(0)
+        playlist.truncate(0)
+        playlist.seek(0)
         playlist.writelines(new_lines)
     with open(f"{path}/{file_name}-muted.m3u8", 'w', encoding = 'utf8') as playlist:
         playlist.writelines(output_lines)
