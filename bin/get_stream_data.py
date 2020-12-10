@@ -42,7 +42,8 @@ def get_data(channel_name, start = "", end = ""):
 
     has_streams = page_soup.find("table", id = "streams")
     if has_streams:
-        for tr in page_soup.find("table", id = "streams").tbody.findAll("tr"):
+        streams = page_soup.find("table", id = "streams").tbody.findAll("tr")
+        for tr in streams:
             for td in tr.findAll("td"):
                 if td.get("data-order") and td.get("nowrap") == "":
                     date_time = (td.get("data-order"),)
@@ -59,6 +60,7 @@ def get_data(channel_name, start = "", end = ""):
                     for img in td.findAll("img"):
                         if img.get("title"):
                             categories += (img.get("title").strip(),)
+
             data = date_time + broadcast_id + minutes + title + categories
             current_date = datetime.fromisoformat(date_time[0]).date()
             if start != "":
