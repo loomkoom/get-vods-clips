@@ -13,9 +13,8 @@ try
 }
 catch
 {
-    Write-Host "Scoop not installed, installing now"
+    Write-Host "Scoop not installed, installing now" -ForegroundColor Yellow
     Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.scoop.sh')
-    write-host "`n"
 
 }
 Write-Host "`nStarting install of programs" -ForegroundColor Cyan
@@ -33,6 +32,7 @@ foreach ($program in $programs)
     Catch
     {
         scoop install $program
+        Write-Host ""
     }
 }
 scoop update *
