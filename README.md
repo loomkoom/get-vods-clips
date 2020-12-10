@@ -39,7 +39,7 @@
 
 ### Prerequisites
 
-* as of now only supported on windows
+* installer as of now only supported on windows (otherwise download programs separately)
 * [python](https://www.python.org/downloads/)
 * [MPV](https://mpv.io/) is used to check if links with a valid url are playable or not
 * [ffmpeg](https://ffmpeg.org/download.html#build-windows) if you wish to download the vods
