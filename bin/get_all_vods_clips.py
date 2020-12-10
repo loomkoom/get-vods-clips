@@ -17,14 +17,8 @@ def check_dirs(path):
             os.mkdir(parent_path)
         os.mkdir(path)
 
-
-def get_vods_clips(channel_name, vods_clips, index = 0, start = None, end = None, download = "no", rename = "no", workers = 150,
-                   test = "yes", data_path = "../output/data", file_path = "../output/files", log_path = "../output/logs"):
-    check_dirs(data_path)
-    check_dirs(file_path)
-    check_dirs(log_path)
-    start_time = datetime.utcnow().strftime("%m-%d-%Y, %H.%M.%S")
-
+def check_input(channel_name, vods_clips, index, start, end, download, rename, workers, test,
+                data_path, file_path, log_path):
     if (len(channel_name) < 4) \
             or not (vods_clips == "clips" or vods_clips == "vods") \
             or not (start is None or len(start) == 10) \
@@ -35,6 +29,16 @@ def get_vods_clips(channel_name, vods_clips, index = 0, start = None, end = None
             or not isinstance(workers, int) \
             or not isinstance(index, int):
         logger.critical("invalid input, please try again")
+
+
+def get_vods_clips(channel_name, vods_clips, index = 0, start = None, end = None, download = "no", rename = "no", workers = 150,
+                   test = "yes", data_path = "../output/data", file_path = "../output/files", log_path = "../output/logs"):
+    check_input(channel_name, vods_clips, index, start, end, download, rename, workers, test,
+                data_path, file_path, log_path)
+    check_dirs(data_path)
+    check_dirs(file_path)
+    check_dirs(log_path)
+    start_time = datetime.utcnow().strftime("%m-%d-%Y, %H.%M.%S")
 
     # list of streams in format: (date_time, broadcast_id, minutes, categories)
     stream_data = get_stream_data.get_data(channel_name, start, end)[index:]

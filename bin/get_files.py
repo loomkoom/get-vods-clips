@@ -1,8 +1,51 @@
-#encoding: utf-8
+# encoding: utf-8
 import os
 import subprocess
 
 import requests
+
+
+def parse_tags(line, vods_clips):
+    tags = line.split(',')
+    for tag in tags:
+        tag = tag.strip()
+        if tag.startswith("URL"):
+            url = (tag[4:].strip(),)
+            if vods_clips == "clips":
+                file_name = (tag[43:-4].strip(),)
+        if tag.startswith("ID") and vods_clips == "vods":
+            broadcast_id = (tag[3:].strip(),)
+        if tag.startswith("DATE"):
+            date = (tag[6:-9].strip(),)
+        if tag.startswith("TIME"):
+            offset_time = tag[6:].strip().split(":")
+            offset_time = (f"{offset_time[0]}h{offset_time[1]}m{offset_time[2]}s",)
+        if tag.startswith("LENGTH"):
+            length = (tag[8:].strip(),)
+        if tag.startswith("MUTED"):
+            muted_url = (tag[7:].strip(),)
+        if tag.startswith("TITLE"):
+            title = tag[7:].strip()
+            trans = title.maketrans('<>:"//|?*', '         ')
+            title = (title.translate(trans),)
+    if vods_clips == "clips":
+        data = (date + file_name + url + length + title + offset_time)
+    elif vods_clips == "vods":
+        file_name = (f"{date[0]}_{broadcast_id[0]}",)
+        data = (date + file_name + url + length + title + muted_url)
+    return data
+
+
+def get_link_data(data_file, vods_clips, data_path):
+    path = data_path
+    data_file = data_file[:-4] if data_file.endswith(".txt") else data_file
+    with open(f"{path}/{data_file}.txt", "r", encoding = 'utf8') as file:
+        url_data = list()
+        streams = list(filter((lambda x: ".twitch.tv" in x), file.readlines()))
+        for stream in streams:
+            data = parse_tags(stream, vods_clips)
+            url_data.append(data)
+    return url_data, vods_clips
 
 
 def download_file(url, channel_name, file_name, new_name, vods_clips, file_path = "../output/files", muted = None):
@@ -41,44 +84,6 @@ def download_file(url, channel_name, file_name, new_name, vods_clips, file_path 
         else:
             print("there seems to have gone something wrong downloading the file")
             print("please check if any errors are display and verify your input\n")
-
-
-def get_link_data(data_file, vods_clips, data_path):
-    path = data_path
-    data_file = data_file[:-4] if data_file.endswith(".txt") else data_file
-    with open(f"{path}/{data_file}.txt", "r", encoding = 'utf8') as file:
-        url_data = list()
-        streams = list(filter((lambda x: ".twitch.tv" in x), file.readlines()))
-        for stream in streams:
-            data = stream.split(',')
-            for tag in data:
-                tag = tag.strip()
-                if tag.startswith("URL"):
-                    url = (tag[4:].strip(),)
-                    if vods_clips == "clips":
-                        file_name = (tag[43:-4].strip(),)
-                if tag.startswith("ID") and vods_clips == "vods":
-                    broadcast_id = (tag[3:].strip(),)
-                if tag.startswith("DATE"):
-                    date = (tag[6:-9].strip(),)
-                if tag.startswith("TIME"):
-                    offset_time = tag[6:].strip().split(":")
-                    offset_time = (f"{offset_time[0]}h{offset_time[1]}m{offset_time[2]}s",)
-                if tag.startswith("LENGTH"):
-                    length = (tag[8:].strip(),)
-                if tag.startswith("MUTED"):
-                    muted_url = (tag[7:].strip(),)
-                if tag.startswith("TITLE"):
-                    title = tag[7:].strip()
-                    trans = title.maketrans('<>:"//|?*', '         ')
-                    title = (title.translate(trans),)
-            if vods_clips == "clips":
-                data = (date + file_name + url + length + title + offset_time)
-            elif vods_clips == "vods":
-                file_name = (f"{date[0]}_{broadcast_id[0]}",)
-                data = (date + file_name + url + length + title + muted_url)
-            url_data.append(data)
-    return url_data, vods_clips
 
 
 def get_files(data_file, rename, data_path = "../output/data", file_path = "../output/files"):
