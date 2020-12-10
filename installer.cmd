@@ -7,13 +7,14 @@ for /F "tokens=1,2 delims=#" %%a in ('"prompt #$H#$E# & echo on & for %%b in (1)
 SET root=%~dp0
 pushd %~dp0
 
-:: installing with scoop
+:: installing programs with scoop
 call :colorEcho 0B "Installing scoop and any program dependencies (scoop needs administrator access on first install)"
 echo[
-call powershell -NoProfile -ExecutionPolicy Bypass -NoLogo -File ./inst/scoop-installer.ps1
+call powershell -NoProfile -ExecutionPolicy Bypass -NoLogo -File .\inst\scoop-installer.ps1
 echo[
 
-call ./inst/RefreshEnv.cmd
+:: refreshing path variables
+call .\inst\RefreshEnv.cmd
 
 :: testing that programs are installed
 python -V >nul 2>&1 || goto :python
@@ -26,6 +27,7 @@ echo[
 
 for /f %%i in ('git rev-parse --abbrev-ref HEAD') do set BRANCH=%%i
 
+:: link to git repo if it isn't already
 if not exist .git\ (
 	echo[
     echo This seems to be your first run The setup will now proceed to download all required files They will be downloaded to the same location as where this install file is.
@@ -44,6 +46,7 @@ set findtext="up"
 findstr %findtext% %findfile% >nul 2>&1 || goto :forward
 goto :install
 
+:: program not installed errors
 :python
 	TITLE Error!
 	call :colorEcho 04 "python not added to PATH or not installed"
@@ -69,6 +72,7 @@ goto :install
     echo run installer again or download mpv manually at https://mpv.io/installation/
     goto :end
 
+:: update files from git repo
 :forward
 	set findfile="tmp.txt"
 	set forwardable="fast-forwardable"
@@ -88,12 +92,12 @@ goto :install
 	echo Finished updating
 	goto :install
 
+:: install python modules
 :install
 	if exist tmp.txt del tmp.txt
 	FOR /f %%p in ('where python') do SET PYTHONPATH=%%p
 	call :colorEcho 0B "Checking-Installing requirements (takes some time on first install)"
     echo[
-	chcp 65001 >nul
 	set PYTHONIOENCODING=utf-8
 	call :colorEcho 0B "Installing python packages"
     echo[
@@ -111,7 +115,7 @@ goto :install
     call :colorEcho 0A "All python packages installed"
     echo[
 	ping 127.0.0.1 -n 2 > nul
-	type success.txt
+	type .\inst\success.txt
 	echo[
 	echo[
 	if %ERRORLEVEL% == 15 goto :update
