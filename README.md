@@ -60,7 +60,7 @@
 - If a vod goes down or is restarted resulting in multiple vods for the same stream in twitchtracker, only the 1st vod part will be found. <br> 
 - for clips most are retrievable for an unlimited amount of time but not 100% are found. <br> 
 
-You need to have some data from the stream if you want a specific vod or clips from that vod (for get_all_vods_and_clips.cmd only a date range is needed) <br>
+You need to have some data from the stream if you want to run scripts under the [extra scripts](#extra-scripts) section<br>
 all data can be found on twitchtracker if you inspect element on the stream link in the streams page https://twitchtracker.com/twitch/streams
 Using twitches glitchcon eve stream as an example: https://twitchtracker.com/twitch/streams/40468501598 <br>
 (dates/times are always in UTC format!) <br>
@@ -73,7 +73,7 @@ channel name = twitch <br>
 length = 30 (minutes) <br>
 
 **<ins>all script executables are located in the scripts folder </ins>** <br>
-**<ins>main scripts</ins>**
+### main scripts
 
 **get_all_vods_and_clips.cmd** writes a text file with all vods or urls found in a certain time period from channel name and date range and allows you to download everything it finds (*only thing you need to run if you want to bulk search clips/vods for a channel*)
 <br>
@@ -84,7 +84,7 @@ length = 30 (minutes) <br>
 
 **get_clips_date.cmd** retrieves all clips from a specific day on a channel
 
-**<ins>extra scripts</ins>** <br>
+### extra scripts
 
 **get_clips.cmd** returns a list with all clips from a specific broadcast-id
 
