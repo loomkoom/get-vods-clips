@@ -79,9 +79,8 @@ def get_data(channel_name, start = "", end = ""):
     if has_streams:
         stream_data = parse_tags(page_soup, start, end)
         return stream_data
-    else:
-        print(f"{channel_name} has no recorded stream history")
-        return []
+    print(f"{channel_name} has no recorded stream history")
+    return []
 
 
 def main():
