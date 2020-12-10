@@ -77,23 +77,23 @@ length = 30 (minutes) <br>
 **get_all_vods_and_clips.cmd** writes a text file with all vods or urls found in a certain time period from channel name and date range and allows you to download everything it finds (*only thing you need to run if you want to bulk search clips/vods for a channel*)
 <br>
 <br>
-**download_all_files.cmd** downloads all links in the text file generated from get_all_vods_and_clips.cmd if you provide the name of the file in output/files/data (*use if you chose not to download at first in get_all_vods_and_clips but want to do it afterwards*)
+* **download_all_files.cmd** downloads all links in the text file generated from get_all_vods_and_clips.cmd if you provide the name of the file in output/files/data (*use if you chose not to download at first in get_all_vods_and_clips but want to do it afterwards*)
 
-**get_vods_date.cmd** retrieves all vods from a specific day on a channel
+* **get_vods_date.cmd** retrieves all vods from a specific day on a channel
 
-**get_clips_date.cmd** retrieves all clips from a specific day on a channel
+* **get_clips_date.cmd** retrieves all clips from a specific day on a channel
 
 ### extra scripts
 
-**get_clips.cmd** returns a list with all clips from a specific broadcast-id
+* **get_clips.cmd** returns a list with all clips from a specific broadcast-id
 
-**get_vod.cmd** gets the vod from the channel name,timestamp and vod-id if it's still available. If the vod is muted it also writes a muted version in output/files/playlists
+* **get_vod.cmd** gets the vod from the channel name,timestamp and vod-id if it's still available. If the vod is muted it also writes a muted version in output/files/playlists
 
-**get_muted_vod.cmd** writes a muted vod file in output/files/playlists if you input a url and filename
+* **get_muted_vod.cmd** writes a muted vod file in output/files/playlists if you input a url and filename
 
-**get_stream_data.cmd** returns a list with all stream data in certain time period from channel name and date range with each stream as (timestamp, broadcast-id, minutes, title)
+* **get_stream_data.cmd** returns a list with all stream data in certain time period from channel name and date range with each stream as (timestamp, broadcast-id, minutes, title)
 
-**test_vods.cmd** test all the vod links (with mpv) in the specified input file in /output/data and writes all succesful links to output file
+* **test_vods.cmd** test all the vod links (with mpv) in the specified input file in /output/data and writes all succesful links to output file
 
 
 <!-- ROADMAP -->
