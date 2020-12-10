@@ -98,6 +98,7 @@ __all script executables are located in the scripts folder__
 * [x] get all vods/clips in date range
 * [x] download them from generated txt file
 * [ ] implement GUI
+* [ ] make .exe for easier install
 
 
 <!-- ACKNOWLEDGEMENTS -->
