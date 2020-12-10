@@ -10,10 +10,10 @@ pushd %~dp0
 :: installing with scoop
 call :colorEcho 0B "Installing scoop and any program dependencies (scoop needs administrator access on first install)"
 echo[
-call powershell -NoProfile -ExecutionPolicy Bypass -NoLogo -File ./installer/scoop-installer.ps1
+call powershell -NoProfile -ExecutionPolicy Bypass -NoLogo -File ./inst/scoop-installer.ps1
 echo[
 
-call ./installer/RefreshEnv.cmd
+call ./inst/RefreshEnv.cmd
 
 :: testing that programs are installed
 python -V >nul 2>&1 || goto :python
