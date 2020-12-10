@@ -60,13 +60,12 @@
 - If a vod goes down or is restarted resulting in multiple vods for the same stream in twitchtracker, only the 1st vod part will be found. <br> 
 - for clips most are retrievable for an unlimited amount of time but not 100% are found. <br> 
 
-You need to have some data from the stream if you want to run scripts under the [extra scripts](#extra-scripts) section<br>
+- You need to have some data from the stream if you want to run scripts under the [extra scripts](#extra-scripts) section<br>
 all data can be found on twitchtracker if you inspect element on the stream link in the streams page https://twitchtracker.com/twitch/streams
 Using twitches glitchcon eve stream as an example: https://twitchtracker.com/twitch/streams/40468501598 <br>
 (dates/times are always in UTC format!) <br>
 ![tracker image][tracker-url] <br>
 ![source image][source-url] <br>
-
 Broadcast-id = 40468501598 <br>
 timestamp = 2020-11-13 19:14:07 <br>
 channel name = twitch <br>
