@@ -22,6 +22,7 @@
 * [Prerequisites](#prerequisites)
 * [Installation](#installation)
 * [Usage](#usage)
+* [Roadmap](#roadmap)
 * [Acknowledgements](#acknowledgements)
 
 
@@ -30,22 +31,23 @@
 * [python 3.5+](https://www.python.org/downloads/)
 * packages used:
   * [beautifulsoup4](https://pypi.org/project/beautifulsoup4/)
-  * [python-vlc](https://pypi.org/project/python-vlc/)
+  * [mpv](https://pypi.org/project/mpv/)
   * [requests](https://pypi.org/project/requests/)
   * [m3u8](https://pypi.org/project/m3u8/)
+  * [Brotli](https://pypi.org/project/Brotli/)
 
 
 ### Prerequisites
 
 * as of now only supported on windows
 * [python](https://www.python.org/downloads/)
-* [VLC media player](https://www.videolan.org/vlc/index.html) is used to check if links with a valid url are playable or not
+* [MPV](https://mpv.io/) is used to check if links with a valid url are playable or not
 * [ffmpeg](https://ffmpeg.org/download.html#build-windows) if you wish to download the vods
 
 ### Installation
 
 1. Clone or download the repo
-2. run install.cmd to install needed programs and required packages
+2. run installer.cmd to install needed programs and required packages, also updates files if needed.
 
 
 <!-- USAGE EXAMPLES -->
@@ -88,6 +90,14 @@ __all script executables are located in the scripts folder__
 **test_vods.cmd** test all the vod links (with vlc) in the specified input file in /output/data and writes all succesful links to output file
 
 
+<!-- ROADMAP -->
+### Roadmap
+* [x] get vods by timestamp and ID
+* [x] get clips by ID and length
+* [x] get vods/clips by date
+* [x] get all vods/clips in date range
+* [x] download them from generated txt file
+* [ ] implement GUI
 
 
 <!-- ACKNOWLEDGEMENTS -->
