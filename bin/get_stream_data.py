@@ -20,6 +20,42 @@ def get_soup(url):
     return soup(html, "html.parser")
 
 
+def parse_tags(page, start, end):
+    stream_data = list()
+    streams = page.find("table", id = "streams").tbody.findAll("tr")
+    for tr in streams:
+        for td in tr.findAll("td"):
+            if td.get("data-order") and td.get("nowrap") == "":
+                date_time = (td.get("data-order"),)
+                broadcast_id = (td.get("data-stream"),)
+            if td.get("data-order") and not td.get("class"):
+                minutes = (td.get("data-order"),)
+            if td.get("class") and "status" in td.get("class"):
+                if td.string:
+                    title = (td.string.strip(),)
+                else:
+                    title = ("",)
+            if td.get("class") and "games" in td.get("class"):
+                categories = ()
+                for img in td.findAll("img"):
+                    if img.get("title"):
+                        categories += (img.get("title").strip(),)
+
+        data = date_time + broadcast_id + minutes + title + categories
+        current_date = datetime.fromisoformat(date_time[0]).date()
+        if start != "":
+            if start <= current_date:
+                stream_data.append(data)
+        elif end != "":
+            if current_date <= end:
+                stream_data.append(data)
+            else:
+                break
+        else:
+            stream_data.append(data)
+    return stream_data
+
+
 def get_data(channel_name, start = "", end = ""):
     if len(channel_name) < 4 \
             or (start != "" and len(start) != 10) \
@@ -28,54 +64,24 @@ def get_data(channel_name, start = "", end = ""):
         return
 
     try:
-        start_date = datetime.fromisoformat(start).date()
+        start = datetime.fromisoformat(start).date()
     except ValueError:
-        start_date = ""
+        start = ""
     try:
-        end_date = datetime.fromisoformat(end).date()
+        end = datetime.fromisoformat(end).date()
     except ValueError:
-        end_date = ""
+        end = ""
 
-    stream_data = list()
     url = f"https://twitchtracker.com/{channel_name}/streams"
     page_soup = get_soup(url)
 
     has_streams = page_soup.find("table", id = "streams")
     if has_streams:
-        streams = page_soup.find("table", id = "streams").tbody.findAll("tr")
-        for tr in streams:
-            for td in tr.findAll("td"):
-                if td.get("data-order") and td.get("nowrap") == "":
-                    date_time = (td.get("data-order"),)
-                    broadcast_id = (td.get("data-stream"),)
-                if td.get("data-order") and not td.get("class"):
-                    minutes = (td.get("data-order"),)
-                if td.get("class") and "status" in td.get("class"):
-                    if td.string:
-                        title = (td.string.strip(),)
-                    else:
-                        title = ("",)
-                if td.get("class") and "games" in td.get("class"):
-                    categories = ()
-                    for img in td.findAll("img"):
-                        if img.get("title"):
-                            categories += (img.get("title").strip(),)
-
-            data = date_time + broadcast_id + minutes + title + categories
-            current_date = datetime.fromisoformat(date_time[0]).date()
-            if start != "":
-                if start_date <= current_date:
-                    stream_data.append(data)
-            elif end != "":
-                if current_date <= end_date:
-                    stream_data.append(data)
-                else:
-                    break
-            else:
-                stream_data.append(data)
+        stream_data = parse_tags(page_soup, start, end)
+        return stream_data
     else:
         print(f"{channel_name} has no recorded stream history")
-    return stream_data
+        return []
 
 
 def main():
