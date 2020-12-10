@@ -19,15 +19,15 @@ def check_dirs(path):
 
 def check_input(channel_name, vods_clips, index, start, end, download, rename, workers, test,
                 data_path, file_path, log_path):
-    if (len(channel_name) < 4) \
-            or not (vods_clips == "clips" or vods_clips == "vods") \
-            or not (start is None or len(start) == 10) \
-            or not (end is None or len(end) == 10) \
-            or not (rename == "no" or rename == "yes") \
-            or not (download == "no" or download == "yes") \
-            or not (test == "no" or test == "yes") \
-            or not isinstance(workers, int) \
-            or not isinstance(index, int):
+    if (len(channel_name) < 4 or
+            (not (vods_clips == "clips" or vods_clips == "vods")) or
+            (not (start is None or len(start) == 10)) or
+            (not (end is None or len(end) == 10)) or
+            (not (rename == "no" or rename == "yes")) or
+            (not (download == "no" or download == "yes")) or
+            (not (test == "no" or test == "yes")) or
+            (not isinstance(workers, int)) or
+            (not isinstance(index, int))):
         logger.critical("invalid input, please try again")
 
 
