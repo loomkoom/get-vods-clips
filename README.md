@@ -74,9 +74,8 @@ length = 30 (minutes) <br>
 **<ins>all script executables are located in the scripts folder </ins>** <br>
 ### main scripts
 
-**get_all_vods_and_clips.cmd** writes a text file with all vods or urls found in a certain time period from channel name and date range and allows you to download everything it finds (*only thing you need to run if you want to bulk search clips/vods for a channel*)
-<br>
-<br>
+* **get_all_vods_and_clips.cmd** writes a text file with all vods or urls found in a certain time period from channel name and date range and allows you to download everything it finds (*only thing you need to run if you want to bulk search clips/vods for a channel*)
+
 * **download_all_files.cmd** downloads all links in the text file generated from get_all_vods_and_clips.cmd if you provide the name of the file in output/files/data (*use if you chose not to download at first in get_all_vods_and_clips but want to do it afterwards*)
 
 * **get_vods_date.cmd** retrieves all vods from a specific day on a channel
