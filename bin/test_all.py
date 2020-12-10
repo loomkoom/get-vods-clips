@@ -1,3 +1,4 @@
+# encoding: utf-8
 import datetime
 import os
 from datetime import timedelta
@@ -63,8 +64,7 @@ def test_get_all_vods_clips(get_data_stream, vods_clips, tmpdir,monkeypatch):
     stream = stream_data[1][-1]
     date = stream[0][:10]
     get_all_vods_clips.get_vods_clips(channel_name, vods_clips, date, date, download = "no", rename = "no", test = "no", workers = 150,
-                                      datapath = data_path, filepath = file_path,logpath=log_path)
+                                      data_path = data_path, file_path = file_path, log_path = log_path)
     assert os.path.isfile(f"{data_path}/{channel_name} {vods_clips} {date} - {date}.txt")
     with open(f"{data_path}/{channel_name} {vods_clips} {date} - {date}.txt", "r", encoding = "utf8") as file:
         assert len(file.readline().split(",")) == 6, "data file not correctly formatted"
-

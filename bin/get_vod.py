@@ -1,3 +1,4 @@
+# encoding: utf-8
 import datetime
 import hashlib
 import time
@@ -11,15 +12,17 @@ import requests
 
 def to_timestamp(date_time, epoch = datetime.datetime(1970, 1, 1)):
     td = date_time - epoch
-    return (td.microseconds + (td.seconds + td.days * 86400) * 10 ** 6) / 10 ** 6
+    day = 60 * 60 * 24
+    return (td.microseconds + (td.seconds + td.days * day) * 10 ** 6) / 10 ** 6
 
 
-def is_muted(url):
-    playlist_url = m3u8.load(url)
-    for uri in playlist_url.segments.uri:
-        if uri.endswith("-unmuted.ts"):
-            return True
-    return False
+def extract_timestamp(timestamp):
+    dt = timestamp.split()[0].split('-')
+    tm = timestamp.split()[1].split(':')
+
+    y, m, d = (int(x) for x in dt)
+    hr, mins, sec = (int(x) for x in tm)
+    return y, m, d, hr, mins, sec
 
 
 def play_url(url, channel_name):
@@ -38,13 +41,9 @@ def play_url(url, channel_name):
 
 def get_vod(channel_name, broadcast_id, timestamp, test = "no"):
     channel_name = channel_name.lower()
-    dt = timestamp.split()[0].split('-')
-    tm = timestamp.split()[1].split(':')
 
-    y, m, d = (int(x) for x in dt)
-    hr, mins, sec = (int(x) for x in tm)
-
-    date_time = datetime.datetime(y, m, d, hr, mins, sec)
+    y, mt, d, h, mn, s = extract_timestamp(timestamp)
+    date_time = datetime.datetime(y, mt, d, h, mn, s)
     converted_timestamp = int(to_timestamp(date_time))
 
     formatted_string = f"{channel_name}_{broadcast_id}_{str(converted_timestamp)}"
@@ -53,10 +52,12 @@ def get_vod(channel_name, broadcast_id, timestamp, test = "no"):
     final_formatted_string = f"{required_hash}_{formatted_string}"
 
     url = f"https://vod-secure.twitch.tv/{final_formatted_string}/chunked/index-dvr.m3u8"
+    header = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36 OPR/71.0.3770.323', }
 
-    if requests.head(url, allow_redirects = False).ok:
+    if requests.head(url, headers = header, allow_redirects = False).ok:
         if test == "yes":
-            if not is_muted(url):
+            if not get_muted_vod.is_muted(url):
                 if play_url(url, channel_name):
                     return url, False
             else:
@@ -73,10 +74,10 @@ def main():
           "-requires [channel name], [broadcast id] and [timestamp] \n"
           "-all can be found on twitchtracker (in the streams page inspect element on the date+time link for a timestamp with seconds \n"
           "-enable testing vod playback with vlc if you non working links (no false positives) takes a little longer and less stable\n\n")
-    channel_name = input("Enter streamer name >>").strip()
-    broadcast_id = input("Enter broadcast id >>").strip()
-    timestamp = input("Enter VOD timestamp (YYYY-MM-DD HH:MM:SS) UTC >>").strip()
-    test = input("enable testing vod playback with mpv to make sure link works yes/no? >>").strip()
+    channel_name = input("Enter streamer name >> ").strip()
+    broadcast_id = input("Enter broadcast id >> ").strip()
+    timestamp = input("Enter VOD timestamp (YYYY-MM-DD HH:MM:SS) UTC >> ").strip()
+    test = input("enable testing vod playback with mpv to make sure link works yes/no? >> ").strip()
     vod = get_vod(channel_name, broadcast_id, timestamp, test)
     if test == "no":
         print("playback has not been tested, no guarantee file works")

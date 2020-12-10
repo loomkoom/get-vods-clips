@@ -1,10 +1,11 @@
+# encoding: utf-8
 import get_stream_data
 import get_vod
 
 
-def get_vods(channel_name,date,test):
+def get_vods(channel_name, date, test):
     vods = []
-    stream_data = get_stream_data.get_data(channel_name,date,date)
+    stream_data = get_stream_data.get_data(channel_name, date, date)
     for stream in stream_data:
         date_time = stream[0]
         broadcast_id = stream[1]
@@ -23,9 +24,9 @@ def main():
           "-requires [channel name] and [date] \n"
           "-output a list wth vod link and data "
           "-disable testing vod playback with mpv if you get mpv errors\n\n")
-    channel_name = input("Enter streamer name >>").strip()
-    date = input("date (YYYY-MM-DD UTC) >>").strip()
-    test = input("enable testing vod playback with mpv to make sure link works yes/no? >>").strip()
+    channel_name = input("Enter streamer name >> ").strip()
+    date = input("date (YYYY-MM-DD UTC) >> ").strip()
+    test = input("enable testing vod playback with mpv to make sure link works yes/no? >> ").strip()
     print(get_vods(channel_name, date, test))
 
 

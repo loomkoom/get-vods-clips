@@ -1,5 +1,7 @@
+# encoding: utf-8
 from datetime import datetime, timedelta
 from math import floor
+import os
 
 import get_clips
 import get_files
@@ -7,15 +9,50 @@ import get_stream_data
 import get_vod
 
 
-def get_vods_clips(channel_name, vods_clips, start, end, download, rename, workers = 150, test = "yes",
-                   datapath = "../output/data", filepath = "../output/files", logpath = "../output/logs"):
+def check_dirs(path):
+    """Checks if directory exists, if not creates it"""
+    if not os.path.isdir(path):
+        parent_path = "/".join(path.split("/")[:-1])
+        if not os.path.isdir(parent_path):
+            os.mkdir(parent_path)
+        os.mkdir(path)
+
+
+def check_input(channel_name, vods_clips, index, start, end, download, rename, workers, test,
+                data_path, file_path, log_path):
+    if (len(channel_name) < 4 or
+            (not (vods_clips == "clips" or vods_clips == "vods")) or
+            (not (start is None or len(start) == 10)) or
+            (not (end is None or len(end) == 10)) or
+            (not (rename == "no" or rename == "yes")) or
+            (not (download == "no" or download == "yes")) or
+            (not (test == "no" or test == "yes")) or
+            (not isinstance(workers, int)) or
+            (not isinstance(index, int))):
+        logger.critical("invalid input, please try again")
+
+
+def get_vods_clips(channel_name, vods_clips, index = 0, start = None, end = None, download = "no", rename = "no", workers = 150,
+                   test = "yes", data_path = "../output/data", file_path = "../output/files", log_path = "../output/logs"):
+    check_input(channel_name, vods_clips, index, start, end, download, rename, workers, test,
+                data_path, file_path, log_path)
+    check_dirs(data_path)
+    check_dirs(file_path)
+    check_dirs(log_path)
     start_time = datetime.utcnow().strftime("%m-%d-%Y, %H.%M.%S")
-    stream_data = get_stream_data.get_data(channel_name, start,
-                                           end)  # list of streams in format: (date_time, broadcast_id, minutes, categories)
+
+    # list of streams in format: (date_time, broadcast_id, minutes, categories)
+    stream_data = get_stream_data.get_data(channel_name, start, end)[index:]
     streams = len(stream_data)
+    if streams == 0:
+        print(f"{channel_name} has no recorded stream history")
+        return
+
+    start = stream_data[0][0][:10]
+    end = stream_data[-1][0][:10]
     file_name = f"{channel_name} {vods_clips} {start} - {end}.txt"
     total_minutes = sum(map(lambda x: int(x[2]), stream_data))
-    time_now = datetime.utcnow().time().strftime("%H:%M:%S")
+    time_now = datetime.now().time().strftime("%H:%M:%S")
     if vods_clips == "vods":
         print(f"\n[{time_now}]: {streams} streams found \n"
               f"processing ... ")
@@ -35,8 +72,11 @@ def get_vods_clips(channel_name, vods_clips, start, end, download, rename, worke
                           f"LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
                           f"TITLE: {title} , CATEGORIES: {categories} \n"
             time_now = datetime.utcnow().time().strftime("%H:%M:%S")
-            log_string = f"[{time_now}]: {date_time}, {broadcast_id}, {title} \n" \
-                         f"streams checked {stream_data.index(stream) + 1}/{len(stream_data)}  \n"
+            log_string = f"[{time_now}]: DATE: {date_time}, ID: {broadcast_id}, LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
+                         f"TITLE: {title}, CATEGORIES: {categories}, \nURL: {vod[0]}  \n"
+            progress_string = f"streams checked {stream_data.index(stream) + 1}/{len(stream_data)}  \n" \
+                              f"{floor((stream_data.index(stream) + 1) / len(stream_data) * 100)}% done "
+            print(progress_string)
             with open(f"{datapath}/{file_name}", "a", encoding = 'utf8') as data_log:
                 data_log.write(data_string)
             if vod[0] != "no valid link":
@@ -45,7 +85,7 @@ def get_vods_clips(channel_name, vods_clips, start, end, download, rename, worke
         elif vods_clips == "clips":
             clips = get_clips.get_clips(broadcast_id, minutes, workers)
 
-            with open(f"{datapath}/{file_name}", "a", encoding = 'utf8') as data_log:
+            with open(f"{data_path}/{file_name}", "a", encoding = 'utf8') as data_log:
                 for clip in clips:
                     data_string = f"DATE: {date_time}, URL: {clip[0]} , TIME: {clip[1]} , ID: {broadcast_id}, " \
                                   f"LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
@@ -53,42 +93,52 @@ def get_vods_clips(channel_name, vods_clips, start, end, download, rename, worke
                     data_log.write(data_string)
 
             minutes_left = sum(map(lambda x: int(x[2]), stream_data[stream_data.index(stream) + 1:]))
-            time_now = datetime.utcnow().time().strftime("%H:%M:%S")
-            log_string = f"[{time_now}]: {date_time}, {broadcast_id}, {title} \n" \
-                         f"streams checked {stream_data.index(stream) + 1}/{len(stream_data)}  \n" \
-                         f"[{time_now}]: {len(clips) if clips[0] != '' else 0} clips found \n"
-            time_left_string = f"{floor(((total_minutes - minutes_left) / total_minutes) * 100)}% done " \
-                               f"estimated time left: {timedelta(minutes = minutes_left * 0.0043)}\n"
+            time_now = datetime.now().time().strftime("%H:%M:%S")
+            log_string = f"[{time_now}]: DATE: {date_time}, ID: {broadcast_id}, LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
+                         f"TITLE: {title}, CATEGORIES: {categories},\nURL: {clips}  \n"
 
-            with open(f"{logpath}/{start_time} {channel_name} Logs.txt", "a", encoding = 'utf8') as progress_log:
+            found_string = f"[{time_now}]: {len(clips) if clips[0][0][:2] != 'no' else 0} clips found "
+            progress_string = f"streams checked {stream_data.index(stream) + 1}/{len(stream_data)}" \
+                              f"{floor(((total_minutes - minutes_left) / total_minutes) * 100)}% done \n" \
+                              f"estimated time left: {timedelta(minutes = minutes_left * 0.0043)}"
+
+            with open(f"{log_path}/{start_time} {channel_name} Logs.txt", "a", encoding = 'utf8') as progress_log:
                 progress_log.write(log_string + time_left_string)
-            print(log_string + time_left_string)
+            print(log_string + found_string + progress_string)
 
-        else:
-            print("input not valid please try again")
     print("\nAll retrievable links found")
+    abs_data_path = os.path.abspath(data_path).replace('\\', '/')
+    print(f"{vods_clips[:-1]} links located in '{abs_data_path}/{file_name}'")
 
     if download == "yes":
         print("starting download")
-        get_files.get_files(file_name, rename, datapath = datapath, filepath = filepath)
+        get_files.get_files(file_name, rename, data_path = datapath, file_path = filepath)
         print("download finished")
+        abs_file_path = os.path.abspath(file_path).replace('\\', '/')
+        print(f"files downloaded at '{abs_file_path}/{file_name}/{channel_name}/'\n")
+
     return file_name
 
 
 def main():
     print("\n-gets all clips or vod links within time period \n"
+          "-Leave start and end empty to get all-time \n"
           "-input [channel name] [vods or clips] [start date] [end date] [download] \n"
           "-outputs to a file in output/data\n"
-          "-for downloads outputs in output/downloads (ffmpeg needed for vod downloads\n"
+          "-for downloads outputs in output/downloads (ffmpeg needed for vod downloads)\n"
           "-worker count is set to 150 by default try changing it to a lower number"
-          " if the script uses too much resources otherwise leave empty \n"
+          " if the script uses too much resources (will be slower) otherwise leave empty \n"
           "-disable testing vod playback with mpv if you get mpv errors\n\n")
 
-    channel_name = input("channel name? >>").strip().lower()
-    vods_clips = input("clips or vods? >>").strip().lower()
-    start = input("from date (earliest) YYYY-MM-DD >>").strip()
-    end = input("to date (newest) YYYY-MM-DD >>").strip()
-    download = input("download files yes/no? >>").strip()
+    channel_name = input("channel name? >> ").strip().lower()
+    vods_clips = input("clips or vods? >> ").strip().lower()
+    start = input("from date (earliest) YYYY-MM-DD >> ").strip()
+    end = input("to date (newest) YYYY-MM-DD >> ").strip()
+    download = input("download files yes/no? >> ").strip()
+    if start == "":
+        start = None
+    if end == "":
+        end = None
     if download == "yes":
         rename = input("rename files after download?\n"
                        "     (clips from {ID-offset}.mp4  --->  {date}__{title}__{offset_time}-{length}_{ID-offset}.mp4\n"
@@ -96,17 +146,14 @@ def main():
     else:
         rename = "no"
     if vods_clips == "clips":
-        workers = input("worker count (empty for default) >>").strip()
+        workers = input("worker count (empty for default) >> ").strip()
         if workers == "":
             workers = 150
-        file_name = get_vods_clips(channel_name, vods_clips, start, end, download, rename, workers = workers)
-        print(f"clip links located in '/output/data/{file_name}'\n")
+        get_vods_clips(channel_name, vods_clips, start = start, end = end, download = download, rename = rename, workers = workers)
+
     if vods_clips == "vods":
         test = input("test if vod actually plays with mpv (no false positives but a bit slower) [yes/no]? >>").strip()
-        file_name = get_vods_clips(channel_name, vods_clips, start, end, download, rename, test = test)
-        print(f"vod links located in '/output/data/{file_name}'\n")
-    if download == "yes":
-        print(f"files downloaded at '/output/files/{channel_name}/'\n")
+        get_vods_clips(channel_name, vods_clips, start = start, end = end, download = download, rename = rename, test = test)
 
 
 if __name__ == "__main__":

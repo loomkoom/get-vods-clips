@@ -1,3 +1,4 @@
+# encoding: utf-8
 import time
 from datetime import timedelta
 
@@ -36,8 +37,8 @@ def main():
     print("\n-tests all vod links in file using vlc \n"
           "-input [input file name] and [output file name] only for files in /output/data/\n")
 
-    input_file = input("input file name?  >>").strip()
-    output_file = input("output file name?  >>").strip()
+    input_file = input("input file name?  >> ").strip()
+    output_file = input("output file name?  >> ").strip()
     validate_vods(input_file, output_file)
 
 

@@ -635,9 +635,9 @@ if hasattr(backend, 'mpv_get_sub_api'):
 
 def _mpv_coax_proptype(value, proptype = str):
     """Intelligently coax the given python value into something that can be understood as a proptype property."""
-    if type(value) is bytes:
-        return value;
-    elif type(value) is bool:
+    if isinstance(value, bytes):
+        return value
+    elif isinstance(value, bool):
         return b'yes' if value else b'no'
     elif proptype in (str, int, float):
         return str(proptype(value)).encode('utf-8')
@@ -771,7 +771,6 @@ class GeneratorStream:
         self._read_iter = iter([])  # make next read() call return EOF
 
 
-
 class ImageOverlay:
 
     def __init__(self, m, overlay_id, img = None, pos = (0, 0)):
@@ -874,7 +873,7 @@ class MPV(object):
         self._core_shutdown = False
 
         _mpv_set_option_string(self.handle, b'audio-display', b'no')
-        istr = lambda o: ('yes' if o else 'no') if type(o) is bool else str(o)
+        istr = lambda o: ('yes' if o else 'no') if isinstance(o, bool) else str(o)
         try:
             for flag in extra_mpv_flags:
                 _mpv_set_option_string(self.handle, flag.encode('utf-8'), b'')
@@ -1079,13 +1078,10 @@ class MPV(object):
         if threading.current_thread() is self._event_thread:
             raise UserWarning('terminate() should not be called from event thread (e.g. from a callback function). If '
                               'you want to terminate mpv from here, please call quit() instead, then sync the main thread '
-                              'against the event thread using e.g. wait_for_shutdown(), then terminate() from the main thread. '
-                              'This call has been transformed into a call to quit().')
-            self.quit()
-        else:
-            _mpv_terminate_destroy(handle)
-            if self._event_thread:
-                self._event_thread.join()
+                              'against the event thread using e.g. wait_for_shutdown(), then terminate() from the main thread. ')
+        _mpv_terminate_destroy(handle)
+        if self._event_thread:
+            self._event_thread.join()
 
     def set_loglevel(self, level):
         """Set MPV's log level. This adjusts which output will be sent to this object's log handlers. If you just want
@@ -1099,7 +1095,7 @@ class MPV(object):
 
     def command(self, name, *args):
         """Execute a raw command."""
-        args = [name.encode('utf-8')] + [(arg if type(arg) is bytes else str(arg).encode('utf-8'))
+        args = [name.encode('utf-8')] + [(arg if isinstance(arg, bytes) else str(arg).encode('utf-8'))
                                          for arg in args if arg is not None] + [None]
         _mpv_command(self.handle, (c_char_p * len(args))(*args))
 
