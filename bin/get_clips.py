@@ -5,20 +5,24 @@ import requests
 
 
 def load_url(url, session):
-    headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36 OPR/71.0.3770.323',
-            }
-    r = session.head(url, allow_redirects = False, headers = headers)
+    r = session.head(url, allow_redirects = False)
     return r.ok
 
 
 def get_clips(broadcast_id, time_offset, file = "no", workers = 150):
+    output = list()
     time_offset = (int(time_offset) + 5) * 60 + 24
     urls = {f"https://clips-media-assets2.twitch.tv/{broadcast_id}-offset-{str(offset)}.mp4": offset for offset in range(0, time_offset)}
-    output = list()
+    headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36 OPR/71.0.3770.323', }
 
     with concurrent.futures.ThreadPoolExecutor(max_workers = workers) as executor:
         with requests.session() as session:
+            session.headers.update(headers)
+            adapter = requests.adapters.HTTPAdapter(pool_connections = 1, pool_maxsize = workers, pool_block = True)
+            session.mount('https://', adapter)
+            session.mount('http://', adapter)
+
             future_to_url = {executor.submit(load_url, url, session = session): url for url in urls.keys()}
             for future in concurrent.futures.as_completed(future_to_url):
                 url = future_to_url[future]
