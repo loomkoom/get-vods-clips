@@ -1,12 +1,15 @@
-#encoding: utf-8
+# encoding: utf-8
 import datetime
 import os
 from datetime import timedelta
+from math import floor
 
 import get_all_vods_clips
 import get_files
 import get_vod
+import get_vods_date
 import get_clips
+import get_clips_date
 import get_stream_data
 import pytest
 import requests
@@ -51,16 +54,37 @@ def test_get_vod_latest(get_data_stream):
     assert requests.head(vod[0], allow_redirects = False).ok, "4xx vod url response"
 
 
+def test_get_vod_date(get_data_stream):
+    stream_data = get_data_stream
+    channel_name = stream_data[0]
+    stream = stream_data[1][-1]
+    date = stream[0][:10]
+    vod = get_vods_date.get_vods(channel_name, date, test = "no")
+    url = vod[0].split(",")[1].strip()[5:]
+    assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
+
+
 def test_get_clips(get_data_stream):
     stream = get_data_stream[1][-1]
-    broadcast_id, time_offset = stream[1], stream[2]
+    broadcast_id, time_offset = stream[1], floor(int(stream[2]) / 5)
     clips = get_clips.get_clips(broadcast_id, time_offset)
     assert len(clips) > 1, "no clips found"
     assert requests.head(clips[1][0], allow_redirects = False).ok, "clip not valid"
 
 
+def test_get_clips_date(get_data_stream):
+    stream_data = get_data_stream
+    channel_name = stream_data[0]
+    stream = get_data_stream[1][-1]
+    date = stream[0][:10]
+    clips = get_clips_date.get_clips_date(channel_name, date)
+    url = clips[0].split(",")[1].strip()[5:]
+    assert len(clips) > 1, "no clips found"
+    assert requests.head(url, allow_redirects = False).ok, "clip not valid"
+
+
 @pytest.mark.parametrize("vods_clips", ["vods", "clips"])
-def test_get_all_vods_clips(get_data_stream, vods_clips, tmpdir,monkeypatch):
+def test_get_all_vods_clips(get_data_stream, vods_clips, tmpdir, monkeypatch):
     monkeypatch.setattr('builtins.input', lambda _: "no")
     output = tmpdir.mkdir("output")
     data_path = output.mkdir("data")
