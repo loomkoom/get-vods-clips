@@ -11,10 +11,11 @@ def get_vods(channel_name, date, test):
         broadcast_id = stream[1]
         minutes = stream[2]
         title = stream[3]
+        categories = stream[3]
         vod = get_vod.get_vod(channel_name, broadcast_id, date_time, test)
         data_string = f"DATE: {date_time}, URL: {vod[0]} , MUTED: {vod[1] if vod[1] else 0} , ID: {broadcast_id}, " \
                       f"LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
-                      f"TITLE: {title} \n"
+                      f"TITLE: {title} , CATEGORIES: {categories}\n"
         vods.append(data_string)
     return vods
 

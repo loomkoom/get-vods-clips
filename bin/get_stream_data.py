@@ -45,7 +45,12 @@ def parse_tags(page, start, end):
                 categories += ")"
         data = date_time + broadcast_id + minutes + title + (categories,)
         current_date = datetime.fromisoformat(date_time[0]).date()
-        if start != "":
+        if start != "" and end != "":
+            if start <= current_date <= end:
+                stream_data.append(data)
+            elif current_date > end:
+                break
+        elif start != "":
             if start <= current_date:
                 stream_data.append(data)
         elif end != "":
