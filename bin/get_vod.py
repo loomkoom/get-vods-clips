@@ -4,10 +4,10 @@ import hashlib
 import time
 from pathlib import Path
 
-import get_muted_vod
-import m3u8
-import mpv_py
 import requests
+
+import get_muted_vod
+import mpv_py
 
 
 def to_timestamp(date_time, epoch = datetime.datetime(1970, 1, 1)):
@@ -73,7 +73,7 @@ def main():
     print("\n-returns the playlist link for a vod (m3u8 link) usually available for any vod within 60 days \n"
           "-requires [channel name], [broadcast id] and [timestamp] \n"
           "-all can be found on twitchtracker (in the streams page inspect element on the date+time link for a timestamp with seconds \n"
-          "-enable testing vod playback with vlc if you non working links (no false positives) takes a little longer and less stable\n\n")
+          "-enable testing vod playback with mpv if you non working links (no false positives) takes a little longer and less stable\n\n")
     channel_name = input("Enter streamer name >> ").strip()
     broadcast_id = input("Enter broadcast id >> ").strip()
     timestamp = input("Enter VOD timestamp (YYYY-MM-DD HH:MM:SS) UTC >> ").strip()

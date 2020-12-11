@@ -41,7 +41,7 @@ def main():
     clips = get_clips_date(channel_name, date, file, workers)
 
     for clip in clips:
-        print(clip)
+        print(clip.replace("\n", ""))
 
 
 if __name__ == "__main__":

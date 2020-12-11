@@ -1,7 +1,7 @@
 # encoding: utf-8
+import os
 from datetime import datetime, timedelta
 from math import floor
-import os
 
 import get_clips
 import get_files
@@ -18,8 +18,7 @@ def check_dirs(path):
         os.mkdir(path)
 
 
-def check_input(channel_name, vods_clips, index, start, end, download, rename, workers, test,
-                data_path, file_path, log_path):
+def check_input(channel_name, vods_clips, index, start, end, download, rename, workers, test):
     if (len(channel_name) < 4 or
             (not (vods_clips == "clips" or vods_clips == "vods")) or
             (not (start is None or len(start) == 10)) or
@@ -29,13 +28,12 @@ def check_input(channel_name, vods_clips, index, start, end, download, rename, w
             (not (test == "no" or test == "yes")) or
             (not isinstance(workers, int)) or
             (not isinstance(index, int))):
-        logger.critical("invalid input, please try again")
+        print("invalid input, please try again")
 
 
 def get_vods_clips(channel_name, vods_clips, index = 0, start = None, end = None, download = "no", rename = "no", workers = 150,
                    test = "yes", data_path = "../output/data", file_path = "../output/files", log_path = "../output/logs"):
-    check_input(channel_name, vods_clips, index, start, end, download, rename, workers, test,
-                data_path, file_path, log_path)
+    check_input(channel_name, vods_clips, index, start, end, download, rename, workers, test)
     check_dirs(data_path)
     check_dirs(file_path)
     check_dirs(log_path)
@@ -72,12 +70,13 @@ def get_vods_clips(channel_name, vods_clips, index = 0, start = None, end = None
                           f"LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
                           f"TITLE: {title} , CATEGORIES: {categories} \n"
             time_now = datetime.utcnow().time().strftime("%H:%M:%S")
-            log_string = f"[{time_now}]: DATE: {date_time}, ID: {broadcast_id}, LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
+            log_string = f"[{time_now}]: DATE: {date_time}, ID: {broadcast_id}, " \
+                         f"LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
                          f"TITLE: {title}, CATEGORIES: {categories}, \nURL: {vod[0]}  \n"
             progress_string = f"streams checked {stream_data.index(stream) + 1}/{len(stream_data)}  \n" \
                               f"{floor((stream_data.index(stream) + 1) / len(stream_data) * 100)}% done "
             print(progress_string)
-            with open(f"{datapath}/{file_name}", "a", encoding = 'utf8') as data_log:
+            with open(f"{data_path}/{file_name}", "a", encoding = 'utf8') as data_log:
                 data_log.write(data_string)
             if vod[0] != "no valid link":
                 print(log_string)
@@ -94,7 +93,8 @@ def get_vods_clips(channel_name, vods_clips, index = 0, start = None, end = None
 
             minutes_left = sum(map(lambda x: int(x[2]), stream_data[stream_data.index(stream) + 1:]))
             time_now = datetime.now().time().strftime("%H:%M:%S")
-            log_string = f"[{time_now}]: DATE: {date_time}, ID: {broadcast_id}, LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
+            log_string = f"[{time_now}]: DATE: {date_time}, ID: {broadcast_id}, " \
+                         f"LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
                          f"TITLE: {title}, CATEGORIES: {categories},\nURL: {clips}  \n"
 
             found_string = f"[{time_now}]: {len(clips) if clips[0][0][:2] != 'no' else 0} clips found "
@@ -103,7 +103,7 @@ def get_vods_clips(channel_name, vods_clips, index = 0, start = None, end = None
                               f"estimated time left: {timedelta(minutes = minutes_left * 0.0043)}"
 
             with open(f"{log_path}/{start_time} {channel_name} Logs.txt", "a", encoding = 'utf8') as progress_log:
-                progress_log.write(log_string + time_left_string)
+                progress_log.write(log_string + found_string + progress_string)
             print(log_string + found_string + progress_string)
 
     print("\nAll retrievable links found")
@@ -112,7 +112,7 @@ def get_vods_clips(channel_name, vods_clips, index = 0, start = None, end = None
 
     if download == "yes":
         print("starting download")
-        get_files.get_files(file_name, rename, data_path = datapath, file_path = filepath)
+        get_files.get_files(file_name, rename, data_path = data_path, file_path = file_path)
         print("download finished")
         abs_file_path = os.path.abspath(file_path).replace('\\', '/')
         print(f"files downloaded at '{abs_file_path}/{file_name}/{channel_name}/'\n")

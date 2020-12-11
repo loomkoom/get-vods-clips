@@ -26,7 +26,7 @@ def parse_tags(line, vods_clips):
             muted_url = (tag[7:].strip(),)
         if tag.startswith("TITLE"):
             title = tag[7:].strip()
-            trans = title.maketrans('<>:"//|?*', '         ')
+            trans = title.maketrans('<>:"\\/|?*', '         ')
             title = (title.translate(trans),)
     if vods_clips == "clips":
         data = (date + file_name + url + length + title + offset_time)
