@@ -12,7 +12,7 @@ def load_url(url, session):
     return r.ok
 
 
-def get_clips(broadcast_id, time_offset,file="no", workers = 150):
+def get_clips(broadcast_id, time_offset, file = "no", workers = 150):
     time_offset = (int(time_offset) + 5) * 60 + 24
     urls = {f"https://clips-media-assets2.twitch.tv/{broadcast_id}-offset-{str(offset)}.mp4": offset for offset in range(0, time_offset)}
     output = list()
@@ -55,7 +55,7 @@ def main():
     workers = input("worker count (empty for default) >> ").strip()
     if workers == "":
         workers = 150
-    clips = get_clips(broadcast_id, time_offset,file, workers)
+    clips = get_clips(broadcast_id, time_offset, file, workers)
 
     for clip in clips:
         print(clip)

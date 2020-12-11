@@ -36,12 +36,14 @@ def parse_tags(page, start, end):
                 else:
                     title = ("",)
             if td.get("class") and "games" in td.get("class"):
-                categories = ()
+                categories = "("
                 for img in td.findAll("img"):
                     if img.get("title"):
-                        categories += (img.get("title").strip(),)
-
-        data = date_time + broadcast_id + minutes + title + categories
+                        category = f'{img.get("title").strip()}; '
+                        categories += category
+                categories = categories[:-2]
+                categories += ")"
+        data = date_time + broadcast_id + minutes + title + (categories,)
         current_date = datetime.fromisoformat(date_time[0]).date()
         if start != "":
             if start <= current_date:

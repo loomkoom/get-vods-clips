@@ -32,7 +32,7 @@ foreach ($program in $programs)
     Catch
     {
         scoop install $program
-		Write-Host ""
+        Write-Host ""
     }
 }
 scoop update *

@@ -21,11 +21,18 @@ def get_data_in():
     return [channel_name, date_range]
 
 
-def test_get_stream_data(get_data_in):
+def test_get_stream_data_dates(get_data_in):
     channel_name, date_1, date_2 = get_data_in[0], get_data_in[1][0], get_data_in[1][1]
     stream_data = get_stream_data.get_data(channel_name, date_1, date_2)
     assert len(stream_data) > 1, "No Streams found"
-    assert len(stream_data[0]) == 4, "Stream data incomplete"
+    assert len(stream_data[0]) == 5, "Stream data incomplete"
+
+
+def test_get_stream_data_all(get_data_in):
+    channel_name = get_data_in[0]
+    stream_data = get_stream_data.get_data(channel_name)
+    assert len(stream_data) > 1, "No Streams found"
+    assert len(stream_data[0]) == 5, "Stream data incomplete"
 
 
 @pytest.fixture()
@@ -63,8 +70,9 @@ def test_get_all_vods_clips(get_data_stream, vods_clips, tmpdir,monkeypatch):
     channel_name = stream_data[0]
     stream = stream_data[1][-1]
     date = stream[0][:10]
-    get_all_vods_clips.get_vods_clips(channel_name, vods_clips, date, date, download = "no", rename = "no", test = "no", workers = 150,
+    get_all_vods_clips.get_vods_clips(channel_name, vods_clips, index = 0, start = date, end = date, download = "no", rename = "no",
+                                      test = "no", workers = 150,
                                       data_path = data_path, file_path = file_path, log_path = log_path)
     assert os.path.isfile(f"{data_path}/{channel_name} {vods_clips} {date} - {date}.txt")
     with open(f"{data_path}/{channel_name} {vods_clips} {date} - {date}.txt", "r", encoding = "utf8") as file:
-        assert len(file.readline().split(",")) == 6, "data file not correctly formatted"
+        assert len(file.readline().split(",")) == 7, "data file not correctly formatted"

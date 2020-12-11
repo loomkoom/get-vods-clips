@@ -34,7 +34,7 @@ def validate_vods(file_name, new_file_name):
 
 
 def main():
-    print("\n-tests all vod links in file using vlc \n"
+    print("\n-tests all vod links in file using mpv \n"
           "-input [input file name] and [output file name] only for files in /output/data/\n")
 
     input_file = input("input file name?  >> ").strip()

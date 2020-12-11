@@ -1,4 +1,4 @@
-#encoding: utf-8
+# encoding: utf-8
 import get_stream_data
 import get_vod
 
@@ -27,6 +27,7 @@ def main():
     channel_name = input("Enter streamer name >> ").strip()
     date = input("date (YYYY-MM-DD UTC) >> ").strip()
     test = input("enable testing vod playback with mpv to make sure link works yes/no? >> ").strip()
+    vods = get_vods(channel_name, date, test)
     for tag in vods:
         print(tag)
 

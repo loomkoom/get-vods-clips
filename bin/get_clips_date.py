@@ -1,9 +1,9 @@
-#encoding: utf-8
+# encoding: utf-8
 import get_clips
 import get_stream_data
 
 
-def get_clips_date(channel_name, date,file="no",workers=150):
+def get_clips_date(channel_name, date, file = "no", workers = 150):
     data_path = "../output/data"
     file_name = f"{channel_name}_clips_{date}"
     clips_lst = []
@@ -13,7 +13,7 @@ def get_clips_date(channel_name, date,file="no",workers=150):
         broadcast_id = stream[1]
         minutes = stream[2]
         title = stream[3]
-        clips = get_clips.get_clips(broadcast_id, minutes,workers)
+        clips = get_clips.get_clips(broadcast_id, minutes, workers)
 
         for clip in clips:
             data_string = f"DATE: {date_time}, URL: {clip[0]} , TIME: {clip[1]} , ID: {broadcast_id}, " \
@@ -38,10 +38,10 @@ def main():
     workers = input("worker count (empty for default) >> ").strip()
     if workers == "":
         workers = 150
-    clips = get_clips_date(channel_name, date,file,workers)
+    clips = get_clips_date(channel_name, date, file, workers)
 
     for clip in clips:
-        print(clip)
+        print(clip.replace("\n", ""))
 
 
 if __name__ == "__main__":
