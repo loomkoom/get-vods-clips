@@ -4,7 +4,7 @@ import get_vod
 
 
 def get_vods(channel_name, date, test):
-    vods = []
+    vods = list()
     stream_data = get_stream_data.get_data(channel_name, date, date)
     for stream in stream_data:
         date_time = stream[0]
