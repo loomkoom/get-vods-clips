@@ -32,7 +32,7 @@ def parse_tags(page, start, end):
                 minutes = (td.get("data-order"),)
             if td.get("class") and "status" in td.get("class"):
                 if td.string:
-                    title = (td.string.strip(),)
+                    title = (td.string.strip().replace(",", ";"),)
                 else:
                     title = ("",)
             if td.get("class") and "games" in td.get("class"):
