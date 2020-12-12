@@ -67,64 +67,73 @@ def get_data_stream(get_data_in):
 def test_get_vod_latest_no_play(get_data_stream):
     stream_data = get_data_stream
     channel_name = stream_data[0]
-    stream = stream_data[1][-1]
+    stream = choice(stream_data[1])
     timestamp, broadcast_id = stream[0], stream[1]
     vod = get_vod.get_vod(channel_name, broadcast_id, timestamp)
-    assert requests.head(vod[0], allow_redirects = False).ok, "4xx vod url response"
+    if vod[0] != "no valid link":
+        url = vod[0]
+        assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
 
 
 def test_get_vod_latest_play(get_data_stream):
     stream_data = get_data_stream
     channel_name = stream_data[0]
-    stream = stream_data[1][-1]
+    stream = choice(stream_data[1])
     timestamp, broadcast_id = stream[0], stream[1]
     vod = get_vod.get_vod(channel_name, broadcast_id, timestamp, test = "yes")
-    assert requests.head(vod[0], allow_redirects = False).ok, "4xx vod url response"
-    assert get_vod.play_url(vod[0]) == True, "Vod not playable"
+    if vod[0] != "no valid link":
+        url = vod[0]
+        assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
+        assert get_vod.play_url(url,channel_name) == True, "Vod not playable"
 
 
 # test get vods date
 def test_get_vods_date(get_data_stream):
     stream_data = get_data_stream
     channel_name = stream_data[0]
-    stream = stream_data[1][-1]
+    stream = choice(stream_data[1])
     date = stream[0][:10]
     vod = get_vods_date.get_vods(channel_name, date, test = "no")
-    url = vod[0].split(",")[1].strip()[5:]
-    assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
+    if vod[0] != "no valid link":
+        url = vod[0].split(",")[1].strip()[5:]
+        assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
 
 
-def test_get_vods_date(get_data_stream):
+def test_get_vods_date_play(get_data_stream,tmpdir):
+    output = tmpdir.mkdir("output")
+    file_path = output.mkdir("files")
     stream_data = get_data_stream
     channel_name = stream_data[0]
-    stream = stream_data[1][-1]
+    stream = choice(stream_data[1])
     date = stream[0][:10]
     vod = get_vods_date.get_vods(channel_name, date, test = "yes")
-    url = vod[0].split(",")[1].strip()[5:]
-    assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
-    assert get_vod.play_url(url) == True, "Vod not playable"
+    if vod[0] != "no valid link":
+        url = vod[0].split(",")[1].strip()[5:]
+        assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
+        assert get_vod.play_url(url,channel_name) == True, "Vod not playable"
 
 
 # test get clips
 def test_get_clips(get_data_stream):
-    stream = get_data_stream[1][-1]
+    stream = choice(get_data_stream[1])
     broadcast_id, time_offset = stream[1], floor(int(stream[2]) / 5)
     clips = get_clips.get_clips(broadcast_id, time_offset)
     assert len(clips) > 1, "no clips found"
     assert requests.head(clips[1][0], allow_redirects = False).ok, "clip not valid"
 
 
-def test_get_clips_file(get_data_stream):
+def test_get_clips_file(get_data_stream, tmpdir):
     output = tmpdir.mkdir("output")
     data_path = output.mkdir("data")
-    stream = get_data_stream[1][-1]
+    stream = choice(get_data_stream[1])
     broadcast_id, time_offset = stream[1], floor(int(stream[2]) / 5)
     clips = get_clips.get_clips(broadcast_id, time_offset, file = "yes", data_path = data_path)
     assert len(clips) > 1, "no clips found"
     assert requests.head(clips[1][0], allow_redirects = False).ok, "clip not valid"
-    assert os.path.isfile(f"{data_path}/{broadcast_id}_clips.txt")
-    with open(f"{data_path}/{broadcast_id}_clips.txt", "r", encoding = "utf8") as file:
+    assert os.path.isfile(f"{data_path}/{broadcast_id}_clips.txt"), "File not made"
+    with open(f"{data_path}\\{broadcast_id}_clips.txt", "r", encoding = "utf8") as file:
         assert len(file.readline().split(",")) == 2, "data file not correctly formatted"
+        file.seek(0)
         url = file.readline().split(",")[0].strip()[5:]
         assert requests.head(url, allow_redirects = False).ok, "clip not valid"
 
@@ -133,7 +142,7 @@ def test_get_clips_file(get_data_stream):
 def test_get_clips_date(get_data_stream):
     stream_data = get_data_stream
     channel_name = stream_data[0]
-    stream = get_data_stream[1][-1]
+    stream = choice(get_data_stream[1])
     date = stream[0][:10]
     clips = get_clips_date.get_clips_date(channel_name, date)
     url = clips[0].split(",")[1].strip()[5:]
@@ -141,20 +150,21 @@ def test_get_clips_date(get_data_stream):
     assert requests.head(url, allow_redirects = False).ok, "clip not valid"
 
 
-def test_get_clips_date_file(get_data_stream):
+def test_get_clips_date_file(get_data_stream, tmpdir):
     output = tmpdir.mkdir("output")
     data_path = output.mkdir("data")
     stream_data = get_data_stream
     channel_name = stream_data[0]
-    stream = get_data_stream[1][-1]
+    stream = choice(get_data_stream[1])
     date = stream[0][:10]
-    clips = get_clips_date.get_clips_date(channel_name, date, data_path = data_path)
+    clips = get_clips_date.get_clips_date(channel_name, date, file = "yes", data_path = data_path)
     url = clips[0].split(",")[1].strip()[5:]
     assert len(clips) > 1, "no clips found"
-    assert requests.head(clips[1][0], allow_redirects = False).ok, "clip not valid"
-    assert os.path.isfile(f"{data_path}/{channel_name}_clips_{date}.txt")
-    with open(f"{data_path}/{channel_name}_clips_{date}.txt", "r", encoding = "utf8") as file:
+    assert requests.head(url, allow_redirects = False).ok, "clip not valid"
+    assert os.path.isfile(f"{data_path}/{channel_name}_clips_{date}.txt"), "File not made"
+    with open(f"{data_path}\\{channel_name}_clips_{date}.txt", "r", encoding = "utf8") as file:
         assert len(file.readline().split(",")) == 6, "data file not correctly formatted"
+        file.seek(0)
         url = file.readline().split(",")[1].strip()[5:]
         assert requests.head(url, allow_redirects = False).ok, "clip not valid"
 
@@ -169,12 +179,15 @@ def test_get_all_vods_clips(get_data_stream, vods_clips, tmpdir, monkeypatch):
     log_path = output.mkdir("logs")
     stream_data = get_data_stream
     channel_name = stream_data[0]
-    stream = stream_data[1][-1]
+    stream = choice(stream_data[1])
     date = stream[0][:10]
     get_all_vods_clips.get_vods_clips(channel_name, vods_clips, index = 0, start = date, end = date, download = "no", rename = "no",
                                       test = "no", workers = 150,
                                       data_path = data_path, file_path = file_path, log_path = log_path)
     assert os.path.isfile(f"{data_path}/{channel_name} {vods_clips} {date} - {date}.txt")
-    with open(f"{data_path}/{channel_name} {vods_clips} {date} - {date}.txt", "r", encoding = "utf8") as file:
+    with open(f"{data_path}\\{channel_name} {vods_clips} {date} - {date}.txt", "r", encoding = "utf8") as file:
         assert len(file.readline().split(",")) == 7, "data file not correctly formatted"
-        assert file.readline().split(","))[1], "data file not correctly formatted"
+        file.seek(0)
+        url = file.readline().split(",")[1].strip()[5:]
+        if url != "no valid link":
+            assert requests.head(url, allow_redirects = False).ok, "link not valid"
