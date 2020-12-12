@@ -9,7 +9,7 @@ def load_url(url, session):
     return r.ok
 
 
-def get_clips(broadcast_id, time_offset, file = "no", workers = 150):
+def get_clips(broadcast_id, time_offset, file = "no", workers = 150, data_path = "../output/data"):
     output = list()
     time_offset = (int(time_offset) + 5) * 60 + 24
     urls = {f"https://clips-media-assets2.twitch.tv/{broadcast_id}-offset-{str(offset)}.mp4": offset for offset in range(0, time_offset)}
@@ -37,11 +37,10 @@ def get_clips(broadcast_id, time_offset, file = "no", workers = 150):
     if len(output) > 0:
         output.sort(key = lambda x: x[57:-4])
         if file == "yes":
-            data_path = "../output/data"
-            file_name = f"{broadcast_id}_clips"
+            file_name = f"{broadcast_id}_clips.txt"
             with open(f"{data_path}/{file_name}", "w", encoding = 'utf8') as data_log:
                 for clip in output:
-                    data_string = f"URL: {clip[0]} , TIME: {clip[1]}"
+                    data_string = f"URL: {clip[0]} , TIME: {clip[1]}\n"
                     data_log.write(data_string)
         return output
     return [("no valid clips found,", "None")]
@@ -62,7 +61,7 @@ def main():
     clips = get_clips(broadcast_id, time_offset, file, workers)
 
     for clip in clips:
-        print(clip)
+        print(clip.replace("\n", ""))
 
 
 if __name__ == "__main__":

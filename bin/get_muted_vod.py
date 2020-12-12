@@ -18,6 +18,8 @@ def get_muted_playlist(url, file_name, file_path = "../output/files"):
     file_name = file_name[:-5] if file_name.endswith(".m3u8") else file_name
     channel_name = url.split("_")[1]
     path = f"{file_path}/{channel_name}/playlists"
+    if not os.path.isdir(file_path):
+        os.mkdir(file_path)
     if not os.path.isdir(f"{file_path}/{channel_name}"):
         os.mkdir(f"{file_path}/{channel_name}")
     if not os.path.isdir(path):

@@ -3,9 +3,8 @@ import get_clips
 import get_stream_data
 
 
-def get_clips_date(channel_name, date, file = "no", workers = 150):
-    data_path = "../output/data"
-    file_name = f"{channel_name}_clips_{date}"
+def get_clips_date(channel_name, date, file = "no", workers = 150, data_path = "../output/data"):
+    file_name = f"{channel_name}_clips_{date}.txt"
     clips_lst = []
     stream_data = get_stream_data.get_data(channel_name, date, date)
     for stream in stream_data:
