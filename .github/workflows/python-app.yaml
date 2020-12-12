@@ -19,7 +19,8 @@ jobs:
         python-version: 3.8
     - name: Install dependencies
       run: |
-        sudo apt install mpv
+        sudo apt-get update -y
+        sudo apt-get install -y libmpv-dev
         python -m pip install --upgrade pip
         pip install flake8 pytest pytest-cov
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
