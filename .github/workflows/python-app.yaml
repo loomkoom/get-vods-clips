@@ -23,6 +23,7 @@ jobs:
         sudo apt-get update -y
         sudo apt-get install -y mpv
         sudo apt-get install -y libmpv-dev
+        sudo apt-get upgrade
         python -m pip install --upgrade pip
         pip install wheel flake8 pytest pytest-cov
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
