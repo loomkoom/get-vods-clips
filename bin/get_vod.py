@@ -52,11 +52,21 @@ def get_vod(channel_name, broadcast_id, timestamp, test = "no"):
     required_hash = hash_string[:20]
     final_formatted_string = f"{required_hash}_{formatted_string}"
 
-    url = f"https://vod-secure.twitch.tv/{final_formatted_string}/chunked/index-dvr.m3u8"
+    hosts = ["https://vod-secure.twitch.tv",
+             "https://vod-metro.twitch.tv",
+             "https://d2nvs31859zcd8.cloudfront.net",
+             "https://d3c27h4odz752x.cloudfront.net",
+             "https://dqrpb9wgowsf5.cloudfront.net",
+             "https://d2e2de1etea730.cloudfront.net",
+             "https://ds0h3roq6wcgc.cloudfront.net"]
+
+    urls = [f"{host}{final_formatted_string}/chunked/index-dvr.m3u8" for host in hosts]
     header = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36 OPR/71.0.3770.323', }
 
-    if requests.head(url, headers = header, allow_redirects = False).ok:
+    for url in urls:
+        if not requests.head(url, headers = header, allow_redirects = False).ok:
+            continue
         if test == "yes":
             if not get_muted_vod.is_muted(url):
                 if play_url(url, channel_name):
