@@ -4,6 +4,8 @@ import os
 from datetime import timedelta
 from math import floor
 
+from random import choice
+
 import get_all_vods_clips
 import get_files
 import get_vod
@@ -17,9 +19,10 @@ import requests
 
 @pytest.fixture()
 def get_data_in():
-    channel_name = "xqcow".lower()
+    channels = ["hasanabi", "xqcow", "shroud", "NICKMERCS", "mizkif", "timthetatman"]
+    channel_name = channels.choice().lower()
     today = datetime.datetime.today()
-    other_day = today - timedelta(days = 3)
+    other_day = today - timedelta(days = 7)
     date_range = (other_day.strftime("%Y-%m-%d"), today.strftime("%Y-%m-%d"))
     return [channel_name, date_range]
 
