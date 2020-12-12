@@ -10,14 +10,16 @@ def play_url(url):
                         frames = "1", untimed = "yes", demuxer = "lavf", demuxer_lavf_format = "hls", demuxer_thread = "no", cache = "no",
                         ytdl = "no", load_scripts = "no", audio = "no", demuxer_lavf_o = '"protocol_whitelist"="file,https,http,tls,tcp"')
     player.play(url)
-    timeout = 2
+    timeout = 2.5
     start = time.time()
     player.wait_until_playing(timeout)
+    player.quit()
     time_taken = time.time() - start
-    return not (time_taken >= 2), time_taken
+    return not (time_taken >= 2.499)
 
 
 def validate_vods(file_name, new_file_name):
+    file_name = file_name[:-4] if file_name.endswith(".txt") else file_name
     with open(f"../output/data/{file_name}.txt", "r", encoding = 'utf8') as file:
         output = list()
         streams = list(filter((lambda x: "vod-secure.twitch.tv" in x), file.readlines()))

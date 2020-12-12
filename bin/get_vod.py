@@ -7,7 +7,7 @@ from pathlib import Path
 import requests
 
 import get_muted_vod
-import mpv_py
+import mpv_py as mpv
 
 
 def to_timestamp(date_time, epoch = datetime.datetime(1970, 1, 1)):
@@ -28,15 +28,16 @@ def extract_timestamp(timestamp):
 def play_url(url, channel_name):
     if not url.startswith("http"):
         url = str(Path(__file__).parents[1]).replace('\\', '/') + f"/output/files/{channel_name}/playlists/{url}"
-    player = mpv_py.MPV(window_minimized = "yes", osc = "no", load_osd_console = "no", load_stats_overlay = "no", profile = "low-latency",
-                        frames = "1", untimed = "yes", demuxer = "lavf", demuxer_lavf_format = "hls", demuxer_thread = "no", cache = "no",
-                        ytdl = "no", load_scripts = "no", audio = "no", demuxer_lavf_o = '"protocol_whitelist"="file,https,http,tls,tcp"')
+    player = mpv.MPV(window_minimized = "yes", osc = "no", load_osd_console = "no", load_stats_overlay = "no", profile = "low-latency",
+                     frames = "1", untimed = "yes", demuxer = "lavf", demuxer_lavf_format = "hls", demuxer_thread = "no", cache = "no",
+                     ytdl = "no", load_scripts = "no", audio = "no", demuxer_lavf_o = '"protocol_whitelist"="file,https,http,tls,tcp"')
     player.play(url)
-    timeout = 2
+    timeout = 2.5
     start = time.time()
     player.wait_until_playing(timeout)
+    player.quit()
     time_taken = time.time() - start
-    return not (time_taken >= 2), time_taken
+    return not (time_taken >= 2.499)
 
 
 def get_vod(channel_name, broadcast_id, timestamp, test = "no"):
@@ -51,11 +52,21 @@ def get_vod(channel_name, broadcast_id, timestamp, test = "no"):
     required_hash = hash_string[:20]
     final_formatted_string = f"{required_hash}_{formatted_string}"
 
-    url = f"https://vod-secure.twitch.tv/{final_formatted_string}/chunked/index-dvr.m3u8"
+    hosts = ["https://vod-secure.twitch.tv/",
+             "https://d2nvs31859zcd8.cloudfront.net/",
+             "https://d3c27h4odz752x.cloudfront.net/",
+             "https://dqrpb9wgowsf5.cloudfront.net/",
+             "https://d2e2de1etea730.cloudfront.net/",
+             "https://ds0h3roq6wcgc.cloudfront.net/",
+             "https://vod-metro.twitch.tv/"]
+
+    urls = [f"{host}{final_formatted_string}/chunked/index-dvr.m3u8" for host in hosts]
     header = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36 OPR/71.0.3770.323', }
 
-    if requests.head(url, headers = header, allow_redirects = False).ok:
+    for url in urls:
+        if not requests.head(url, headers = header, allow_redirects = False).ok:
+            continue
         if test == "yes":
             if not get_muted_vod.is_muted(url):
                 if play_url(url, channel_name):
