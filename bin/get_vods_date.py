@@ -3,7 +3,7 @@ import get_stream_data
 import get_vod
 
 
-def get_vods(channel_name, date, test):
+def get_vods(channel_name, date, test, file_path = "../output/files"):
     vods = list()
     stream_data = get_stream_data.get_data(channel_name, date, date)
     for stream in stream_data:
@@ -12,7 +12,7 @@ def get_vods(channel_name, date, test):
         minutes = stream[2]
         title = stream[3]
         categories = stream[3]
-        vod = get_vod.get_vod(channel_name, broadcast_id, date_time, test)
+        vod = get_vod.get_vod(channel_name, broadcast_id, date_time, test, file_path = file_path)
         data_string = f"DATE: {date_time}, URL: {vod[0]} , MUTED: {vod[1] if vod[1] else 0} , ID: {broadcast_id}, " \
                       f"LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
                       f"TITLE: {title} , CATEGORIES: {categories}\n"

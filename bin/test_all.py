@@ -70,21 +70,23 @@ def test_get_vod_latest_no_play(get_data_stream):
     stream = choice(stream_data[1])
     timestamp, broadcast_id = stream[0], stream[1]
     vod = get_vod.get_vod(channel_name, broadcast_id, timestamp)
-    if vod[0] != "no valid link":
-        url = vod[0]
+    url = vod[0]
+    if url != "no valid link":
         assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
 
 
-def test_get_vod_latest_play(get_data_stream):
+def test_get_vod_latest_play(get_data_stream, tmpdir):
+    output = tmpdir.mkdir("output")
+    file_path = output.mkdir("files")
     stream_data = get_data_stream
     channel_name = stream_data[0]
     stream = choice(stream_data[1])
     timestamp, broadcast_id = stream[0], stream[1]
-    vod = get_vod.get_vod(channel_name, broadcast_id, timestamp, test = "yes")
-    if vod[0] != "no valid link":
-        url = vod[0]
+    vod = get_vod.get_vod(channel_name, broadcast_id, timestamp, test = "yes", file_path = file_path)
+    url = vod[0]
+    if url != "no valid link":
         assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
-        assert get_vod.play_url(url,channel_name) == True, "Vod not playable"
+        assert get_vod.play_url(url, channel_name) == True, "Vod not playable"
 
 
 # test get vods date
@@ -94,8 +96,8 @@ def test_get_vods_date(get_data_stream):
     stream = choice(stream_data[1])
     date = stream[0][:10]
     vod = get_vods_date.get_vods(channel_name, date, test = "no")
-    if vod[0] != "no valid link":
-        url = vod[0].split(",")[1].strip()[5:]
+    url = vod[0].split(",")[1].strip()[5:]
+    if url != "no valid link":
         assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
 
 
@@ -106,17 +108,17 @@ def test_get_vods_date_play(get_data_stream,tmpdir):
     channel_name = stream_data[0]
     stream = choice(stream_data[1])
     date = stream[0][:10]
-    vod = get_vods_date.get_vods(channel_name, date, test = "yes")
-    if vod[0] != "no valid link":
-        url = vod[0].split(",")[1].strip()[5:]
+    vod = get_vods_date.get_vods(channel_name, date, test = "yes", file_path = file_path)
+    url = vod[0].split(",")[1].strip()[5:]
+    if url != "no valid link":
         assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
-        assert get_vod.play_url(url,channel_name) == True, "Vod not playable"
+        assert get_vod.play_url(url, channel_name) == True, "Vod not playable"
 
 
 # test get clips
 def test_get_clips(get_data_stream):
     stream = choice(get_data_stream[1])
-    broadcast_id, time_offset = stream[1], floor(int(stream[2]) / 5)
+    broadcast_id, time_offset = stream[1], stream[2]
     clips = get_clips.get_clips(broadcast_id, time_offset)
     assert len(clips) > 1, "no clips found"
     assert requests.head(clips[1][0], allow_redirects = False).ok, "clip not valid"

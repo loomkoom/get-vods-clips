@@ -40,7 +40,7 @@ def play_url(url, channel_name):
     return not (time_taken >= 2.499)
 
 
-def get_vod(channel_name, broadcast_id, timestamp, test = "no"):
+def get_vod(channel_name, broadcast_id, timestamp, test = "no", file_path = "../output/files"):
     channel_name = channel_name.lower()
 
     y, mt, d, h, mn, s = extract_timestamp(timestamp)
@@ -72,7 +72,8 @@ def get_vod(channel_name, broadcast_id, timestamp, test = "no"):
                 if play_url(url, channel_name):
                     return url, False
             else:
-                muted_vod = get_muted_vod.get_muted_playlist(url, f"{datetime.datetime.date(date_time)}_{broadcast_id}")
+                muted_vod = get_muted_vod.get_muted_playlist(url, f"{datetime.datetime.date(date_time)}_{broadcast_id}",
+                                                             file_path = file_path)
                 if play_url(muted_vod, channel_name):
                     return url, muted_vod
         elif test == "no":
