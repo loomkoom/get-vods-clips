@@ -34,7 +34,6 @@
   * [mpv](https://pypi.org/project/mpv/)
   * [requests](https://pypi.org/project/requests/)
   * [m3u8](https://pypi.org/project/m3u8/)
-  * [Brotli](https://pypi.org/project/Brotli/)
 
 ### Prerequisites
 
