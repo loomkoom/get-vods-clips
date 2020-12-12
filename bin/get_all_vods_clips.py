@@ -131,7 +131,7 @@ def main():
           "-outputs to a file in output/data\n"
           "-for downloads outputs in output/downloads (ffmpeg needed for vod downloads)\n"
           "-worker count is set to 150 by default try changing it to a lower number"
-          " if the script uses too much resources (will be slower) otherwise leave empty \n"
+          " if the script uses too much resources (will take an extra 2.5sec per vod) otherwise leave empty \n"
           "-disable testing vod playback with mpv if you get mpv errors\n\n")
 
     channel_name = input("channel name? >> ").strip().lower()
