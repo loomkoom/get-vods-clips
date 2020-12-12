@@ -20,7 +20,7 @@ import requests
 @pytest.fixture()
 def get_data_in():
     channels = ["hasanabi", "xqcow", "shroud", "NICKMERCS", "mizkif", "timthetatman"]
-    channel_name = channels.choice().lower()
+    channel_name = choice(channels).lower()
     today = datetime.datetime.today()
     other_day = today - timedelta(days = 7)
     date_range = (other_day.strftime("%Y-%m-%d"), today.strftime("%Y-%m-%d"))
