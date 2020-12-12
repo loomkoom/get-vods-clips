@@ -64,9 +64,9 @@ def parse_tags(page, start, end):
 
 
 def get_data(channel_name, start = "", end = ""):
-    if len(channel_name) < 4 \
-            or (start != "" and len(start) != 10) \
-            or (end != "" and len(end) != 10):
+    if (len(channel_name) < 4 or
+            (not (start == "" or len(start) == 10)) or
+            (not (end == "" or len(end) == 10))):
         print("\ninvalid input data, check that date is in the correct format (YYYY-MM-DD)")
         return
 
