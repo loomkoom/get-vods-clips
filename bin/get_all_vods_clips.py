@@ -21,19 +21,23 @@ def check_dirs(path):
 def check_input(channel_name, vods_clips, index, start, end, download, rename, workers, test):
     if (len(channel_name) < 4 or
             (not (vods_clips == "clips" or vods_clips == "vods")) or
-            (not (start is None or len(start) == 10)) or
-            (not (end is None or len(end) == 10)) or
+            (not (start == "" or len(start) == 10)) or
+            (not (end == "" or len(end) == 10)) or
             (not (rename == "no" or rename == "yes")) or
             (not (download == "no" or download == "yes")) or
             (not (test == "no" or test == "yes")) or
             (not isinstance(workers, int)) or
             (not isinstance(index, int))):
         print("invalid input, please try again")
+        return 0
+    return 1
 
 
-def get_vods_clips(channel_name, vods_clips, index = 0, start = None, end = None, download = "no", rename = "no", workers = 150,
+def get_vods_clips(channel_name, vods_clips, index = 0, start = "", end = "", download = "no", rename = "no", workers = 150,
                    test = "yes", data_path = "../output/data", file_path = "../output/files", log_path = "../output/logs"):
-    check_input(channel_name, vods_clips, index, start, end, download, rename, workers, test)
+    valid_input = check_input(channel_name, vods_clips, index, start, end, download, rename, workers, test)
+    if not bool(valid_input):
+        return
     check_dirs(data_path)
     check_dirs(file_path)
     check_dirs(log_path)
@@ -135,10 +139,6 @@ def main():
     start = input("from date (earliest) YYYY-MM-DD >> ").strip()
     end = input("to date (newest) YYYY-MM-DD >> ").strip()
     download = input("download files yes/no? >> ").strip()
-    if start == "":
-        start = None
-    if end == "":
-        end = None
     if download == "yes":
         rename = input("rename files after download?\n"
                        "     (clips from {ID-offset}.mp4  --->  {date}__{title}__{offset_time}-{length}_{ID-offset}.mp4\n"
