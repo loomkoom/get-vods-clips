@@ -17,7 +17,7 @@ import requests
 
 @pytest.fixture()
 def get_data_in():
-    channel_name = "Hasanabi".lower()
+    channel_name = "xqcow".lower()
     today = datetime.datetime.today()
     other_day = today - timedelta(days = 3)
     date_range = (other_day.strftime("%Y-%m-%d"), today.strftime("%Y-%m-%d"))
