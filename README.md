@@ -9,6 +9,7 @@
 *** https://www.markdownguide.org/basic-syntax/#reference-style-links
 -->
 [![CodeFactor][codefactor-shield]][codefactor-url]
+[![codecov][codecov-shield]][codecov-url]
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
@@ -124,6 +125,10 @@
 [codefactor-shield]: https://www.codefactor.io/repository/github/loomkoom/get-vods-clips/badge
 
 [codefactor-url]: https://www.codefactor.io/repository/github/loomkoom/get-vods-clips
+
+[codecov-shield]: https://codecov.io/gh/loomkoom/get-vods-clips/branch/dev/graph/badge.svg?token=854YYAWM89
+
+[codecov-url]: https://codecov.io/gh/loomkoom/get-vods-clips
 
 [contributors-shield]: https://img.shields.io/github/contributors/loomkoom/get-vods-clips.svg?style=flat-square
 
