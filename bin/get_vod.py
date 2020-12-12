@@ -7,7 +7,7 @@ from pathlib import Path
 import requests
 
 import get_muted_vod
-import mpv_py
+import mpv_py as mpv
 
 
 def to_timestamp(date_time, epoch = datetime.datetime(1970, 1, 1)):
@@ -28,15 +28,16 @@ def extract_timestamp(timestamp):
 def play_url(url, channel_name):
     if not url.startswith("http"):
         url = str(Path(__file__).parents[1]).replace('\\', '/') + f"/output/files/{channel_name}/playlists/{url}"
-    player = mpv_py.MPV(window_minimized = "yes", osc = "no", load_osd_console = "no", load_stats_overlay = "no", profile = "low-latency",
-                        frames = "1", untimed = "yes", demuxer = "lavf", demuxer_lavf_format = "hls", demuxer_thread = "no", cache = "no",
-                        ytdl = "no", load_scripts = "no", audio = "no", demuxer_lavf_o = '"protocol_whitelist"="file,https,http,tls,tcp"')
+    player = mpv.MPV(window_minimized = "yes", osc = "no", load_osd_console = "no", load_stats_overlay = "no", profile = "low-latency",
+                     frames = "1", untimed = "yes", demuxer = "lavf", demuxer_lavf_format = "hls", demuxer_thread = "no", cache = "no",
+                     ytdl = "no", load_scripts = "no", audio = "no", demuxer_lavf_o = '"protocol_whitelist"="file,https,http,tls,tcp"')
     player.play(url)
-    timeout = 2
+    timeout = 2.5
     start = time.time()
     player.wait_until_playing(timeout)
+    player.quit()
     time_taken = time.time() - start
-    return not (time_taken >= 2), time_taken
+    return not (time_taken >= 2.499)
 
 
 def get_vod(channel_name, broadcast_id, timestamp, test = "no"):
