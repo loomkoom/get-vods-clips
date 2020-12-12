@@ -19,8 +19,9 @@ jobs:
         python-version: 3.8
     - name: Install dependencies
       run: |
+        sudo add-apt-repository ppa:mc3man/mpv-tests -y
         sudo apt-get update -y
-        sudo apt-get install -y libmpv-dev
+        sudo apt install mpv -y
         python -m pip install --upgrade pip
         pip install flake8 pytest pytest-cov
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
