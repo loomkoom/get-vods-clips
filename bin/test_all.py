@@ -131,7 +131,7 @@ def test_get_clips_file(get_data_stream, tmpdir):
     assert len(clips) > 1, "no clips found"
     assert requests.head(clips[1][0], allow_redirects = False).ok, "clip not valid"
     assert os.path.isfile(f"{data_path}/{broadcast_id}_clips.txt"), "File not made"
-    with open(f"{data_path}\\{broadcast_id}_clips.txt", "r", encoding = "utf8") as file:
+    with open(f"{data_path}/{broadcast_id}_clips.txt", "r", encoding = "utf8") as file:
         assert len(file.readline().split(",")) == 2, "data file not correctly formatted"
         file.seek(0)
         url = file.readline().split(",")[0].strip()[5:]
@@ -162,7 +162,7 @@ def test_get_clips_date_file(get_data_stream, tmpdir):
     assert len(clips) > 1, "no clips found"
     assert requests.head(url, allow_redirects = False).ok, "clip not valid"
     assert os.path.isfile(f"{data_path}/{channel_name}_clips_{date}.txt"), "File not made"
-    with open(f"{data_path}\\{channel_name}_clips_{date}.txt", "r", encoding = "utf8") as file:
+    with open(f"{data_path}/{channel_name}_clips_{date}.txt", "r", encoding = "utf8") as file:
         assert len(file.readline().split(",")) == 6, "data file not correctly formatted"
         file.seek(0)
         url = file.readline().split(",")[1].strip()[5:]
@@ -185,7 +185,7 @@ def test_get_all_vods_clips(get_data_stream, vods_clips, tmpdir, monkeypatch):
                                       test = "no", workers = 150,
                                       data_path = data_path, file_path = file_path, log_path = log_path)
     assert os.path.isfile(f"{data_path}/{channel_name} {vods_clips} {date} - {date}.txt")
-    with open(f"{data_path}\\{channel_name} {vods_clips} {date} - {date}.txt", "r", encoding = "utf8") as file:
+    with open(f"{data_path}/{channel_name} {vods_clips} {date} - {date}.txt", "r", encoding = "utf8") as file:
         assert len(file.readline().split(",")) == 7, "data file not correctly formatted"
         file.seek(0)
         url = file.readline().split(",")[1].strip()[5:]
