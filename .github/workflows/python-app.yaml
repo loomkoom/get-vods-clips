@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
     - uses: actions/checkout@v2
@@ -19,8 +19,12 @@ jobs:
         python-version: 3.8
     - name: Install dependencies
       run: |
+        sudo add-apt-repository ppa:mc3man/mpv-tests -y
+        sudo apt-get update -y
+        sudo apt-get install -y mpv
+        sudo apt-get install -y libmpv-dev
         python -m pip install --upgrade pip
-        pip install flake8 pytest pytest-cov
+        pip install wheel flake8 pytest pytest-cov
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Lint with flake8
       run: |
