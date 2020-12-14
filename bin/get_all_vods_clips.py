@@ -58,14 +58,14 @@ def check_input(channel_name, vods_clips, index, start, end, download, rename, w
 def get_vods_clips(channel_name, vods_clips, index = 0, start = "", end = "", tracker = "TT", download = "no", rename = "no", workers = 150,
                    test = "yes", data_path = "../output/data", file_path = "../output/files", log_path = "../output/logs",
                    loglevel = "INFO"):
-    valid_input = check_input(channel_name, vods_clips, index, start, end, download, rename, workers, test)
-    if not bool(valid_input):
-        return
     check_dirs(data_path)
     check_dirs(file_path)
     check_dirs(log_path)
-    start_time = datetime.utcnow().strftime("%m-%d-%Y, %H.%M.%S")
+    start_time = datetime.now().strftime("%m-%d-%Y, %H.%M.%S")
     logger = set_logger(loglevel, log_path, start_time, channel_name)
+    valid_input = check_input(channel_name, vods_clips, index, start, end, download, rename, workers, test)
+    if not bool(valid_input):
+        return
 
     # list of streams in format: (date_time, broadcast_id, minutes, categories)
     stream_data = get_stream_data.get_data(channel_name, start, end, tracker = tracker)[index:]
@@ -136,7 +136,11 @@ def get_vods_clips(channel_name, vods_clips, index = 0, start = "", end = "", tr
 
     abs_data_path = os.path.abspath(data_path).replace('\\', '/')
     logger.info("\nAll retrievable links found")
-    logger.info(f"{vods_clips[:-1]} links located in '{abs_data_path}/{file_name}'")
+    if not vod_clips == "both":
+        logger.info(f"{vods_clips[:-1]} links located in '{abs_data_path}/{file_name}'")
+    else:
+        logger.info(f"vod links located in '{abs_data_path}/{channel_name} vods {start} - {end}.txt'")
+        logger.info(f"clips links located in '{abs_data_path}/{channel_name} clips {start} - {end}.txt'")
 
     if download == "yes":
         abs_file_path = os.path.abspath(file_path).replace('\\', '/')
