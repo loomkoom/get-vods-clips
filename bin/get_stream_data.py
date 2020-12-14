@@ -5,6 +5,7 @@ import logging
 
 import requests
 from bs4 import BeautifulSoup as soup
+from alt_twitch import twitch
 from twitch import TwitchHelix
 
 logger = logging.getLogger(__name__)

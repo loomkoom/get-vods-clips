@@ -120,6 +120,8 @@ def get_vod(channel_name, broadcast_id, timestamp, tracker = "TR", test = "no", 
             muted = verified[1]
             if found_url != "no valid link":
                 found.append(found_url)
+    if len(found) == 0:
+        found.append("no valid link")
     return found, muted
 
 
@@ -127,7 +129,7 @@ def main():
     print("\n-returns the playlist link for a vod (m3u8 link) usually available for any vod within 60 days \n"
           "-requires [channel name], [broadcast id] and [timestamp] \n"
           "-all can be found on twitchtracker (in the streams page inspect element on the date+time link for a timestamp with seconds \n"
-          "-enable testing vod playback with mpv if you non working links (no false positives) takes a little longer and less stable\n\n")
+          "-disable testing vod playback if it's slow and you don't mind false positives\n\n")
     channel_name = input("Enter streamer name >> ").strip()
     broadcast_id = input("Enter broadcast id >> ").strip()
     timestamp = input("Enter VOD timestamp (YYYY-MM-DD HH:MM:SS) UTC >> ").strip()

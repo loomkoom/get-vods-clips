@@ -180,7 +180,7 @@ def test_get_clips_date_file(get_data_stream, tmpdir):
 
 
 # test get_all_vods_clips
-@pytest.mark.parametrize("vods_clips", ["vods", "clips"])
+@pytest.mark.parametrize("vods_clips", ["vods", "clips", "both"])
 def test_get_all_vods_clips(get_data_stream, vods_clips, tmpdir, monkeypatch):
     monkeypatch.setattr('builtins.input', lambda _: "no")
     output = tmpdir.mkdir("output")

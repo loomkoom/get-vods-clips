@@ -23,8 +23,8 @@ def get_vods(channel_name, date, tracker = "TT", test = "yes", file_path = "../o
 def main():
     print("\n-returns the playlist links for all vods on a specific date usually available for any vod within 60 days \n"
           "-requires [channel name] and [date] \n"
-          "-output a list wth vod link and data "
-          "-disable testing vod playback with mpv if you get mpv errors\n\n")
+          "-output a list wth vod link and data\n"
+          "-disable testing vod playback if it's slow and you don't mind false positives\n\n")
     channel_name = input("Enter streamer name >> ").strip()
     date = input("date (YYYY-MM-DD UTC) >> ").strip()
     test = input("enable testing vod playback with mpv to make sure link works yes/no? >> ").strip()

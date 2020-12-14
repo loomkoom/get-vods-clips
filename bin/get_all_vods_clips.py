@@ -42,7 +42,7 @@ def check_dirs(path):
 
 def check_input(channel_name, vods_clips, index, start, end, download, rename, workers, test):
     if (len(channel_name) < 4 or
-            (not (vods_clips == "clips" or vods_clips == "vods")) or
+            (not (vods_clips == "clips" or vods_clips == "vods" or vods_clips == "both")) or
             (not (start == "" or len(start) == 10)) or
             (not (end == "" or len(end) == 10)) or
             (not (rename == "no" or rename == "yes")) or
@@ -65,7 +65,7 @@ def get_vods_clips(channel_name, vods_clips, index = 0, start = "", end = "", tr
     check_dirs(file_path)
     check_dirs(log_path)
     start_time = datetime.utcnow().strftime("%m-%d-%Y, %H.%M.%S")
-    logger = set_logger(loglevel, logpath, start_time, channel_name)
+    logger = set_logger(loglevel, log_path, start_time, channel_name)
 
     # list of streams in format: (date_time, broadcast_id, minutes, categories)
     stream_data = get_stream_data.get_data(channel_name, start, end, tracker = tracker)[index:]
@@ -92,24 +92,24 @@ def get_vods_clips(channel_name, vods_clips, index = 0, start = "", end = "", tr
         minutes = stream[2]
         title = stream[3]
         categories = stream[4]
-        if vods_clips == "vods":
+        if vods_clips == "vods" or vods_clips == "both":
             log_string = f"[{time_now}]: DATE: {date_time}, ID: {broadcast_id}, LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
                          f"TITLE: {title}, CATEGORIES: {categories}"
             logger.info(log_string)
             vod = get_vod.get_vod(channel_name, broadcast_id, date_time, test)
-            logger.info(f"URL: {vod[0]} , MUTED: {vod[1] if vod[1] else 0}")
+            logger.info(f"VOD: URL: {vod[0]} , MUTED: {vod[1] if vod[1] else 0}")
             data_string = f"DATE: {date_time}, URL: {vod[0]} , MUTED: {vod[1] if vod[1] else 0} , ID: {broadcast_id}, " \
                           f"LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
                           f"TITLE: {title} , CATEGORIES: {categories} \n"
             time_now = datetime.now().time().strftime("%H:%M:%S")
-            progress_string = f"streams checked {stream_data.index(stream) + 1}/{len(stream_data)}  \n" \
+            progress_string = f"streams checked {stream_data.index(stream) + 1}/{len(stream_data)}\t" \
                               f"{floor((stream_data.index(stream) + 1) / len(stream_data) * 100)}% done "
             logger.info(progress_string)
 
             with open(f"{data_path}/{file_name}", "a", encoding = 'utf8') as data_log:
                 data_log.write(data_string)
 
-        elif vods_clips == "clips":
+        if vods_clips == "clips" or vods_clips == "both":
             time_now = datetime.now().time().strftime("%H:%M:%S")
             log_string = f"[{time_now}]: DATE: {date_time}, ID: {broadcast_id}, LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
                          f"TITLE: {title}, CATEGORIES: {categories}"
@@ -124,8 +124,8 @@ def get_vods_clips(channel_name, vods_clips, index = 0, start = "", end = "", tr
                     data_log.write(data_string)
 
             minutes_left = sum(map(lambda x: int(x[2]), stream_data[stream_data.index(stream) + 1:]))
-            found_string = f"[{time_now}]: {len(clips) if clips[0][0][:2] != 'no' else 0} clips found "
-            progress_string = f"streams checked {stream_data.index(stream) + 1}/{len(stream_data)}" \
+            found_string = f"CLIPS: {len(clips) if clips[0][0][:2] != 'no' else 0} clips found "
+            progress_string = f"streams checked {stream_data.index(stream) + 1}/{len(stream_data)}\t" \
                               f"{floor(((total_minutes - minutes_left) / total_minutes) * 100)}% done \n" \
                               f"estimated time left: {timedelta(minutes = minutes_left * 0.0043)}"
             logger.info(found_string + progress_string)
@@ -157,13 +157,23 @@ def main():
           "-for downloads outputs in output/downloads (ffmpeg needed for vod downloads)\n"
           "-worker count is set to 150 by default try changing it to a lower number"
           " if the script uses too much resources (will take an extra 2.5sec per vod) otherwise leave empty \n"
-          "-disable testing vod playback with mpv if you get mpv errors\n\n")
+          "-disable testing vod playback if it's slow and you don't mind false positives\n"
+          "-choose twitchtracker or steamcharts as tracker\n"
+          "     - streamcharts:\n"
+          "         PRO: can get multiple vods when stream goes down\n"
+          "         CON: earliest stream history is 2019-06-00\n"
+          "              slower data retrieval and slower vod finding\n"
+          "     - twitchtracker:\n"
+          "         PRO: fast\n"
+          "              large stream history\n"
+          "         CON: will merge multiple streams (can only get 1st part of vod)\n\n")
 
     channel_name = input("channel name? >> ").strip().lower()
-    vods_clips = input("clips or vods? >> ").strip().lower()
+    vods_clips = input("clips or vods or both? >> ").strip().lower()
     start = input("from date (earliest) YYYY-MM-DD >> ").strip()
     end = input("to date (newest) YYYY-MM-DD >> ").strip()
     download = input("download files yes/no? >> ").strip()
+    tracker = input("tracker to use [TT/SC]? >> ").strip().upper()
     if download == "yes":
         rename = input("rename files after download?\n"
                        "     (clips from {ID-offset}.mp4  --->  {date}__{title}__{offset_time}-{length}_{ID-offset}.mp4\n"
@@ -179,6 +189,14 @@ def main():
     if vods_clips == "vods":
         test = input("test if vod actually plays with mpv (no false positives but a bit slower) [yes/no]? >>").strip()
         get_vods_clips(channel_name, vods_clips, 0, start = start, end = end, download = download, rename = rename, test = test)
+
+    elif vods_clips == "both":
+        workers = input("worker count (empty for default) >> ").strip()
+        if workers == "":
+            workers = 150
+        test = input("test if vod actually plays with mpv (no false positives but a bit slower) [yes/no]? >>").strip()
+        get_vods_clips(channel_name, vods_clips, 0, start = start, end = end, download = download, rename = rename, test = test,
+                       workers = workers)
 
 
 if __name__ == "__main__":
