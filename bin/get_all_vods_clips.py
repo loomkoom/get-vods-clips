@@ -40,7 +40,7 @@ def check_dirs(path):
         os.mkdir(path)
 
 
-def check_input(channel_name, vods_clips, index, start, end, download, rename, workers, test):
+def check_input(channel_name, vods_clips, index, start, end, download, rename, workers, test, logger):
     if (len(channel_name) < 4 or
             (not (vods_clips == "clips" or vods_clips == "vods" or vods_clips == "both")) or
             (not (start == "" or len(start) == 10)) or
@@ -63,7 +63,7 @@ def get_vods_clips(channel_name, vods_clips, index = 0, start = "", end = "", tr
     check_dirs(log_path)
     start_time = datetime.now().strftime("%m-%d-%Y, %H.%M.%S")
     logger = set_logger(loglevel, log_path, start_time, channel_name)
-    valid_input = check_input(channel_name, vods_clips, index, start, end, download, rename, workers, test)
+    valid_input = check_input(channel_name, vods_clips, index, start, end, download, rename, workers, test, logger)
     if not bool(valid_input):
         return
 
