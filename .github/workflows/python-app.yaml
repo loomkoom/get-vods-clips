@@ -25,7 +25,6 @@ jobs:
         sudo apt-get install -y libmpv-dev
         python -m pip install --upgrade pip
         pip install wheel flake8 pytest pytest-cov
-        lib_path=$(python3 -m site --user-site); pip install --target=$lib_path/alt_twitch python-twitch-client
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Lint with flake8
       run: |
