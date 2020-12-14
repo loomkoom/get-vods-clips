@@ -1,9 +1,18 @@
 # encoding: utf-8
-from datetime import datetime
+from datetime import datetime, timedelta
+from math import ceil
+import logging
 
 import requests
 from bs4 import BeautifulSoup as soup
+from twitch import TwitchHelix
 
+logger = logging.getLogger(__name__)
+formatter = logging.Formatter('[%(asctime)s : %(name)s]: %(message)s')
+
+stream_handler = logging.StreamHandler()
+stream_handler.setFormatter(formatter)
+logger.addHandler(stream_handler)
 
 
 def get_page(url, format = "html", session = False):
@@ -83,7 +92,7 @@ def get_data(channel_name, start = "", end = "", tracker = "TT"):
     if (len(channel_name) < 4 or
             (not (start == "" or len(start) == 10)) or
             (not (end == "" or len(end) == 10))):
-        print("\ninvalid input data, check that date is in the correct format (YYYY-MM-DD)")
+        logger.critical("\ninvalid input data, check that date is in the correct format (YYYY-MM-DD)")
         return
 
     try:
@@ -128,7 +137,7 @@ def get_data(channel_name, start = "", end = "", tracker = "TT"):
     if stream_data is not None:
         logger.info(f"{len(stream_data)} streams found")
         return stream_data
-    print(f"{channel_name} has no recorded stream history")
+    logger.info(f"{channel_name} has no recorded stream history (in this date range)")
     return []
 
 

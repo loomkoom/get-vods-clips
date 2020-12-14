@@ -3,12 +3,20 @@ from datetime import datetime, timedelta
 import hashlib
 import time
 from pathlib import Path
+import concurrent.futures
+import logging
 
 import requests
 
 import get_muted_vod
 import mpv_py as mpv
 
+logger = logging.getLogger(__name__)
+formatter = logging.Formatter('[%(asctime)s : %(name)s]: %(message)s')
+
+stream_handler = logging.StreamHandler()
+stream_handler.setFormatter(formatter)
+logger.addHandler(stream_handler)
 
 
 def to_timestamp(date_time, epoch = datetime(1970, 1, 1)):
