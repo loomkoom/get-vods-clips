@@ -12,7 +12,9 @@ def is_muted(url):
     return False
 
 
-def get_muted_playlist(url, file_name, file_path = "../output/files"):
+def get_muted_playlist(url, file_name = None, file_path = "../output/files"):
+    if file_name == None:
+        file_name = url.split("/")[-3]
     if not is_muted(url):
         return "stream has no muted parts"
     file_name = file_name[:-5] if file_name.endswith(".m3u8") else file_name

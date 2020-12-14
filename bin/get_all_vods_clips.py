@@ -44,7 +44,7 @@ def get_vods_clips(channel_name, vods_clips, index = 0, start = "", end = "", do
     start_time = datetime.utcnow().strftime("%m-%d-%Y, %H.%M.%S")
 
     # list of streams in format: (date_time, broadcast_id, minutes, categories)
-    stream_data = get_stream_data.get_data(channel_name, start, end)[index:]
+    stream_data = get_stream_data.get_data(channel_name, start, end, tracker = tracker)[index:]
     streams = len(stream_data)
     if streams == 0:
         print(f"{channel_name} has no recorded stream history")
@@ -149,11 +149,11 @@ def main():
         workers = input("worker count (empty for default) >> ").strip()
         if workers == "":
             workers = 150
-        get_vods_clips(channel_name, vods_clips, start = start, end = end, download = download, rename = rename, workers = workers)
+        get_vods_clips(channel_name, vods_clips, 0, start = start, end = end, download = download, rename = rename, workers = workers)
 
     if vods_clips == "vods":
         test = input("test if vod actually plays with mpv (no false positives but a bit slower) [yes/no]? >>").strip()
-        get_vods_clips(channel_name, vods_clips, start = start, end = end, download = download, rename = rename, test = test)
+        get_vods_clips(channel_name, vods_clips, 0, start = start, end = end, download = download, rename = rename, test = test)
 
 
 if __name__ == "__main__":

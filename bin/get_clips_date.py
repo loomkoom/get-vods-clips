@@ -3,10 +3,10 @@ import get_clips
 import get_stream_data
 
 
-def get_clips_date(channel_name, date, file = "no", workers = 150, data_path = "../output/data"):
+def get_clips_date(channel_name, date, tracker = "SC", file = "no", workers = 150, data_path = "../output/data"):
     file_name = f"{channel_name}_clips_{date}.txt"
     clips_lst = []
-    stream_data = get_stream_data.get_data(channel_name, date, date)
+    stream_data = get_stream_data.get_data(channel_name, date, date, tracker = tracker)
     for stream in stream_data:
         date_time = stream[0]
         broadcast_id = stream[1]

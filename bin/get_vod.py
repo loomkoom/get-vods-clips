@@ -1,5 +1,5 @@
 # encoding: utf-8
-import datetime
+from datetime import datetime, timedelta
 import hashlib
 import time
 from pathlib import Path
@@ -10,19 +10,30 @@ import get_muted_vod
 import mpv_py as mpv
 
 
-def to_timestamp(date_time, epoch = datetime.datetime(1970, 1, 1)):
+
+def to_timestamp(date_time, epoch = datetime(1970, 1, 1)):
     td = date_time - epoch
     day = 60 * 60 * 24
     return (td.microseconds + (td.seconds + td.days * day) * 10 ** 6) / 10 ** 6
 
 
-def extract_timestamp(timestamp):
-    dt = timestamp.split()[0].split('-')
-    tm = timestamp.split()[1].split(':')
+def get_urls(channel_name, broadcast_id, date_time):
+    converted_timestamp = int(to_timestamp(date_time))
+    formatted_string = f"{channel_name}_{broadcast_id}_{str(converted_timestamp)}"
+    hash_string = str(hashlib.sha1(formatted_string.encode('utf-8')).hexdigest())
+    required_hash = hash_string[:20]
+    final_formatted_string = f"{required_hash}_{formatted_string}"
 
-    y, m, d = (int(x) for x in dt)
-    hr, mins, sec = (int(x) for x in tm)
-    return y, m, d, hr, mins, sec
+    hosts = ["https://vod-secure.twitch.tv",
+             "https://vod-metro.twitch.tv",
+             "https://d2nvs31859zcd8.cloudfront.net",
+             "https://d3c27h4odz752x.cloudfront.net",
+             "https://dqrpb9wgowsf5.cloudfront.net",
+             "https://d2e2de1etea730.cloudfront.net",
+             "https://ds0h3roq6wcgc.cloudfront.net"]
+
+    urls = [f"{host}/{final_formatted_string}/chunked/index-dvr.m3u8" for host in hosts]
+    return urls
 
 
 def play_url(url, channel_name):
@@ -40,45 +51,68 @@ def play_url(url, channel_name):
     return not (time_taken >= 2.499)
 
 
-def get_vod(channel_name, broadcast_id, timestamp, test = "no", file_path = "../output/files"):
-    channel_name = channel_name.lower()
-
-    y, mt, d, h, mn, s = extract_timestamp(timestamp)
-    date_time = datetime.datetime(y, mt, d, h, mn, s)
-    converted_timestamp = int(to_timestamp(date_time))
-
-    formatted_string = f"{channel_name}_{broadcast_id}_{str(converted_timestamp)}"
-    hash_string = str(hashlib.sha1(formatted_string.encode('utf-8')).hexdigest())
-    required_hash = hash_string[:20]
-    final_formatted_string = f"{required_hash}_{formatted_string}"
-
-    hosts = ["https://vod-secure.twitch.tv",
-             "https://vod-metro.twitch.tv",
-             "https://d2nvs31859zcd8.cloudfront.net",
-             "https://d3c27h4odz752x.cloudfront.net",
-             "https://dqrpb9wgowsf5.cloudfront.net",
-             "https://d2e2de1etea730.cloudfront.net",
-             "https://ds0h3roq6wcgc.cloudfront.net"]
-
-    urls = [f"{host}/{final_formatted_string}/chunked/index-dvr.m3u8" for host in hosts]
+def verify_url(urls, test, channel_name, date_time, broadcast_id, session, file_path = "../output/files"):
     header = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36 OPR/71.0.3770.323', }
-
     for url in urls:
-        if not requests.head(url, headers = header, allow_redirects = False).ok:
-            continue
-        if test == "yes":
-            if not get_muted_vod.is_muted(url):
-                if play_url(url, channel_name):
-                    return url, False
-            else:
-                muted_vod = get_muted_vod.get_muted_playlist(url, f"{datetime.datetime.date(date_time)}_{broadcast_id}",
-                                                             file_path = file_path)
-                if play_url(muted_vod, channel_name):
-                    return url, muted_vod
-        elif test == "no":
-            return url, False
+        if session.head(url, headers = header, allow_redirects = False).ok:
+            if test == "yes":
+                if not get_muted_vod.is_muted(url):
+                    if play_url(url, channel_name):
+                        logger.info(f"link found (not muted): {url}")
+                        return url, False
+                else:
+                    muted_vod = get_muted_vod.get_muted_playlist(url, f"{datetime.date(date_time)}_{broadcast_id}",
+                                                                 file_path = file_path)
+                    if play_url(muted_vod, channel_name):
+                        logger.info(f"link found (muted): {url} , {muted_vod}")
+                        return url, muted_vod
+            elif test == "no":
+                logger.info(f"link found (not tested): {url}")
+                return url, False
+    logger.info("no link found")
     return "no valid link", False
+
+
+def get_vod(channel_name, broadcast_id, timestamp, tracker = "TR", test = "no", file_path = "../output/files", workers = 60):
+    channel_name = channel_name.lower()
+    date_time = datetime.fromisoformat(timestamp)
+    found = list()
+
+    if len(timestamp.split(" ")[1].split(":")) == 2:
+        if tracker == "SC":
+            secs, mins = 600, 5
+        else:
+            secs, mins = 60, 0
+        dates = [date_time - timedelta(minutes = mins) for i in range(secs)]
+        times = list(map((lambda date, sec: date + timedelta(seconds = sec)), dates, range(secs)))
+        all_urls = {f"{get_urls(channel_name, broadcast_id, time)}": time for time in times}
+        with concurrent.futures.ThreadPoolExecutor(max_workers = workers) as executor:
+            logger.info("searching all urls ...")
+            with requests.session() as session:
+                adapter = requests.adapters.HTTPAdapter(pool_connections = 7, pool_maxsize = workers, pool_block = True)
+                session.mount('https://', adapter)
+                session.mount('http://', adapter)
+                future_to_url = {executor.submit(verify_url,
+                                                 urls.strip("][").replace("'", "").split(","),
+                                                 test, channel_name, date_time, broadcast_id, session = session, file_path = file_path)
+                                 : urls for urls in all_urls.keys()}
+
+                for future in concurrent.futures.as_completed(future_to_url):
+                    time = all_urls[f"{future_to_url[future]}"]
+                    found_url = future.result()[0]
+                    muted = future.result()[1]
+                    if found_url != "no valid link":
+                        found.append(found_url)
+    else:
+        urls = get_urls(channel_name, broadcast_id, date_time)
+        with requests.session() as session:
+            verified = verify_url(urls, test, channel_name, date_time, broadcast_id, session, file_path = file_path)
+            found_url = verified[0]
+            muted = verified[1]
+            if found_url != "no valid link":
+                found.append(found_url)
+    return found, muted
 
 
 def main():
@@ -90,7 +124,8 @@ def main():
     broadcast_id = input("Enter broadcast id >> ").strip()
     timestamp = input("Enter VOD timestamp (YYYY-MM-DD HH:MM:SS) UTC >> ").strip()
     test = input("enable testing vod playback with mpv to make sure link works yes/no? >> ").strip()
-    vod = get_vod(channel_name, broadcast_id, timestamp, test)
+    tracker = input("tracker you got data from twitchtracker/streamcharts [TT/SC]? >> ").strip().upper()
+    vod = get_vod(channel_name, broadcast_id, timestamp, tracker = tracker, test = test)
     if test == "no":
         print("playback has not been tested, no guarantee file works")
     if vod[1]:
