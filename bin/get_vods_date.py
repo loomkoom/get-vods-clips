@@ -25,7 +25,14 @@ def main():
     print("\n-returns the playlist links for all vods on a specific date usually available for any vod within 60 days \n"
           "-requires [channel name] and [date] \n"
           "-output a list wth vod link and data\n"
-          "-disable testing vod playback if it's slow and you don't mind false positives\n\n")
+          "-disable testing vod playback if it's slow and you don't mind false positives\n"
+          "-choose twitchtracker or steamcharts as tracker\n"
+          "     - streamcharts:\n"
+          "         PRO: can get multiple vods when stream goes down\n"
+          "         CON: slower data retrieval and slower vod finding\n"
+          "     - twitchtracker:\n"
+          "         PRO: fast\n"
+          "         CON: will merge multiple streams (can only get 1st part of vod)\n\n")
     channel_name = input("Enter streamer name >> ").strip()
     date = input("date (YYYY-MM-DD UTC) >> ").strip()
     test = input("enable testing vod playback with mpv to make sure link works yes/no? >> ").strip()

@@ -96,7 +96,6 @@ goto :install
 :install
 	if exist tmp.txt del tmp.txt
 	FOR /f %%p in ('where python') do SET PYTHONPATH=%%p
-	set lib_path=python -m site --user-site
 	call :colorEcho 0B "Checking-Installing requirements (takes some time on first install)"
     echo[
 	set PYTHONIOENCODING=utf-8
@@ -105,7 +104,6 @@ goto :install
 	python -m pip install --upgrade pip
 	python -m pip install wheel
 	python -m pip install -r requirements.txt
-	python -m pip install --target=%lib_path%/alt_twitch python-twitch-client
     if errorlevel 1 (
         call :colorEcho 04 "Requirements installation failed, Perhaps some dependency is missing or access was denied"
         echo Possible solutions:

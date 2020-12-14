@@ -4,7 +4,6 @@ from datetime import datetime, timedelta
 from math import ceil
 
 import requests
-from alt_twitch.twitch.helix.api import TwitchHelix
 from bs4 import BeautifulSoup as soup
 
 logger = logging.getLogger(__name__)
@@ -114,8 +113,12 @@ def get_data(channel_name, start = "", end = "", tracker = "TT"):
             stream_data = parse_tags_TT(page, start, end)
 
     elif tracker == "SC":
-        client = TwitchHelix(client_id = "qe38ugsyxwcmzg7hhva1b55qhoc65u", oauth_token = "wbrkcr8uyg2p5yw3pn97ci1u4haby5")
-        user_id = client.get_users(channel_name)[0]["id"]
+
+        api_headers = {"client-id"    : "qe38ugsyxwcmzg7hhva1b55qhoc65u",
+                       "Authorization": "Bearer w61n4ndwty0kua2mx9lbc2m56i6spu"}
+        id_url = "https://api.twitch.tv/helix/users?login=tyongeee"
+        user_json = requests.get(id_url, headers = api_headers).json()
+        user_id = user_json["data"][0]["id"]
 
         url = f"https://alla.streamscharts.com/api/free/streaming/platforms/1/channels/{user_id}/" \
               f"streams?startDate={start}&endDate={end}"
@@ -154,10 +157,10 @@ def main():
           "         CON: will merge multiple streams (can only get 1st part of vod)\n"
           "-Leave start and end empty to get all-time \n"
           "-returns a list with streams as (timestamp, broadcast id, length (in minutes),title\n\n")
-    tracker = input("tracker to use [TT/SC]? >> ").strip()
     channel_name = input("streamer name? >> ").strip()
     start = input("from date (earliest) YYYY-MM-DD UTC >> ").strip()
     end = input("to date (newest) YYYY-MM-DD UTC >> ").strip()
+    tracker = input("tracker to use [TT/SC]? >> ").strip()
     data = get_data(channel_name, start, end, tracker)
 
     if data is not None:
