@@ -1,17 +1,27 @@
 # encoding: utf-8
 import get_clips
 import get_stream_data
+import logging
+
+logger = logging.getLogger(__name__)
+formatter = logging.Formatter('[%(asctime)s : %(name)s]: %(message)s')
+
+stream_handler = logging.StreamHandler()
+stream_handler.setFormatter(formatter)
+logger.addHandler(stream_handler)
 
 
-def get_clips_date(channel_name, date, file = "no", workers = 150, data_path = "../output/data"):
+def get_clips_date(channel_name, date, tracker = "SC", file = "no", workers = 150, data_path = "../output/data"):
     file_name = f"{channel_name}_clips_{date}.txt"
     clips_lst = []
-    stream_data = get_stream_data.get_data(channel_name, date, date)
+    logger.debug("getting stream data")
+    stream_data = get_stream_data.get_data(channel_name, date, date, tracker = tracker)
     for stream in stream_data:
         date_time = stream[0]
         broadcast_id = stream[1]
         minutes = stream[2]
         title = stream[3]
+        logger.debug(f"getting getting clips for stream {stream_data.index(stream) + 1}")
         clips = get_clips.get_clips(broadcast_id, minutes, workers)
 
         for clip in clips:
@@ -37,7 +47,7 @@ def main():
     workers = input("worker count (empty for default) >> ").strip()
     if workers == "":
         workers = 150
-    clips = get_clips_date(channel_name, date, file, workers)
+    clips = get_clips_date(channel_name, date, file = file, workers = workers)
 
     for clip in clips:
         print(clip.replace("\n", ""))

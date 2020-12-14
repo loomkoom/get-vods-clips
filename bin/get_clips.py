@@ -1,5 +1,6 @@
 # encoding: utf-8
 import concurrent.futures
+import logging
 
 import requests
 
@@ -9,7 +10,12 @@ def load_url(url, session):
     return r.ok
 
 
-def get_clips(broadcast_id, time_offset, file = "no", workers = 150, data_path = "../output/data"):
+def get_clips(broadcast_id, time_offset, file = "no", workers = 150, data_path = "../output/data", loglevel = "INFO"):
+    loglevels = {"NOTSET": 0, "DEBUG": 10, "INFO": 20, "WARNING": 30, "ERROR": 40, "CRITICAL": 50}
+    logger = logging.getLogger(__name__)
+    loglevel = loglevels[loglevel.upper()]
+    logger.setLevel(loglevel)
+
     output = list()
     time_offset = (int(time_offset) + 5) * 60 + 24
     urls = {f"https://clips-media-assets2.twitch.tv/{broadcast_id}-offset-{str(offset)}.mp4": offset for offset in range(0, time_offset)}
@@ -18,6 +24,7 @@ def get_clips(broadcast_id, time_offset, file = "no", workers = 150, data_path =
 
     with concurrent.futures.ThreadPoolExecutor(max_workers = workers) as executor:
         with requests.session() as session:
+            logger.info("fetching clips ...")
             session.headers.update(headers)
             adapter = requests.adapters.HTTPAdapter(pool_connections = 1, pool_maxsize = workers, pool_block = True)
             session.mount('https://', adapter)
@@ -32,6 +39,7 @@ def get_clips(broadcast_id, time_offset, file = "no", workers = 150, data_path =
                     mins = (offset_time % 3600) // 60
                     sec = (offset_time % 60)
                     offset_time = f"{hr}:{mins}:{sec}"
+                    logger.debug(f"clip found at {offset_time}")
                     output.append((url, offset_time))
 
     if len(output) > 0:
@@ -42,6 +50,7 @@ def get_clips(broadcast_id, time_offset, file = "no", workers = 150, data_path =
                 for clip in output:
                     data_string = f"URL: {clip[0]} , TIME: {clip[1]}\n"
                     data_log.write(data_string)
+        logger.info(f"{len(output)} links found")
         return output
     return [("no valid clips found,", "None")]
 

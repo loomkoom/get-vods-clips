@@ -1,8 +1,11 @@
 # encoding: utf-8
+import logging
 import os
 import subprocess
 
 import requests
+
+logger = logging.getLogger(__name__)
 
 
 def parse_tags(line, vods_clips):
@@ -10,7 +13,7 @@ def parse_tags(line, vods_clips):
     for tag in tags:
         tag = tag.strip()
         if tag.startswith("URL"):
-            url = (tag[4:].strip(),)
+            url = (tag[4:].strip().strip("]["),)
             if vods_clips == "clips":
                 file_name = (tag[43:-4].strip(),)
         if tag.startswith("ID") and vods_clips == "vods":
@@ -57,36 +60,39 @@ def download_file(url, channel_name, file_name, new_name, vods_clips, file_path 
         os.mkdir(path)
 
     if os.path.isfile(f"{path}/{file_name}.mp4") or os.path.isfile(f"{path}/{new_name}.mp4"):
-        print(f"file for {vods_clips[:-1]}: {file_name} already exists\n")
+        logger.warning(f"file for {vods_clips[:-1]}: {file_name} already exists\n")
         return
     if vods_clips == "vods":
         if muted == "muted":
             url = f"{muted_path}/{url}"
-            print(url)
-        print(f"Download of {file_name}.mp4 started")
+        logger.info(f"Download of {file_name}.mp4 started")
         subprocess.run(["ffmpeg", "-hide_banner", "-v", "24", "-i", url, "-c", "copy", f"{path}/{file_name}.mp4"])
         if os.path.isfile(f"{path}/{file_name}.mp4"):
-            print(f"{file_name}.mp4 Downloaded to {path[2:]}\n")
+            logger.info(f"{file_name}.mp4 Downloaded to {path[2:]}\n")
         else:
-            print("there seems to have gone something wrong downloading the file")
-            print("please check if any errors are display and verify your input\n")
+            logger.warning("there seems to have gone something wrong downloading the file")
+            logger.warning("please check if any errors are display and verify your input\n")
 
     elif vods_clips == "clips":
         headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36', }
         r = requests.get(url, headers = headers, stream = True)
-        print(f"Download of {file_name}.mp4 started")
+        logger.info(f"Download of {file_name}.mp4 started")
         with open(f"{path}/{file_name}.mp4", 'wb') as f:
             for chunk in r.iter_content(chunk_size = 1024):
                 if chunk:  # filter out keep-alive new chunks
                     f.write(chunk)
         if os.path.isfile(f"{path}/{file_name}.mp4"):
-            print(f"{file_name}.mp4 Downloaded to {path[2:]}\n")
+            logger.info(f"{file_name}.mp4 Downloaded to {path[2:]}\n")
         else:
-            print("there seems to have gone something wrong downloading the file")
-            print("please check if any errors are display and verify your input\n")
+            logger.warning("there seems to have gone something wrong downloading the file")
+            logger.warning("please check if any errors are display and verify your input\n")
 
 
-def get_files(data_file, rename, data_path = "../output/data", file_path = "../output/files"):
+def get_files(data_file, rename, data_path = "../output/data", file_path = "../output/files", loglevel = "INFO"):
+    loglevels = {"NOTSET": 0, "DEBUG": 10, "INFO": 20, "WARNING": 30, "ERROR": 40, "CRITICAL": 50}
+    loglevel = loglevels[loglevel.upper()]
+    logger.setLevel(loglevel)
+
     channel_name = data_file.split(" ")[0]
     vods_clips = data_file.split(" ")[1]
     file_names = []
@@ -98,7 +104,7 @@ def get_files(data_file, rename, data_path = "../output/data", file_path = "../o
     for data in link_data[0]:
         date, file_name, url, length, title = data[0], data[1], data[2], data[3], data[4]
         if vods_clips == "vods" and try_muted == "yes" and len(data[5]) != 1:
-            print("vod has muted parts, using muted version\n")
+            logger.debug("vod has muted parts, using muted version\n")
             url = data[5]
 
         if vods_clips == "clips":
