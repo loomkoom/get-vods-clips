@@ -138,7 +138,7 @@ def get_vods_clips(channel_name, vods_clips, index = 0, start = "", end = "", tr
 
     abs_data_path = os.path.abspath(data_path).replace('\\', '/')
     logger.info("\nAll retrievable links found")
-    if not vod_clips == "both":
+    if not vods_clips == "both":
         logger.info(f"{vods_clips[:-1]} links located in '{abs_data_path}/{file_name}'")
     else:
         logger.info(f"vod links located in '{abs_data_path}/{channel_name} vods {start} - {end}.txt'")
