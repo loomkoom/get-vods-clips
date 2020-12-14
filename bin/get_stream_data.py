@@ -1,12 +1,11 @@
 # encoding: utf-8
+import logging
 from datetime import datetime, timedelta
 from math import ceil
-import logging
 
 import requests
+from alt_twitch.twitch import TwitchHelix
 from bs4 import BeautifulSoup as soup
-from alt_twitch import twitch
-from twitch import TwitchHelix
 
 logger = logging.getLogger(__name__)
 formatter = logging.Formatter('[%(asctime)s : %(name)s]: %(message)s')
