@@ -126,10 +126,10 @@ def get_vods_clips(channel_name, vods_clips, index = 0, start = "", end = "", tr
                     data_log.write(data_string)
 
             minutes_left = sum(map(lambda x: int(x[2]), stream_data[stream_data.index(stream) + 1:]))
-            found_string = f"CLIPS: {len(clips) if clips[0][0][:2] != 'no' else 0} clips found "
+            found_string = f"CLIPS: {len(clips) if clips[0][0][:2] != 'no' else 0} clips found\n"
             progress_string = f"streams checked {stream_data.index(stream) + 1}/{len(stream_data)}\t" \
                               f"{floor(((total_minutes - minutes_left) / total_minutes) * 100)}% done \n" \
-                              f"estimated time left: {timedelta(minutes = minutes_left * 0.0043)}"
+                              f"estimated time left: {timedelta(minutes = minutes_left * 0.0043)}\n"
             logger.info(found_string + progress_string)
             logger.debug(log_string + found_string + progress_string)
 
