@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from math import ceil
 
 import requests
-from alt_twitch.twitch import TwitchHelix
+from alt_twitch.twitch.helix.api import TwitchHelix
 from bs4 import BeautifulSoup as soup
 
 logger = logging.getLogger(__name__)
