@@ -194,12 +194,23 @@ def test_get_all_vods_clips(get_data_stream, vods_clips, tmpdir, monkeypatch):
     get_all_vods_clips.get_vods_clips(channel_name, vods_clips, index = 0, start = date, end = date, download = "no", rename = "no",
                                       test = "no", workers = 150,
                                       data_path = data_path, file_path = file_path, log_path = log_path)
-    assert os.path.isfile(f"{data_path}/{channel_name} {vods_clips} {date} - {date}.txt")
-    with open(f"{data_path}/{channel_name} {vods_clips} {date} - {date}.txt", "r", encoding = "utf8") as file:
-        assert len(file.readline().split(",")) == 7, "data file not correctly formatted"
-        file.seek(0)
-        url = file.readline().split(",")[1].strip()[5:]
-        if "[" in url:
-            url = url.strip("][").replace("'", "")
-        if url != "no valid link":
-            assert requests.head(url, allow_redirects = False).ok, "link not valid"
+    if vods_clips == "both" or vods_clips == "clips":
+        assert os.path.isfile(f"{data_path}/{channel_name} clips {date} - {date}.txt")
+        with open(f"{data_path}/{channel_name} clips {date} - {date}.txt", "r", encoding = "utf8") as file:
+            assert len(file.readline().split(",")) == 7, "data file not correctly formatted"
+            file.seek(0)
+            url = file.readline().split(",")[1].strip()[5:]
+            if "[" in url:
+                url = url.strip("][").replace("'", "")
+            if url != "no valid link":
+                assert requests.head(url, allow_redirects = False).ok, "link not valid"
+    if vods_clips == "both" or vods_clips == "vods":
+        assert os.path.isfile(f"{data_path}/{channel_name} vods {date} - {date}.txt")
+        with open(f"{data_path}/{channel_name} vods {date} - {date}.txt", "r", encoding = "utf8") as file:
+            assert len(file.readline().split(",")) == 7, "data file not correctly formatted"
+            file.seek(0)
+            url = file.readline().split(",")[1].strip()[5:]
+            if "[" in url:
+                url = url.strip("][").replace("'", "")
+            if url != "no valid link":
+                assert requests.head(url, allow_redirects = False).ok, "link not valid"
