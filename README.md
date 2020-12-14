@@ -10,8 +10,7 @@
 -->
 [![CodeFactor][codefactor-shield]][codefactor-url]
 [![codecov][codecov-shield]][codecov-url]
-[![Contributors][contributors-shield]][contributors-url]
-[![Forks][forks-shield]][forks-url]
+![Python application][action-url]
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
 
@@ -128,6 +127,8 @@
 [codecov-shield]: https://codecov.io/gh/loomkoom/get-vods-clips/branch/dev/graph/badge.svg?token=854YYAWM89
 
 [codecov-url]: https://codecov.io/gh/loomkoom/get-vods-clips
+
+[action-url]: https://github.com/loomkoom/get-vods-clips/workflows/Python%20application/badge.svg?branch=dev
 
 [contributors-shield]: https://img.shields.io/github/contributors/loomkoom/get-vods-clips.svg?style=flat-square
 
