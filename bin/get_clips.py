@@ -10,7 +10,7 @@ def load_url(url, session):
     return r.ok
 
 
-def get_clips(broadcast_id, time_offset, file = "no", workers = 150, data_path = "../output/data", loglevel = "WARNING"):
+def get_clips(broadcast_id, time_offset, file = "no", workers = 150, data_path = "../output/data", loglevel = "INFO"):
     loglevels = {"NOTSET": 0, "DEBUG": 10, "INFO": 20, "WARNING": 30, "ERROR": 40, "CRITICAL": 50}
     logger = logging.getLogger(__name__)
     loglevel = loglevels[loglevel.upper()]
@@ -24,6 +24,7 @@ def get_clips(broadcast_id, time_offset, file = "no", workers = 150, data_path =
 
     with concurrent.futures.ThreadPoolExecutor(max_workers = workers) as executor:
         with requests.session() as session:
+            logger.info("fetching clips ...")
             session.headers.update(headers)
             adapter = requests.adapters.HTTPAdapter(pool_connections = 1, pool_maxsize = workers, pool_block = True)
             session.mount('https://', adapter)
@@ -38,6 +39,7 @@ def get_clips(broadcast_id, time_offset, file = "no", workers = 150, data_path =
                     mins = (offset_time % 3600) // 60
                     sec = (offset_time % 60)
                     offset_time = f"{hr}:{mins}:{sec}"
+                    logger.debug(f"clip found at {offset_time}")
                     output.append((url, offset_time))
 
     if len(output) > 0:

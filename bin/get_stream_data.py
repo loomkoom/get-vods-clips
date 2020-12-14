@@ -122,6 +122,7 @@ def get_data(channel_name, start = "", end = "", tracker = "TT"):
 
         url = f"https://alla.streamscharts.com/api/free/streaming/platforms/1/channels/{user_id}/" \
               f"streams?startDate={start}&endDate={end}"
+        logger.debug(f"SC URL: {url}")
         page = get_page(url, "json")
         total_streams = page["total"]
 
