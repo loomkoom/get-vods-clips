@@ -76,7 +76,7 @@ def get_vods_clips(channel_name, vods_clips, index = 0, start = "", end = "", tr
 
     start = stream_data[0][0][:10]
     end = stream_data[-1][0][:10]
-    file_name = f"{channel_name} {vods_clips} {start} - {end}.txt"
+
     total_minutes = sum(map(lambda x: int(x[2]), stream_data))
     time_now = datetime.now().time().strftime("%H:%M:%S")
     if vods_clips == "vods":
@@ -93,6 +93,7 @@ def get_vods_clips(channel_name, vods_clips, index = 0, start = "", end = "", tr
         title = stream[3]
         categories = stream[4]
         if vods_clips == "vods" or vods_clips == "both":
+            file_name = f"{channel_name} vods {start} - {end}.txt"
             log_string = f"[{time_now}]: DATE: {date_time}, ID: {broadcast_id}, LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
                          f"TITLE: {title}, CATEGORIES: {categories}"
             logger.info(log_string)
@@ -110,6 +111,7 @@ def get_vods_clips(channel_name, vods_clips, index = 0, start = "", end = "", tr
                 data_log.write(data_string)
 
         if vods_clips == "clips" or vods_clips == "both":
+            file_name = f"{channel_name} clips {start} - {end}.txt"
             time_now = datetime.now().time().strftime("%H:%M:%S")
             log_string = f"[{time_now}]: DATE: {date_time}, ID: {broadcast_id}, LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
                          f"TITLE: {title}, CATEGORIES: {categories}"

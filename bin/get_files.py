@@ -13,7 +13,7 @@ def parse_tags(line, vods_clips):
     for tag in tags:
         tag = tag.strip()
         if tag.startswith("URL"):
-            url = (tag[4:].strip(),)
+            url = (tag[4:].strip().strip("]["),)
             if vods_clips == "clips":
                 file_name = (tag[43:-4].strip(),)
         if tag.startswith("ID") and vods_clips == "vods":

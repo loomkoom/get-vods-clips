@@ -5,6 +5,7 @@ import get_vod
 
 def get_vods(channel_name, date, tracker = "TT", test = "yes", file_path = "../output/files"):
     vods = list()
+    date = date.split(" ")[0]
     stream_data = get_stream_data.get_data(channel_name, date, date, tracker)
     for stream in stream_data:
         date_time = stream[0]
