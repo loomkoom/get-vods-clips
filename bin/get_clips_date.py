@@ -26,13 +26,14 @@ def get_clips_date(channel_name, date, tracker = "SC", file = "no", workers = 15
         broadcast_id = stream[1]
         minutes = stream[2]
         title = stream[3]
+        categories = stream[4]
         logger.info(f"getting getting clips for stream {stream_data.index(stream) + 1}")
         clips = get_clips.get_clips(broadcast_id, minutes, workers)
 
         for clip in clips:
             data_string = f"DATE: {date_time}, URL: {clip[0]} , TIME: {clip[1]} , ID: {broadcast_id}, " \
                           f"LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
-                          f"TITLE: {title} \n"
+                          f"TITLE: {title} , CATEGORIES: {categories}\n"
             clips_lst.append(data_string)
         if file == "yes":
             with open(f"{data_path}/{file_name}", "w", encoding = 'utf8') as data_log:
