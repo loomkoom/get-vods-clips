@@ -71,7 +71,7 @@ def get_vods_clips(channel_name, vods_clips, index = 0, start = "", end = "", tr
     stream_data = get_stream_data.get_data(channel_name, start, end, tracker = tracker)[index:]
     streams = len(stream_data)
     if streams == 0:
-        print(f"{channel_name} has no recorded stream history")
+        logger.info(f"{channel_name} has no recorded stream history")
         return
 
     start = stream_data[0][0][:10]
@@ -82,9 +82,10 @@ def get_vods_clips(channel_name, vods_clips, index = 0, start = "", end = "", tr
     if vods_clips == "vods":
         logger.info(f"\n[{time_now}]: {streams} streams found \n"
                     f"processing ... ")
-    elif vods_clips == "clips":
+    elif vods_clips == "clips" or vods_clips == "both":
         logger.info(f"\n[{time_now}]: {streams} streams found, {total_minutes} vod minutes \n"
-                    f"[{time_now}]: {timedelta(minutes = total_minutes * 0.0043)} estimated process time \n")
+                    f"[{time_now}]: {timedelta(minutes = total_minutes * 0.0043)} estimated process time \n"
+                    f"processing ... \n")
 
     for stream in stream_data:
         date_time = stream[0]
@@ -94,7 +95,7 @@ def get_vods_clips(channel_name, vods_clips, index = 0, start = "", end = "", tr
         categories = stream[4]
         if vods_clips == "vods" or vods_clips == "both":
             file_name = f"{channel_name} vods {start} - {end}.txt"
-            log_string = f"[{time_now}]: DATE: {date_time}, ID: {broadcast_id}, LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
+            log_string = f"DATE: {date_time}, ID: {broadcast_id}, LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
                          f"TITLE: {title}, CATEGORIES: {categories}"
             logger.info(log_string)
             vod = get_vod.get_vod(channel_name, broadcast_id, date_time, test)
@@ -103,9 +104,10 @@ def get_vods_clips(channel_name, vods_clips, index = 0, start = "", end = "", tr
                           f"LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
                           f"TITLE: {title} , CATEGORIES: {categories} \n"
             time_now = datetime.now().time().strftime("%H:%M:%S")
-            progress_string = f"streams checked {stream_data.index(stream) + 1}/{len(stream_data)}\t" \
-                              f"{floor((stream_data.index(stream) + 1) / len(stream_data) * 100)}% done "
-            logger.info(progress_string)
+            progress_string = f"[{time_now}]: {stream_data.index(stream) + 1}/{len(stream_data)} streams checked \t" \
+                              f"{floor((stream_data.index(stream) + 1) / len(stream_data) * 100)}% done"
+            if vods_clips != "both":
+                logger.info(progress_string)
 
             with open(f"{data_path}/{file_name}", "a", encoding = 'utf8') as data_log:
                 data_log.write(data_string)
@@ -113,9 +115,10 @@ def get_vods_clips(channel_name, vods_clips, index = 0, start = "", end = "", tr
         if vods_clips == "clips" or vods_clips == "both":
             file_name = f"{channel_name} clips {start} - {end}.txt"
             time_now = datetime.now().time().strftime("%H:%M:%S")
-            log_string = f"[{time_now}]: DATE: {date_time}, ID: {broadcast_id}, LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
+            log_string = f"DATE: {date_time}, ID: {broadcast_id}, LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
                          f"TITLE: {title}, CATEGORIES: {categories}"
-            logger.info(log_string)
+            if vods_clips != "both":
+                logger.info(log_string)
             clips = get_clips.get_clips(broadcast_id, minutes, workers)
 
             with open(f"{data_path}/{file_name}", "a", encoding = 'utf8') as data_log:
@@ -126,10 +129,13 @@ def get_vods_clips(channel_name, vods_clips, index = 0, start = "", end = "", tr
                     data_log.write(data_string)
 
             minutes_left = sum(map(lambda x: int(x[2]), stream_data[stream_data.index(stream) + 1:]))
-            found_string = f"CLIPS: {len(clips) if clips[0][0][:2] != 'no' else 0} clips found\n"
-            progress_string = f"streams checked {stream_data.index(stream) + 1}/{len(stream_data)}\t" \
+            timedelta_left = timedelta(minutes = minutes_left * 0.0043)
+            timedelta_left -= timedelta(microseconds = timedelta_left.microseconds)
+            found_string = f"CLIPS: {len(clips) if clips[0][0][:2] != 'no' else 0} clips found \n"
+            progress_string = f"[{time_now}]: {stream_data.index(stream) + 1}/{len(stream_data)} streams checked \t" \
                               f"{floor(((total_minutes - minutes_left) / total_minutes) * 100)}% done \n" \
-                              f"estimated time left: {timedelta(minutes = minutes_left * 0.0043)}\n"
+                              f"[{time_now}]: estimated time left: {timedelta_left} \n"
+
             logger.info(found_string + progress_string)
             logger.debug(log_string + found_string + progress_string)
 
