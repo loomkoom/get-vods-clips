@@ -9,8 +9,8 @@
 *** https://www.markdownguide.org/basic-syntax/#reference-style-links
 -->
 [![CodeFactor][codefactor-shield]][codefactor-url]
-[![Contributors][contributors-shield]][contributors-url]
-[![Forks][forks-shield]][forks-url]
+[![codecov][codecov-shield]][codecov-url]
+![Tests][action-url]
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
 
@@ -55,20 +55,9 @@
 
 **info:** <br>
 
-- Vods are only retrievable for the last 60days with some exceptions <br>
-- If a vod goes down or is restarted resulting in multiple vods for the same stream in twitchtracker, only the 1st vod part will be found. <br>
-- for clips most are retrievable for an unlimited amount of time but not 100% are found. <br>
-
-- You need to have some data from the stream if you want to run scripts under the [extra scripts](#extra-scripts) section<br>
-  all data can be found on twitchtracker if you inspect element on the stream link in the streams page https://twitchtracker.com/twitch/streams
-  Using twitches glitchcon eve stream as an example: https://twitchtracker.com/twitch/streams/40468501598 <br>
-  (dates/times are always in UTC format!) <br>
-  ![tracker image][tracker-url] <br>
-  ![source image][source-url] <br>
-  Broadcast-id = 40468501598 <br>
-  timestamp = 2020-11-13 19:14:07 <br>
-  channel name = twitch <br>
-  length = 30 (minutes) <br>
+- Vods are usually only retrievable for the last 60 days with some exceptions <br>
+- If a vod goes down or is restarted resulting in multiple vods for the same stream in twitchtracker use streamcharts to get vod. <br>
+- for clips most are retrievable for an unlimited amount of time but not 100% are found (a bit unpredictable). <br>
 
 **<ins>all script executables are located in the scripts folder </ins>** <br>
 
@@ -83,6 +72,17 @@
 * **get_vods_date.cmd** retrieves all vods from a specific day on a channel
 
 * **get_clips_date.cmd** retrieves all clips from a specific day on a channel
+
+You need to have some data from the stream if you want to run scripts under the [extra scripts](#extra-scripts) section<br>
+all data can be found on twitchtracker if you inspect element on the stream link in the streams page https://twitchtracker.com/twitch/streams
+Using twitches glitchcon eve stream as an example: https://twitchtracker.com/twitch/streams/40468501598 <br>
+(dates/times are always in UTC format!) <br>
+![tracker image][tracker-url] <br>
+![source image][source-url] <br>
+Broadcast-id = 40468501598 <br>
+timestamp = 2020-11-13 19:14:07 <br>
+channel name = twitch <br>
+length = 30 (minutes) <br>
 
 ### extra scripts
 
@@ -124,6 +124,12 @@
 [codefactor-shield]: https://www.codefactor.io/repository/github/loomkoom/get-vods-clips/badge
 
 [codefactor-url]: https://www.codefactor.io/repository/github/loomkoom/get-vods-clips
+
+[codecov-shield]: https://codecov.io/gh/loomkoom/get-vods-clips/branch/dev/graph/badge.svg?token=854YYAWM89
+
+[codecov-url]: https://codecov.io/gh/loomkoom/get-vods-clips
+
+[action-url]: https://github.com/loomkoom/get-vods-clips/workflows/Tests/badge.svg?branch=dev
 
 [contributors-shield]: https://img.shields.io/github/contributors/loomkoom/get-vods-clips.svg?style=flat-square
 
