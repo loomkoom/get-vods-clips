@@ -116,7 +116,7 @@ def get_data(channel_name, start = "", end = "", tracker = "TT"):
 
         api_headers = {"client-id"    : "qe38ugsyxwcmzg7hhva1b55qhoc65u",
                        "Authorization": "Bearer w61n4ndwty0kua2mx9lbc2m56i6spu"}
-        id_url = "https://api.twitch.tv/helix/users?login=tyongeee"
+        id_url = f"https://api.twitch.tv/helix/users?login={channel_name}"
         user_json = requests.get(id_url, headers = api_headers).json()
         user_id = user_json["data"][0]["id"]
 
