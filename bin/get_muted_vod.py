@@ -49,7 +49,7 @@ def get_muted_playlist(url, file_name = None, file_path = "../output/files"):
         playlist.writelines(new_lines)
     with open(f"{path}/{file_name}-muted.m3u8", 'w', encoding = 'utf8') as playlist:
         playlist.writelines(output_lines)
-    return f"playlist saved at '{path}/{file_name}-muted.m3u8'"
+    return f"{file_name}-muted.m3u8", path
 
 
 def main():
@@ -58,7 +58,8 @@ def main():
           "-outputs the playlist file as <file_name>-muted.m3u8 in /output/files/channel-name/playlists\n\n")
     url = input("url >> ").strip()
     file_name = input("file name to call playlist >> ").strip()
-    print(get_muted_playlist(url, file_name))
+    file, path = get_muted_playlist(url, file_name)
+    print(f"playlist saved at '{path}/{file}'")
 
 
 if __name__ == "__main__":

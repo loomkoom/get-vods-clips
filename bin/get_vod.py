@@ -71,7 +71,7 @@ def verify_url(urls, test, channel_name, date_time, broadcast_id, session, file_
                         return url, False
                 else:
                     muted_vod = get_muted_vod.get_muted_playlist(url, f"{datetime.date(date_time)}_{broadcast_id}",
-                                                                 file_path = file_path)
+                                                                 file_path = file_path)[0]
                     if play_url(muted_vod, channel_name):
                         logger.info(f"link found (muted): {url} , {muted_vod}")
                         return url, muted_vod
