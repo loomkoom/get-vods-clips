@@ -11,7 +11,7 @@ stream_handler.setFormatter(formatter)
 logger.addHandler(stream_handler)
 
 
-def get_clips_date(channel_name, date, tracker = "SC", file = "no", workers = 150, data_path = "../output/data", loglevel = "DEBUG"):
+def get_clips_date(channel_name, date, tracker = "SC", file = "no", workers = 150, data_path = "../output/data", loglevel = "INFO"):
     if not isinstance(loglevel, int):
         loglevels = {"NOTSET": 0, "DEBUG": 10, "INFO": 20, "WARNING": 30, "ERROR": 40, "CRITICAL": 50}
         loglevel = loglevels[loglevel.upper()]
@@ -19,14 +19,14 @@ def get_clips_date(channel_name, date, tracker = "SC", file = "no", workers = 15
 
     file_name = f"{channel_name} clips {date}.txt"
     clips_lst = []
-    logger.debug("getting stream data")
+    logger.info("getting stream data")
     stream_data = get_stream_data.get_data(channel_name, date, date, tracker = tracker)
     for stream in stream_data:
         date_time = stream[0]
         broadcast_id = stream[1]
         minutes = stream[2]
         title = stream[3]
-        logger.debug(f"getting getting clips for stream {stream_data.index(stream) + 1}")
+        logger.info(f"getting getting clips for stream {stream_data.index(stream) + 1}")
         clips = get_clips.get_clips(broadcast_id, minutes, workers)
 
         for clip in clips:

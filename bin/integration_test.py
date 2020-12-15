@@ -172,8 +172,8 @@ def test_get_clips_date_file(get_data_stream, tmpdir):
     url = clips[0].split(",")[1].strip()[5:]
     assert len(clips) > 1, "no valid clips found"
     assert requests.head(url, allow_redirects = False).ok, "clip not valid"
-    assert os.path.isfile(f"{data_path}/{channel_name}_clips_{date}.txt"), "File not made"
-    with open(f"{data_path}/{channel_name}_clips_{date}.txt", "r", encoding = "utf8") as file:
+    assert os.path.isfile(f"{data_path}/{channel_name} clips {date}.txt"), "File not made"
+    with open(f"{data_path}/{channel_name} clips {date}.txt", "r", encoding = "utf8") as file:
         assert len(file.readline().split(",")) == 6, "data file not correctly formatted"
         file.seek(0)
         url = file.readline().split(",")[1].strip()[5:]
