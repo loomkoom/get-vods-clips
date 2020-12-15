@@ -38,7 +38,7 @@ def get_clips(broadcast_id, time_offset, file = "no", workers = 150, data_path =
                     hr = offset_time // 3600
                     mins = (offset_time % 3600) // 60
                     sec = (offset_time % 60)
-                    offset_time = f"{hr}:{mins}:{sec}"
+                    offset_time = f"{str(hr).zfill(2)}:{str(mins).zfill(2)}:{str(sec).zfill(2)}"
                     logger.debug(f"clip found at {offset_time}")
                     output.append((url, offset_time))
 
