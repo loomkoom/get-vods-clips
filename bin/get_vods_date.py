@@ -1,11 +1,26 @@
 # encoding: utf-8
+import logging
+
 import get_stream_data
 import get_vod
 
+logger = logging.getLogger(__name__)
+formatter = logging.Formatter('%(message)s')
 
-def get_vods(channel_name, date, tracker = "TT", test = "yes", file_path = "../output/files"):
+stream_handler = logging.StreamHandler()
+stream_handler.setFormatter(formatter)
+logger.addHandler(stream_handler)
+
+
+def get_vods(channel_name, date, tracker = "TT", test = "yes", file_path = "../output/files", loglevel = "INFO"):
+    if not isinstance(loglevel, int):
+        loglevels = {"NOTSET": 0, "DEBUG": 10, "INFO": 20, "WARNING": 30, "ERROR": 40, "CRITICAL": 50}
+        loglevel = loglevels[loglevel.upper()]
+    logger.setLevel(loglevel)
+
     vods = list()
     date = date.split(" ")[0]
+    logger.info("fetching stream data")
     stream_data = get_stream_data.get_data(channel_name, date, date, tracker)
     for stream in stream_data:
         date_time = stream[0]
@@ -13,6 +28,7 @@ def get_vods(channel_name, date, tracker = "TT", test = "yes", file_path = "../o
         minutes = stream[2]
         title = stream[3]
         categories = stream[4]
+        logger.info("fetching vod links")
         vod = get_vod.get_vod(channel_name, broadcast_id, date_time, tracker = tracker, test = test, file_path = file_path)
         data_string = f"DATE: {date_time}, URL: {vod[0]} , MUTED: {vod[1] if vod[1] else 0} , ID: {broadcast_id}, " \
                       f"LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
