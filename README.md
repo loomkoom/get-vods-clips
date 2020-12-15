@@ -54,9 +54,9 @@
 
 **info:** <br>
 
-- Vods are only retrievable for the last 60days with some exceptions <br>
+- Vods are usually only retrievable for the last 60 days with some exceptions <br>
 - If a vod goes down or is restarted resulting in multiple vods for the same stream in twitchtracker use streamcharts to get vod. <br>
-- for clips most are retrievable for an unlimited amount of time but not 100% are found. <br>
+- for clips most are retrievable for an unlimited amount of time but not 100% are found (a bit unpredictable). <br>
 
 **<ins>all script executables are located in the scripts folder </ins>** <br>
 
