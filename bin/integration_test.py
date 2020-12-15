@@ -97,26 +97,27 @@ def test_get_vod_latest_play(get_data_stream, tmpdir):
 
 
 # test get vods date
-
-def test_get_vods_date(get_data_stream):
+@pytest.mark.parametrize("tracker", ["TT", "SC"])
+def test_get_vods_date(get_data_stream, tracker):
     stream_data = get_data_stream
     channel_name = stream_data[0]
     stream = choice(stream_data[1])
     date = stream[0][:10]
-    vod = get_vods_date.get_vods(channel_name, date, test = "no")
+    vod = get_vods_date.get_vods(channel_name, date, test = "no", tracker = tracker)
     url = vod[0].split(",")[1].strip()[5:].strip("][").replace("'", "")
     if url != "no valid link":
         assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
 
 
-def test_get_vods_date_play(get_data_stream,tmpdir):
+@pytest.mark.parametrize("tracker", ["TT", "SC"])
+def test_get_vods_date_play(get_data_stream, tmpdir, tracker):
     output = tmpdir.mkdir("output")
     file_path = output.mkdir("files")
     stream_data = get_data_stream
     channel_name = stream_data[0]
     stream = choice(stream_data[1])
     date = stream[0][:10]
-    vod = get_vods_date.get_vods(channel_name, date, test = "yes", file_path = file_path)
+    vod = get_vods_date.get_vods(channel_name, date, test = "yes", file_path = file_path, tracker = tracker)
     url = vod[0].split(",")[1].strip()[5:].strip("][").replace("'", "")
     if url != "no valid link":
         assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
