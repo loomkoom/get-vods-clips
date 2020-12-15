@@ -4,15 +4,20 @@ import get_stream_data
 import logging
 
 logger = logging.getLogger(__name__)
-formatter = logging.Formatter('[%(asctime)s : %(name)s]: %(message)s')
+formatter = logging.Formatter('%(message)s')
 
 stream_handler = logging.StreamHandler()
 stream_handler.setFormatter(formatter)
 logger.addHandler(stream_handler)
 
 
-def get_clips_date(channel_name, date, tracker = "SC", file = "no", workers = 150, data_path = "../output/data"):
-    file_name = f"{channel_name}_clips_{date}.txt"
+def get_clips_date(channel_name, date, tracker = "SC", file = "no", workers = 150, data_path = "../output/data", loglevel = "DEBUG"):
+    if not isinstance(loglevel, int):
+        loglevels = {"NOTSET": 0, "DEBUG": 10, "INFO": 20, "WARNING": 30, "ERROR": 40, "CRITICAL": 50}
+        loglevel = loglevels[loglevel.upper()]
+    logger.setLevel(loglevel)
+
+    file_name = f"{channel_name} clips {date}.txt"
     clips_lst = []
     logger.debug("getting stream data")
     stream_data = get_stream_data.get_data(channel_name, date, date, tracker = tracker)

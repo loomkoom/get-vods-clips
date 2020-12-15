@@ -128,7 +128,7 @@ def test_get_clips(get_data_stream):
     stream = choice(get_data_stream[1])
     broadcast_id, time_offset = stream[1], stream[2]
     clips = get_clips.get_clips(broadcast_id, time_offset)
-    assert len(clips) > 1, "no clips found"
+    assert len(clips) > 1, "no valid clips found"
     assert requests.head(clips[1][0], allow_redirects = False).ok, "clip not valid"
 
 
@@ -138,7 +138,7 @@ def test_get_clips_file(get_data_stream, tmpdir):
     stream = choice(get_data_stream[1])
     broadcast_id, time_offset = stream[1], floor(int(stream[2]) / 5)
     clips = get_clips.get_clips(broadcast_id, time_offset, file = "yes", data_path = data_path)
-    assert len(clips) > 1, "no clips found"
+    assert len(clips) > 1, "no valid clips found"
     assert requests.head(clips[1][0], allow_redirects = False).ok, "clip not valid"
     assert os.path.isfile(f"{data_path}/{broadcast_id}_clips.txt"), "File not made"
     with open(f"{data_path}/{broadcast_id}_clips.txt", "r", encoding = "utf8") as file:
@@ -155,9 +155,10 @@ def test_get_clips_date(get_data_stream):
     stream = choice(get_data_stream[1])
     date = stream[0][:10]
     clips = get_clips_date.get_clips_date(channel_name, date)
+    assert len(clips) > 1, "no valid clips found"
     url = clips[0].split(",")[1].strip()[5:]
-    assert len(clips) > 1, "no clips found"
-    assert requests.head(url, allow_redirects = False).ok, "clip not valid"
+    if url != "no valid clips found":
+        assert requests.head(url, allow_redirects = False).ok, "clip not valid"
 
 
 def test_get_clips_date_file(get_data_stream, tmpdir):
@@ -169,7 +170,7 @@ def test_get_clips_date_file(get_data_stream, tmpdir):
     date = stream[0][:10]
     clips = get_clips_date.get_clips_date(channel_name, date, file = "yes", data_path = data_path)
     url = clips[0].split(",")[1].strip()[5:]
-    assert len(clips) > 1, "no clips found"
+    assert len(clips) > 1, "no valid clips found"
     assert requests.head(url, allow_redirects = False).ok, "clip not valid"
     assert os.path.isfile(f"{data_path}/{channel_name}_clips_{date}.txt"), "File not made"
     with open(f"{data_path}/{channel_name}_clips_{date}.txt", "r", encoding = "utf8") as file:
