@@ -14,7 +14,7 @@ stream_handler.setFormatter(formatter)
 logger.addHandler(stream_handler)
 
 
-def get_page(url, format = "html", session = False):
+def get_page(url, output = "html", session = False):
     headers = {
             'Accept'                   : 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
             'Accept-Encoding'          : 'gzip, deflate, br',
@@ -30,10 +30,10 @@ def get_page(url, format = "html", session = False):
     else:
         resp = requests.get(url, headers = headers, allow_redirects = False)
 
-    if format == "html":
+    if output == "html":
         html = resp.content
         page = soup(html, "html.parser")
-    elif format == "json":
+    elif output == "json":
         page = resp.json()
     return page
 

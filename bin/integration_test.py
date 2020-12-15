@@ -93,7 +93,7 @@ def test_get_vod_latest_play(get_data_stream, tmpdir):
     for url in urls:
         if url != "no valid link":
             assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
-            assert get_vod.play_url(url, channel_name) == True, "Vod not playable"
+            assert get_vod.play_url(url, channel_name), "Vod not playable"
 
 
 # test get vods date
@@ -120,7 +120,7 @@ def test_get_vods_date_play(get_data_stream,tmpdir):
     url = vod[0].split(",")[1].strip()[5:].strip("][").replace("'", "")
     if url != "no valid link":
         assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
-        assert get_vod.play_url(url, channel_name) == True, "Vod not playable"
+        assert get_vod.play_url(url, channel_name), "Vod not playable"
 
 
 # test get clips
