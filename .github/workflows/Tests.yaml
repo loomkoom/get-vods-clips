@@ -34,7 +34,7 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test and generate coverage report
       run: |
-        pytest bin/integration_test.py --cov=./ --cov-report=xml
+        pytest bin/integration_test.py --cache-clear --cov=./ --cov-report=xml
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
       with:
