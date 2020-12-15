@@ -118,6 +118,9 @@ def get_data(channel_name, start = "", end = "", tracker = "TT"):
                        "Authorization": "Bearer w61n4ndwty0kua2mx9lbc2m56i6spu"}
         id_url = f"https://api.twitch.tv/helix/users?login={channel_name}"
         user_json = requests.get(id_url, headers = api_headers).json()
+        if len(user_json["data"]) == 0:
+            logger.error("channel doesn't exist")
+            return
         user_id = user_json["data"][0]["id"]
 
         url = f"https://alla.streamscharts.com/api/free/streaming/platforms/1/channels/{user_id}/" \
