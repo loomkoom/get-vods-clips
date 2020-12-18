@@ -97,19 +97,19 @@ def test_get_vod_latest_play(get_data_stream, tmpdir):
 
 
 # test get vods date
-
-def test_get_vods_date(get_data_stream):
+@pytest.mark.parametrize("tracker", ["TT", "SC"])
+def test_get_vods_date(get_data_stream, tracker):
     stream_data = get_data_stream
     channel_name = stream_data[0]
     stream = choice(stream_data[1])
     date = stream[0][:10]
-    vod = get_vods_date.get_vods(channel_name, date, test = "no")
+    vod = get_vods_date.get_vods(channel_name, date, test = "no", tracker = tracker)
     url = vod[0].split(",")[1].strip()[5:].strip("][").replace("'", "")
     if url != "no valid link":
         assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
 
 
-def test_get_vods_date_play(get_data_stream,tmpdir):
+def test_get_vods_date_play(get_data_stream, tmpdir):
     output = tmpdir.mkdir("output")
     file_path = output.mkdir("files")
     stream_data = get_data_stream
@@ -174,7 +174,7 @@ def test_get_clips_date_file(get_data_stream, tmpdir):
     assert requests.head(url, allow_redirects = False).ok, "clip not valid"
     assert os.path.isfile(f"{data_path}/{channel_name} clips {date}.txt"), "File not made"
     with open(f"{data_path}/{channel_name} clips {date}.txt", "r", encoding = "utf8") as file:
-        assert len(file.readline().split(",")) == 6, "data file not correctly formatted"
+        assert len(file.readline().split(",")) == 7, "data file not correctly formatted"
         file.seek(0)
         url = file.readline().split(",")[1].strip()[5:]
         assert requests.head(url, allow_redirects = False).ok, "clip not valid"
@@ -182,8 +182,7 @@ def test_get_clips_date_file(get_data_stream, tmpdir):
 
 # test get_all_vods_clips
 @pytest.mark.parametrize("vods_clips", ["vods", "clips", "both"])
-def test_get_all_vods_clips(get_data_stream, vods_clips, tmpdir, monkeypatch):
-    monkeypatch.setattr('builtins.input', lambda _: "no")
+def test_get_all_vods_clips(get_data_stream, vods_clips, tmpdir):
     output = tmpdir.mkdir("output")
     data_path = output.mkdir("data")
     file_path = output.mkdir("files")
@@ -202,7 +201,7 @@ def test_get_all_vods_clips(get_data_stream, vods_clips, tmpdir, monkeypatch):
             file.seek(0)
             url = file.readline().split(",")[1].strip()[5:]
             if "[" in url:
-                url = url.strip("][").replace("'", "")
+                url = url.strip("][").strip("'")
             if url != "no valid link":
                 assert requests.head(url, allow_redirects = False).ok, "link not valid"
     if vods_clips == "both" or vods_clips == "vods":
@@ -212,6 +211,6 @@ def test_get_all_vods_clips(get_data_stream, vods_clips, tmpdir, monkeypatch):
             file.seek(0)
             url = file.readline().split(",")[1].strip()[5:]
             if "[" in url:
-                url = url.strip("][").replace("'", "")
+                url = url.strip("][").strip("'")
             if url != "no valid link":
                 assert requests.head(url, allow_redirects = False).ok, "link not valid"

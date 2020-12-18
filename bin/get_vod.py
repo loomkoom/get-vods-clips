@@ -102,7 +102,7 @@ def get_vod(channel_name, broadcast_id, timestamp, tracker = "TR", test = "no", 
                 session.mount('https://', adapter)
                 session.mount('http://', adapter)
                 future_to_url = {executor.submit(verify_url,
-                                                 urls.strip("][").replace("'", "").split(","),
+                                                 urls.strip("][").replace("'", "").strip(" ").split(","),
                                                  test, channel_name, date_time, broadcast_id, session = session, file_path = file_path)
                                  : urls for urls in all_urls.keys()}
 

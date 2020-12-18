@@ -99,7 +99,7 @@ def get_vods_clips(channel_name, vods_clips, index = 0, start = "", end = "", tr
                          f"TITLE: {title}, CATEGORIES: {categories}"
             logger.info(log_string)
             vod = get_vod.get_vod(channel_name, broadcast_id, date_time, test)
-            logger.info(f"VOD: URL: {vod[0]} , MUTED: {vod[1] if vod[1] else 0}")
+            logger.info(f"VOD: URL: {str(vod[0]).strip('][')} , MUTED: {vod[1] if vod[1] else 0}")
             data_string = f"DATE: {date_time}, URL: {vod[0]} , MUTED: {vod[1] if vod[1] else 0} , ID: {broadcast_id}, " \
                           f"LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
                           f"TITLE: {title} , CATEGORIES: {categories} \n"
