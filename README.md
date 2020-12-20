@@ -68,7 +68,7 @@
 * **download_all_files.cmd** downloads all links in the text file generated from get_all_vods_and_clips.cmd if you provide the name of the file in
   output/files/data (*use if you chose not to download at first in get_all_vods_and_clips but want to do it afterwards*)
 
-* **get_vods_date.cmd** retrieves all vods from a specific day on a channel
+* **get_vods_date.cmd** retrieves all vods from a specific day on a channel (if the vod is muted a muted version will be saved under /output/files/streamername/playlists)
 
 * **get_clips_date.cmd** retrieves all clips from a specific day on a channel
 
