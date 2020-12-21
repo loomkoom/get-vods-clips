@@ -4,6 +4,7 @@ import os
 from datetime import timedelta
 from math import floor
 from random import choice
+from pathlib import Path
 
 import pytest
 import requests
@@ -87,7 +88,7 @@ def test_get_vod_latest_play(get_data_stream, tmpdir):
     channel_name = stream_data[0]
     stream = choice(stream_data[1])
     timestamp, broadcast_id = stream[0], stream[1]
-    vod = get_vod.get_vod(channel_name, broadcast_id, timestamp, test = "yes", file_path = file_path)
+    vod = get_vod.get_vod(channel_name, broadcast_id, timestamp, test = "yes", file_path = Path(file_path))
     urls = vod[0]
     for url in urls:
         if url != "no valid link":
@@ -115,7 +116,7 @@ def test_get_vods_date_play(get_data_stream, tmpdir):
     channel_name = stream_data[0]
     stream = choice(stream_data[1])
     date = stream[0][:10]
-    vod = get_vods_date.get_vods(channel_name, date, test = "yes", file_path = file_path)
+    vod = get_vods_date.get_vods(channel_name, date, test = "yes", file_path = Path(file_path))
     url = vod[0].split(",")[1].strip()[5:].strip("][").replace("'", "")
     if url != "no valid link":
         assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
@@ -136,7 +137,7 @@ def test_get_clips_file(get_data_stream, tmpdir):
     data_path = output.mkdir("data")
     stream = choice(get_data_stream[1])
     broadcast_id, time_offset = stream[1], floor(int(stream[2]) / 5)
-    clips = get_clips.get_clips(broadcast_id, time_offset, file = "yes", data_path = data_path)
+    clips = get_clips.get_clips(broadcast_id, time_offset, file = "yes", data_path = Path(data_path))
     assert len(clips) > 1, "no valid clips found"
     assert requests.head(clips[1][0], allow_redirects = False).ok, "clip not valid"
     assert os.path.isfile(f"{data_path}/{broadcast_id}_clips.txt"), "File not made"
@@ -167,7 +168,7 @@ def test_get_clips_date_file(get_data_stream, tmpdir):
     channel_name = stream_data[0]
     stream = choice(get_data_stream[1])
     date = stream[0][:10]
-    clips = get_clips_date.get_clips_date(channel_name, date, file = "yes", data_path = data_path)
+    clips = get_clips_date.get_clips_date(channel_name, date, file = "yes", data_path = Path(data_path))
     url = clips[0].split(",")[1].strip()[5:]
     assert len(clips) > 1, "no valid clips found"
     assert requests.head(url, allow_redirects = False).ok, "clip not valid"
@@ -192,7 +193,7 @@ def test_get_all_vods_clips(get_data_stream, vods_clips, tmpdir):
     date = stream[0][:10]
     get_all_vods_clips.get_vods_clips(channel_name, vods_clips, start = date, end = date, download = "no", rename = "no",
                                       test = "no", workers = 150,
-                                      data_path = data_path, file_path = file_path, log_path = log_path)
+                                      data_path = Path(data_path), file_path = Path(file_path), log_path = Path(log_path))
     if vods_clips == "both" or vods_clips == "clips":
         assert os.path.isfile(f"{data_path}/{channel_name} clips {date} - {date}.txt")
         with open(f"{data_path}/{channel_name} clips {date} - {date}.txt", "r", encoding = "utf8") as file:

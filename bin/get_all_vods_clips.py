@@ -60,7 +60,8 @@ def calculate_time(vods_clips, tracker, test, stream_data, index):
     """returns estimated time until finish"""
     streams = len(stream_data[index + 1:])
     estimated_time = timedelta(seconds = 0)
-    total_minutes = sum(map(lambda x: int(x[2]), stream_data[index + 1:]))
+    total_minutes = sum(map(lambda x: (int(x[2][:2]) * 60 + int(x[2][3:5])) if "h" in x[2] else int(x[2]),
+                            stream_data[index + 1:]))
 
     if vods_clips == "vods" or vods_clips == "both":
         if tracker == "SC":
@@ -75,7 +76,6 @@ def calculate_time(vods_clips, tracker, test, stream_data, index):
         estimated_clip_time = timedelta(minutes = total_minutes * 0.0043)
         estimated_time += estimated_clip_time
 
-    estimated_time -= timedelta(microseconds = estimated_time.microseconds)
     return estimated_time
 
 
@@ -134,7 +134,7 @@ def get_vods_clips(channel_name, vods_clips, start = "", end = "", tracker = "TT
     total_minutes = sum(map(lambda x: int(x[2]), stream_data))
     estimated_time = calculate_time(vods_clips, tracker, test, stream_data, -1)
     logger.info(f"\n[{time_now}]: {streams} streams found, {total_minutes} vod minutes \n"
-                f"[{time_now}]: estimated process time:\t {estimated_time}  \n"
+                f"[{time_now}]: estimated process time:\t {estimated_time - timedelta(microseconds = estimated_time.microseconds)}  \n"
                 f"processing ... \n")
 
     for index, stream in enumerate(stream_data):
@@ -178,7 +178,8 @@ def get_vods_clips(channel_name, vods_clips, start = "", end = "", tracker = "TT
         percent = floor(((estimated_time - estimated_time_left) / estimated_time) * 100)
         progress_string = f"[{time_now}]: {index + 1}/{streams} streams checked   \t" \
                           f"{percent}% done \n"
-        time_left_string = f"[{time_now}]: estimated time left:\t {estimated_time_left}"
+        time_left_string = f"[{time_now}]: estimated time left:\t" \
+                           f" {estimated_time_left - timedelta(microseconds = estimated_time_left.microseconds)}"
         logger.info(progress_string + time_left_string)
         logger.debug(progress_string + time_left_string)
 
