@@ -143,6 +143,7 @@ def get_data(channel_name, start = "", end = "", tracker = "TT"):
 
     if stream_data is not None:
         logger.info(f"{len(stream_data)} streams found")
+        stream_data.sort(key = lambda x: datetime.fromisoformat(x[0]))
         return stream_data
     logger.info(f"{channel_name} has no recorded stream history (in this date range)")
     return []

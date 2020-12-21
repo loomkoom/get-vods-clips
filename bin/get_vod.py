@@ -83,7 +83,7 @@ def verify_url(urls, test, channel_name, date_time, broadcast_id, session, file_
     return "no valid link", False
 
 
-def get_vod(channel_name, broadcast_id, timestamp, tracker = "TR", test = "no", file_path = "../output/files", workers = 60):
+def get_vod(channel_name, broadcast_id, timestamp, tracker = "TT", test = "no", file_path = Path("../output/files"), workers = 60):
     channel_name = channel_name.lower()
     date_time = datetime.fromisoformat(timestamp)
     found = list()
@@ -113,6 +113,7 @@ def get_vod(channel_name, broadcast_id, timestamp, tracker = "TR", test = "no", 
                     muted = future.result()[1]
                     if found_url != "no valid link":
                         found.append(found_url)
+                        break
     else:
         urls = get_urls(channel_name, broadcast_id, date_time)
         with requests.session() as session:

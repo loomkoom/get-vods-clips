@@ -6,6 +6,8 @@ from pathlib import Path
 import requests
 
 logger = logging.getLogger(__name__)
+stream_handler = logging.StreamHandler()
+logger.addHandler(stream_handler)
 
 
 def parse_tags(line, vods_clips):
@@ -13,20 +15,20 @@ def parse_tags(line, vods_clips):
     for tag in tags:
         tag = tag.strip()
         if tag.startswith("URL"):
-            url = (tag[4:].strip().strip("]["),)
+            url = (tag.split(" ")[1].strip("][").strip("'"),)
             if vods_clips == "clips":
-                file_name = (tag[43:-4].strip(),)
+                file_name = (Path(url.split("/")[-1].strip()),)
         if tag.startswith("ID") and vods_clips == "vods":
-            broadcast_id = (tag[3:].strip(),)
+            broadcast_id = (tag.split(" ")[1],)
         if tag.startswith("DATE"):
-            date = (tag[6:-9].strip(),)
+            date = (tag.split(" ")[1],)
         if tag.startswith("TIME"):
-            offset_time = tag[6:].strip().split(":")
+            offset_time = tag.split(" ").split(":")
             offset_time = (f"{offset_time[0]}h{offset_time[1]}m{offset_time[2]}s",)
         if tag.startswith("LENGTH"):
-            length = (tag[8:].strip(),)
+            length = (tag.split(" ")[1],)
         if tag.startswith("MUTED"):
-            muted_url = (tag[7:].strip(),)
+            muted_url = (tag.split(" ")[1],)
         if tag.startswith("TITLE"):
             title = tag[7:].strip()
             trans = title.maketrans('<>:"\\/|?*', '         ')
@@ -103,7 +105,8 @@ def get_files(data_file, rename, vods_clips, try_muted = "yes", data_path = Path
     vods_clips = link_data[1]
     path = file_path / channel_name / vods_clips
     for data in link_data[0]:
-        date, file_name, url, length, title = data[0], data[1], data[2], data[3], data[4]
+        date, file_name, url, length, title, _ = data
+        print(vods_clips, try_muted, len(data[5]))
         if vods_clips == "vods" and try_muted == "yes" and len(data[5]) != 1:
             logger.debug("vod has muted parts, using muted version\n")
             url = data[5]

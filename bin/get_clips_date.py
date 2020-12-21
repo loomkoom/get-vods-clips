@@ -4,7 +4,6 @@ from pathlib import Path
 
 import get_clips
 import get_stream_data
-import logging
 
 logger = logging.getLogger(__name__)
 formatter = logging.Formatter('%(message)s')
@@ -30,7 +29,7 @@ def get_clips_date(channel_name, date, tracker = "SC", file = "no", workers = 15
         minutes = stream[2]
         title = stream[3]
         categories = stream[4]
-        logger.info(f"getting getting clips for stream {stream_data.index(stream) + 1}")
+        logger.info(f"fetching clips for stream {stream_data.index(stream) + 1}")
         clips = get_clips.get_clips(broadcast_id, minutes, workers)
 
         for clip in clips:

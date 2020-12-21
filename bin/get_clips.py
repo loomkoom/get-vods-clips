@@ -71,7 +71,7 @@ def main():
     clips = get_clips(broadcast_id, time_offset, file, workers)
 
     for clip in clips:
-        print(clip.replace("\n", ""))
+        print(clip)
 
 
 if __name__ == "__main__":
