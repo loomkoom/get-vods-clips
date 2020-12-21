@@ -17,7 +17,7 @@ def parse_tags(line, vods_clips):
         if tag.startswith("URL"):
             url = (tag.split(" ")[1].strip("][").strip("'"),)
             if vods_clips == "clips":
-                file_name = (Path(url.split("/")[-1].strip()),)
+                file_name = (Path(url[0].split("/")[-1].strip()),)
         if tag.startswith("ID") and vods_clips == "vods":
             broadcast_id = (tag.split(" ")[1],)
         if tag.startswith("DATE"):
