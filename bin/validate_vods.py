@@ -20,8 +20,9 @@ def play_url(url):
 
 
 def validate_vods(file_name, new_file_name):
-    file_name = file_name[:-4] if file_name.endswith(".txt") else file_name
-    with open(Path("../output/data/{file_name}.txt"), "r", encoding = 'utf8') as file:
+    file_name = Path.with_suffix(Path(file_name), ".txt")
+    path = Path("../output/data")
+    with open(path / file_name, "r", encoding = 'utf8') as file:
         output = list()
         streams = list(filter((lambda x: "vod-secure.twitch.tv" in x), file.readlines()))
         print(f"estimated run time: {timedelta(seconds = 5 * len(streams))}")
@@ -32,7 +33,7 @@ def validate_vods(file_name, new_file_name):
             if played:
                 output.append(stream)
 
-    with open(Path("../output/data/{new_file_name}.txt"), "w", encoding = 'utf8') as file:
+    with open(path / new_file_name, "w", encoding = 'utf8') as file:
         file.writelines(output)
 
 
