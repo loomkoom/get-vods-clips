@@ -79,8 +79,8 @@ def calculate_time(vods_clips, tracker, test, stream_data, index):
     return estimated_time
 
 
-def find_vod(stream, channel_name, tracker, test):
-    """finds vod link and returns all vod data as a string"""
+def find_vod(stream, channel_name, tracker, test, file_name, data_path):
+    """finds vod link and appends to file"""
     logger = logging.getLogger(__name__)
     date_time, broadcast_id, minutes, title, categories, = stream
 
@@ -89,8 +89,28 @@ def find_vod(stream, channel_name, tracker, test):
     data_string = f"DATE: {date_time}, URL: {vod[0]} , MUTED: {vod[1] if vod[1] else 0} , ID: {broadcast_id}, " \
                   f"LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
                   f"TITLE: {title} , CATEGORIES: {categories} \n"
+
+    with open(data_path / file_name, "a", encoding = 'utf8') as data_log:
+        data_log.write(data_string)
     logger.info(vod_string)
-    return data_string
+
+
+def find_clips(stream, workers, file_name, data_path):
+    """finds clip links and appends to file"""
+    logger = logging.getLogger(__name__)
+    date_time, broadcast_id, minutes, title, categories, = stream
+
+    clips = get_clips.get_clips(broadcast_id, minutes, workers)
+    with open(data_path / file_name, "a", encoding = 'utf8') as data_log:
+        for clip in clips:
+            data_string = f"DATE: {date_time}, URL: {clip[0]} , TIME: {clip[1]} , ID: {broadcast_id}, " \
+                          f"LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
+                          f"TITLE: {title} , CATEGORIES: {categories} \n"
+            data_log.write(data_string)
+
+    found_string = f"CLIPS: {len(clips) if clips[0][0][:2] != 'no' else 0} clips found \n"
+    logger.info(found_string)
+    logger.debug(found_string)
 
 
 def download_links(channel_name, vods_clips, rename, try_muted, file_path, data_path, file_name_vods, file_name_clips):
@@ -134,8 +154,7 @@ def get_vods_clips(channel_name, vods_clips, start = "", end = "", tracker = "TT
     total_minutes = sum(map(lambda x: int(x[2]), stream_data))
     estimated_time = calculate_time(vods_clips, tracker, test, stream_data, -1)
     logger.info(f"\n[{time_now}]: {streams} streams found, {total_minutes} vod minutes \n"
-                f"[{time_now}]: estimated process time:\t {estimated_time - timedelta(microseconds = estimated_time.microseconds)}  \n"
-                f"processing ... \n")
+                f"[{time_now}]: estimated process time:\t {estimated_time - timedelta(microseconds = estimated_time.microseconds)}  \n")
 
     for index, stream in enumerate(stream_data):
         date_time, broadcast_id, minutes, title, categories, = stream
@@ -147,31 +166,15 @@ def get_vods_clips(channel_name, vods_clips, start = "", end = "", tracker = "TT
 
         if vods_clips == "vods" or vods_clips == "both":
             file_name_vods = Path(f"{channel_name} vods {start} - {end}.txt")
-            data_string = find_vod(stream, channel_name, tracker, test)
-
-            with open(data_path / file_name_vods, "a", encoding = 'utf8') as data_log:
-                if index == 0:
-                    data_log.seek(0)
-                    data_log.truncate()
-                data_log.write(data_string)
+            if index == 0:
+                open(data_path / file_name_vods, "w").close()
+            find_vod(stream, channel_name, tracker, test, file_name_vods, data_path)
 
         if vods_clips == "clips" or vods_clips == "both":
             file_name_clips = Path(f"{channel_name} clips {start} - {end}.txt")
-            clips = get_clips.get_clips(broadcast_id, minutes, workers)
-
-            with open(data_path / file_name_clips, "a", encoding = 'utf8') as data_log:
-                if index == 0:
-                    data_log.seek(0)
-                    data_log.truncate()
-                for clip in clips:
-                    data_string = f"DATE: {date_time}, URL: {clip[0]} , TIME: {clip[1]} , ID: {broadcast_id}, " \
-                                  f"LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
-                                  f"TITLE: {title} , CATEGORIES: {categories} \n"
-                    data_log.write(data_string)
-
-            found_string = f"CLIPS: {len(clips) if clips[0][0][:2] != 'no' else 0} clips found \n"
-            logger.info(found_string)
-            logger.debug(found_string)
+            if index == 0:
+                open(data_path / file_name_clips, "w").close()
+            find_clips(stream, workers, file_name_clips, data_path)
 
         time_now = datetime.now().time().strftime("%H:%M:%S")
         estimated_time_left = calculate_time(vods_clips, tracker, test, stream_data, index)
