@@ -63,12 +63,11 @@ def test_get_stream_data_end(get_data_in, tracker):
 @pytest.fixture()
 def get_data_stream(get_data_in):
     channel_name, date_1, date_2 = get_data_in[0], get_data_in[1][0], get_data_in[1][1]
-    stream_data = get_stream_data.get_data(channel_name, date_1, date_2)
+    stream_data = get_stream_data.get_data(channel_name, date_1, date_2, loglevel = "DEBUG")
     return channel_name, stream_data
 
 
 # test get vod
-
 def test_get_vod_latest_no_play(get_data_stream):
     stream_data = get_data_stream
     channel_name = stream_data[0]
@@ -181,8 +180,8 @@ def test_get_clips_date_file(get_data_stream, tmpdir):
 
 
 # test get_all_vods_clips
-@pytest.mark.parametrize("vods_clips", ["vods", "clips", "both"])
-def test_get_all_vods_clips(get_data_stream, vods_clips, tmpdir):
+@pytest.mark.parametrize("tracker", ["TT", "SC"])
+def test_get_all_vods_clips(get_data_stream, tracker, tmpdir):
     output = tmpdir.mkdir("output")
     data_path = output.mkdir("data")
     file_path = output.mkdir("files")
@@ -191,26 +190,24 @@ def test_get_all_vods_clips(get_data_stream, vods_clips, tmpdir):
     channel_name = stream_data[0]
     stream = choice(stream_data[1])
     date = stream[0].split(" ")[0]
+    vods_clips = "both"
     get_all_vods_clips.get_vods_clips(channel_name, vods_clips, start = date, end = date, download = "no", rename = "no",
-                                      test = "no", workers = 150, loglevel = "DEBUG",
+                                      test = "no", workers = 150, tracker = tracker, loglevel = "DEBUG",
                                       data_path = Path(data_path), file_path = Path(file_path), log_path = Path(log_path))
-    if vods_clips == "both" or vods_clips == "clips":
-        assert os.path.isfile(f"{data_path}/{channel_name} clips {date} - {date}.txt")
-        with open(f"{data_path}/{channel_name} clips {date} - {date}.txt", "r", encoding = "utf8") as file:
-            assert len(file.readline().split(",")) == 7, "data file not correctly formatted"
-            file.seek(0)
-            url = file.readline().split(",")[1].strip()[5:]
-            if "[" in url:
-                url = url.strip("][").strip("'")
-            if url != "no valid link":
-                assert requests.head(url, allow_redirects = False).ok, "link not valid"
-    if vods_clips == "both" or vods_clips == "vods":
-        assert os.path.isfile(f"{data_path}/{channel_name} vods {date} - {date}.txt")
-        with open(f"{data_path}/{channel_name} vods {date} - {date}.txt", "r", encoding = "utf8") as file:
-            assert len(file.readline().split(",")) == 7, "data file not correctly formatted"
-            file.seek(0)
-            url = file.readline().split(",")[1].strip()[5:]
-            if "[" in url:
-                url = url.strip("][").strip("'")
-            if url != "no valid link":
-                assert requests.head(url, allow_redirects = False).ok, "link not valid"
+    assert os.path.isfile(f"{data_path}/{channel_name} clips {date} - {date}.txt")
+    with open(f"{data_path}/{channel_name} clips {date} - {date}.txt", "r", encoding = "utf8") as file:
+        assert len(file.readline().split(",")) == 7, "data file not correctly formatted"
+        file.seek(0)
+        url = file.readline().split(",")[1].strip()[5:]
+        url = url.strip("'")
+        if url != "no valid link":
+            assert requests.head(url, allow_redirects = False).ok, "link not valid"
+    assert os.path.isfile(f"{data_path}/{channel_name} vods {date} - {date}.txt")
+    with open(f"{data_path}/{channel_name} vods {date} - {date}.txt", "r", encoding = "utf8") as file:
+        assert len(file.readline().split(",")) == 7, "data file not correctly formatted"
+        file.seek(0)
+        url = file.readline().split(",")[1].strip()[5:]
+        if "[" in url:
+            url = url.strip("][").strip("'")
+        if url != "no valid link":
+            assert requests.head(url, allow_redirects = False).ok, "link not valid"
