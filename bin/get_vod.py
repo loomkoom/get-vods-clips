@@ -83,7 +83,12 @@ def verify_url(urls, test, channel_name, date_time, broadcast_id, session, file_
     return "no valid link", False
 
 
-def get_vod(channel_name, broadcast_id, timestamp, tracker = "TT", test = "no", file_path = Path("../output/files"), workers = 60):
+def get_vod(channel_name, broadcast_id, timestamp, tracker = "TT", test = "no", file_path = Path("../output/files"), workers = 60,
+            loglevel = "WARNING"):
+    loglevels = {"NOTSET": 0, "DEBUG": 10, "INFO": 20, "WARNING": 30, "ERROR": 40, "CRITICAL": 50}
+    loglevel = loglevels[loglevel.upper()]
+    logger.setLevel(loglevel)
+
     channel_name = channel_name.lower()
     date_time = datetime.fromisoformat(timestamp)
     found = list()
@@ -94,8 +99,8 @@ def get_vod(channel_name, broadcast_id, timestamp, tracker = "TT", test = "no", 
         else:
             secs, mins = 60, 0
         dates = [date_time - timedelta(minutes = mins) for i in range(secs)]
-        times = list(map((lambda date, sec: date + timedelta(seconds = sec)), dates, range(secs)))
-        all_urls = {f"{get_urls(channel_name, broadcast_id, time)}": time for time in times}
+        timestamps = list(map((lambda date, sec: date + timedelta(seconds = sec)), dates, range(secs)))
+        all_urls = {f"{get_urls(channel_name, broadcast_id, time_stamp)}": time_stamp for time_stamp in timestamps}
         with concurrent.futures.ThreadPoolExecutor(max_workers = workers) as executor:
             logger.info("searching all urls ...")
             with requests.session() as session:
@@ -137,7 +142,7 @@ def main():
     timestamp = input("Enter VOD timestamp (YYYY-MM-DD HH:MM:SS) UTC >> ").strip()
     test = input("enable testing vod playback with mpv to make sure link works yes/no? >> ").strip()
     tracker = input("tracker you got data from twitchtracker/streamcharts [TT/SC]? >> ").strip().upper()
-    vod = get_vod(channel_name, broadcast_id, timestamp, tracker = tracker, test = test)
+    vod = get_vod(channel_name, broadcast_id, timestamp, tracker = tracker, test = test, loglevel = "INFO")
     if test == "no":
         print("playback has not been tested, no guarantee file works")
     if vod[1]:

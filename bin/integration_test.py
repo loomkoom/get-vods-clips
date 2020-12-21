@@ -3,8 +3,8 @@ import datetime
 import os
 from datetime import timedelta
 from math import floor
-from random import choice
 from pathlib import Path
+from random import choice
 
 import pytest
 import requests
@@ -31,7 +31,7 @@ def get_data_in():
 @pytest.mark.parametrize("tracker", ["TT", "SC"])
 def test_get_stream_data_daterange(get_data_in, tracker):
     channel_name, date_1, date_2 = get_data_in[0], get_data_in[1][0], get_data_in[1][1]
-    stream_data = get_stream_data.get_data(channel_name, start = date_1, end = date_2, tracker = tracker)
+    stream_data = get_stream_data.get_data(channel_name, start = date_1, end = date_2, tracker = tracker, loglevel = "DEBUG")
     assert len(stream_data) > 1, "No Streams found"
     assert len(stream_data[0]) == 5, "Stream data incomplete"
 
@@ -39,7 +39,7 @@ def test_get_stream_data_daterange(get_data_in, tracker):
 @pytest.mark.parametrize("tracker", ["TT", "SC"])
 def test_get_stream_data_all(get_data_in, tracker):
     channel_name = get_data_in[0]
-    stream_data = get_stream_data.get_data(channel_name, tracker = tracker)
+    stream_data = get_stream_data.get_data(channel_name, tracker = tracker, loglevel = "DEBUG")
     assert len(stream_data) > 1, "No Streams found"
     assert len(stream_data[0]) == 5, "Stream data incomplete"
 
@@ -47,7 +47,7 @@ def test_get_stream_data_all(get_data_in, tracker):
 @pytest.mark.parametrize("tracker", ["TT", "SC"])
 def test_get_stream_data_start(get_data_in, tracker):
     channel_name, date = get_data_in[0], get_data_in[1][0]
-    stream_data = get_stream_data.get_data(channel_name, start = date, tracker = tracker)
+    stream_data = get_stream_data.get_data(channel_name, start = date, tracker = tracker, loglevel = "DEBUG")
     assert len(stream_data) > 1, "No Streams found"
     assert len(stream_data[0]) == 5, "Stream data incomplete"
 
@@ -55,7 +55,7 @@ def test_get_stream_data_start(get_data_in, tracker):
 @pytest.mark.parametrize("tracker", ["TT", "SC"])
 def test_get_stream_data_end(get_data_in, tracker):
     channel_name, date = get_data_in[0], get_data_in[1][1]
-    stream_data = get_stream_data.get_data(channel_name, end = date, tracker = tracker)
+    stream_data = get_stream_data.get_data(channel_name, end = date, tracker = tracker, loglevel = "DEBUG")
     assert len(stream_data) > 1, "No Streams found"
     assert len(stream_data[0]) == 5, "Stream data incomplete"
 
@@ -74,7 +74,7 @@ def test_get_vod_latest_no_play(get_data_stream):
     channel_name = stream_data[0]
     stream = choice(stream_data[1])
     timestamp, broadcast_id = stream[0], stream[1]
-    vod = get_vod.get_vod(channel_name, broadcast_id, timestamp)
+    vod = get_vod.get_vod(channel_name, broadcast_id, timestamp, loglevel = "DEBUG")
     urls = vod[0]
     for url in urls:
         if url != "no valid link":
@@ -88,7 +88,7 @@ def test_get_vod_latest_play(get_data_stream, tmpdir):
     channel_name = stream_data[0]
     stream = choice(stream_data[1])
     timestamp, broadcast_id = stream[0], stream[1]
-    vod = get_vod.get_vod(channel_name, broadcast_id, timestamp, test = "yes", file_path = Path(file_path))
+    vod = get_vod.get_vod(channel_name, broadcast_id, timestamp, test = "yes", file_path = Path(file_path), loglevel = "DEBUG")
     urls = vod[0]
     for url in urls:
         if url != "no valid link":
@@ -102,8 +102,8 @@ def test_get_vods_date(get_data_stream, tracker):
     stream_data = get_data_stream
     channel_name = stream_data[0]
     stream = choice(stream_data[1])
-    date = stream[0][:10]
-    vod = get_vods_date.get_vods(channel_name, date, test = "no", tracker = tracker)
+    date = stream[0].split(" ")[0]
+    vod = get_vods_date.get_vods(channel_name, date, test = "no", tracker = tracker, loglevel = "DEBUG")
     url = vod[0].split(",")[1].strip()[5:].strip("][").replace("'", "")
     if url != "no valid link":
         assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
@@ -115,8 +115,8 @@ def test_get_vods_date_play(get_data_stream, tmpdir):
     stream_data = get_data_stream
     channel_name = stream_data[0]
     stream = choice(stream_data[1])
-    date = stream[0][:10]
-    vod = get_vods_date.get_vods(channel_name, date, test = "yes", file_path = Path(file_path))
+    date = stream[0].split(" ")[0]
+    vod = get_vods_date.get_vods(channel_name, date, test = "yes", file_path = Path(file_path), loglevel = "DEBUG")
     url = vod[0].split(",")[1].strip()[5:].strip("][").replace("'", "")
     if url != "no valid link":
         assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
@@ -127,7 +127,7 @@ def test_get_vods_date_play(get_data_stream, tmpdir):
 def test_get_clips(get_data_stream):
     stream = choice(get_data_stream[1])
     broadcast_id, time_offset = stream[1], stream[2]
-    clips = get_clips.get_clips(broadcast_id, time_offset)
+    clips = get_clips.get_clips(broadcast_id, time_offset, loglevel = "DEBUG")
     assert len(clips) > 1, "no valid clips found"
     assert requests.head(clips[1][0], allow_redirects = False).ok, "clip not valid"
 
@@ -137,7 +137,7 @@ def test_get_clips_file(get_data_stream, tmpdir):
     data_path = output.mkdir("data")
     stream = choice(get_data_stream[1])
     broadcast_id, time_offset = stream[1], floor(int(stream[2]) / 5)
-    clips = get_clips.get_clips(broadcast_id, time_offset, file = "yes", data_path = Path(data_path))
+    clips = get_clips.get_clips(broadcast_id, time_offset, file = "yes", data_path = Path(data_path), loglevel = "DEBUG")
     assert len(clips) > 1, "no valid clips found"
     assert requests.head(clips[1][0], allow_redirects = False).ok, "clip not valid"
     assert os.path.isfile(f"{data_path}/{broadcast_id}_clips.txt"), "File not made"
@@ -153,8 +153,8 @@ def test_get_clips_date(get_data_stream):
     stream_data = get_data_stream
     channel_name = stream_data[0]
     stream = choice(get_data_stream[1])
-    date = stream[0][:10]
-    clips = get_clips_date.get_clips_date(channel_name, date)
+    date = stream[0].split(" ")[0]
+    clips = get_clips_date.get_clips_date(channel_name, date, loglevel = "DEBUG")
     assert len(clips) > 1, "no valid clips found"
     url = clips[0].split(",")[1].strip()[5:]
     if url != "no valid clips found":
@@ -167,8 +167,8 @@ def test_get_clips_date_file(get_data_stream, tmpdir):
     stream_data = get_data_stream
     channel_name = stream_data[0]
     stream = choice(get_data_stream[1])
-    date = stream[0][:10]
-    clips = get_clips_date.get_clips_date(channel_name, date, file = "yes", data_path = Path(data_path))
+    date = stream[0].split(" ")[0]
+    clips = get_clips_date.get_clips_date(channel_name, date, file = "yes", data_path = Path(data_path), loglevel = "DEBUG")
     url = clips[0].split(",")[1].strip()[5:]
     assert len(clips) > 1, "no valid clips found"
     assert requests.head(url, allow_redirects = False).ok, "clip not valid"
@@ -190,9 +190,9 @@ def test_get_all_vods_clips(get_data_stream, vods_clips, tmpdir):
     stream_data = get_data_stream
     channel_name = stream_data[0]
     stream = choice(stream_data[1])
-    date = stream[0][:10]
+    date = stream[0].split(" ")[0]
     get_all_vods_clips.get_vods_clips(channel_name, vods_clips, start = date, end = date, download = "no", rename = "no",
-                                      test = "no", workers = 150,
+                                      test = "no", workers = 150, loglevel = "DEBUG",
                                       data_path = Path(data_path), file_path = Path(file_path), log_path = Path(log_path))
     if vods_clips == "both" or vods_clips == "clips":
         assert os.path.isfile(f"{data_path}/{channel_name} clips {date} - {date}.txt")
