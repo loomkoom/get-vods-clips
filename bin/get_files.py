@@ -1,7 +1,7 @@
 # encoding: utf-8
 import logging
-import os
 import subprocess
+from pathlib import Path
 
 import requests
 
@@ -34,15 +34,15 @@ def parse_tags(line, vods_clips):
     if vods_clips == "clips":
         data = (date + file_name + url + length + title + offset_time)
     elif vods_clips == "vods":
-        file_name = (f"{date[0]}_{broadcast_id[0]}",)
+        file_name = (Path(f"{date[0]}_{broadcast_id[0]}"),)
         data = (date + file_name + url + length + title + muted_url)
     return data
 
 
 def get_link_data(data_file, vods_clips, data_path):
     path = data_path
-    data_file = data_file[:-4] if data_file.endswith(".txt") else data_file
-    with open(f"{path}/{data_file}.txt", "r", encoding = 'utf8') as file:
+    data_file = Path.with_suffix(data_file, ".txt")
+    with open(path / data_file, "r", encoding = 'utf8') as file:
         url_data = list()
         streams = list(filter((lambda x: ".twitch.tv" in x), file.readlines()))
         for stream in streams:
@@ -51,56 +51,57 @@ def get_link_data(data_file, vods_clips, data_path):
     return url_data, vods_clips
 
 
-def download_file(url, channel_name, file_name, new_name, vods_clips, file_path = "../output/files", muted = None):
-    path = f"{file_path}/{channel_name}/{vods_clips}"
-    muted_path = os.path.abspath(f"{file_path}/{channel_name}/playlists").replace("\\", "/")
-    if not os.path.isdir(f"{file_path}/{channel_name}"):
-        os.mkdir(f"{file_path}/{channel_name}")
-    if not os.path.isdir(path):
-        os.mkdir(path)
+def download_file(url, channel_name, file_name, new_name, vods_clips, file_path = Path("../output/files"), muted = None):
+    path = Path.resolve(file_path / channel_name / vods_clips)
+    muted_path = Path.resolve(Path.cwd() / file_path / channel_name / "playlists")
+    if not Path.is_dir(path):
+        Path.mkdir(path, parents = True)
 
-    if os.path.isfile(f"{path}/{file_name}.mp4") or os.path.isfile(f"{path}/{new_name}.mp4"):
+    if Path.is_file(path / file_name) or Path.is_file(path / new_name):
         logger.warning(f"file for {vods_clips[:-1]}: {file_name} already exists\n")
         return
     if vods_clips == "vods":
         if muted == "muted":
-            url = f"{muted_path}/{url}"
-        logger.info(f"Download of {file_name}.mp4 started")
-        subprocess.run(["ffmpeg", "-hide_banner", "-v", "24", "-i", url, "-c", "copy", f"{path}/{file_name}.mp4"])
-        if os.path.isfile(f"{path}/{file_name}.mp4"):
-            logger.info(f"{file_name}.mp4 Downloaded to {path[2:]}\n")
+            url = f"{muted_path / url}"
+        output_file = f"{path / file_name}"
+        logger.info(f"Download of {file_name} started\n")
+        logger.info(f"Press [+] for more log details, [-] for less log details and [q] to quit\n")
+        subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "warning", "-protocol_whitelist", "file,https,http,tls,tcp",
+                        "-i", url,
+                        "-c", "copy", output_file])
+        if Path.is_file(path / file_name):
+            logger.info(f"{file_name} Downloaded to {path}\n")
         else:
             logger.warning("there seems to have gone something wrong downloading the file")
-            logger.warning("please check if any errors are display and verify your input\n")
+            logger.warning("please check if any errors are displayed and verify your input\n")
 
     elif vods_clips == "clips":
         headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36', }
         r = requests.get(url, headers = headers, stream = True)
-        logger.info(f"Download of {file_name}.mp4 started")
-        with open(f"{path}/{file_name}.mp4", 'wb') as f:
+        logger.info(f"Download of {file_name} started")
+        with open(path / file_name, 'wb') as f:
             for chunk in r.iter_content(chunk_size = 1024):
                 if chunk:  # filter out keep-alive new chunks
                     f.write(chunk)
-        if os.path.isfile(f"{path}/{file_name}.mp4"):
-            logger.info(f"{file_name}.mp4 Downloaded to {path[2:]}\n")
+        if Path.is_file(path / file_name):
+            logger.info(f"{file_name} Downloaded to {path}\n")
         else:
             logger.warning("there seems to have gone something wrong downloading the file")
             logger.warning("please check if any errors are display and verify your input\n")
 
 
-def get_files(data_file, rename, data_path = "../output/data", file_path = "../output/files", loglevel = "INFO"):
+def get_files(data_file, rename, vods_clips, try_muted = "yes", data_path = Path("../output/data"), file_path = Path("../output/files"),
+              loglevel = "INFO"):
     loglevels = {"NOTSET": 0, "DEBUG": 10, "INFO": 20, "WARNING": 30, "ERROR": 40, "CRITICAL": 50}
     loglevel = loglevels[loglevel.upper()]
     logger.setLevel(loglevel)
 
-    channel_name = data_file.split(" ")[0]
-    vods_clips = data_file.split(" ")[1]
+    data_file = Path(data_file)
+    channel_name = data_file.name.split(" ")[0]
     file_names = []
-    if vods_clips == "vods":
-        try_muted = input("Download muted version when available [yes/no]? >>").strip()
     link_data = get_link_data(data_file, vods_clips, data_path)
     vods_clips = link_data[1]
-    path = f"{file_path}/{channel_name}/{vods_clips}"
+    path = file_path / channel_name / vods_clips
     for data in link_data[0]:
         date, file_name, url, length, title = data[0], data[1], data[2], data[3], data[4]
         if vods_clips == "vods" and try_muted == "yes" and len(data[5]) != 1:
@@ -109,15 +110,17 @@ def get_files(data_file, rename, data_path = "../output/data", file_path = "../o
 
         if vods_clips == "clips":
             offset_time = data[5]
-            new_name = f"{date}__{title}__{offset_time}-{length}_{file_name}"
+            new_name = Path.with_suffix(Path(f"{date}__{title}__{offset_time}-{length}_{file_name}"), ".mp4")
+            file_name = Path.with_suffix(file_name, ".mp4")
             download_file(url, channel_name, file_name, new_name, vods_clips, file_path)
         if vods_clips == "vods":
             muted = "muted" if len(data[5]) != 1 else "unmuted"
-            new_name = f"{date}_{title}_{length}_{file_name}_{muted}"
+            new_name = Path.with_suffix(Path(f"{date}_{title}_{length}_{file_name}_{muted}"), ".mp4")
+            file_name = Path.with_suffix(file_name, ".mp4")
             download_file(url, channel_name, file_name, new_name, vods_clips, file_path, muted)
 
-        if rename == "yes" and os.path.exists(f"{path}/{file_name}.mp4") and not os.path.exists(f"{path}/{new_name}.mp4"):
-            os.rename(f"{path}/{file_name}.mp4", f"{path}/{new_name}.mp4")
+        if rename == "yes" and Path.is_file(path / file_name) and not Path.is_file(path / new_name):
+            Path.rename(path / file_name, path / new_name)
             file_names.append(new_name)
         else:
             file_names.append(file_name)
@@ -134,7 +137,12 @@ def main():
           "-option to download muted versions (use if unmuted version doesn't work)\n\n")
     data_file = input("file name? >> ").strip()
     rename = input("rename files with stream data instead of ID's [yes/no] >> ").strip()
-    get_files(data_file, rename)
+    vods_clips = Path(data_file).name.split(" ")[1]
+    if vods_clips == "vods":
+        try_muted = input("Download muted version when available [yes/no]? >>").strip()
+    else:
+        try_muted = "no"
+    get_files(data_file, rename, vods_clips, try_muted, loglevel = "DEBUG")
 
 
 if __name__ == "__main__":

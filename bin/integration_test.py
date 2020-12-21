@@ -3,18 +3,17 @@ import datetime
 import os
 from datetime import timedelta
 from math import floor
-
 from random import choice
 
+import pytest
+import requests
+
 import get_all_vods_clips
-import get_files
-import get_vod
-import get_vods_date
 import get_clips
 import get_clips_date
 import get_stream_data
-import pytest
-import requests
+import get_vod
+import get_vods_date
 
 
 @pytest.fixture()
@@ -191,7 +190,7 @@ def test_get_all_vods_clips(get_data_stream, vods_clips, tmpdir):
     channel_name = stream_data[0]
     stream = choice(stream_data[1])
     date = stream[0][:10]
-    get_all_vods_clips.get_vods_clips(channel_name, vods_clips, index = 0, start = date, end = date, download = "no", rename = "no",
+    get_all_vods_clips.get_vods_clips(channel_name, vods_clips, start = date, end = date, download = "no", rename = "no",
                                       test = "no", workers = 150,
                                       data_path = data_path, file_path = file_path, log_path = log_path)
     if vods_clips == "both" or vods_clips == "clips":

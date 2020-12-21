@@ -1,4 +1,7 @@
 # encoding: utf-8
+import logging
+from pathlib import Path
+
 import get_clips
 import get_stream_data
 import logging
@@ -11,7 +14,7 @@ stream_handler.setFormatter(formatter)
 logger.addHandler(stream_handler)
 
 
-def get_clips_date(channel_name, date, tracker = "SC", file = "no", workers = 150, data_path = "../output/data", loglevel = "INFO"):
+def get_clips_date(channel_name, date, tracker = "SC", file = "no", workers = 150, data_path = Path("../output/data"), loglevel = "INFO"):
     if not isinstance(loglevel, int):
         loglevels = {"NOTSET": 0, "DEBUG": 10, "INFO": 20, "WARNING": 30, "ERROR": 40, "CRITICAL": 50}
         loglevel = loglevels[loglevel.upper()]
@@ -36,7 +39,7 @@ def get_clips_date(channel_name, date, tracker = "SC", file = "no", workers = 15
                           f"TITLE: {title} , CATEGORIES: {categories}\n"
             clips_lst.append(data_string)
         if file == "yes":
-            with open(f"{data_path}/{file_name}", "w", encoding = 'utf8') as data_log:
+            with open(data_path / f"{file_name}", "w", encoding = 'utf8') as data_log:
                 data_log.writelines(clips_lst)
     return clips_lst
 

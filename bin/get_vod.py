@@ -1,10 +1,10 @@
 # encoding: utf-8
-from datetime import datetime, timedelta
-import hashlib
-import time
-from pathlib import Path
 import concurrent.futures
+import hashlib
 import logging
+import time
+from datetime import datetime, timedelta
+from pathlib import Path
 
 import requests
 
@@ -59,10 +59,11 @@ def play_url(url, channel_name):
     return not (time_taken >= 2.499)
 
 
-def verify_url(urls, test, channel_name, date_time, broadcast_id, session, file_path = "../output/files"):
+def verify_url(urls, test, channel_name, date_time, broadcast_id, session, file_path = Path("../output/files")):
     header = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36 OPR/71.0.3770.323', }
     for url in urls:
+        url = url.strip(" ").strip("'")
         if session.head(url, headers = header, allow_redirects = False).ok:
             if test == "yes":
                 if not get_muted_vod.is_muted(url):
@@ -70,7 +71,7 @@ def verify_url(urls, test, channel_name, date_time, broadcast_id, session, file_
                         logger.info(f"link found (not muted): {url}")
                         return url, False
                 else:
-                    muted_vod = get_muted_vod.get_muted_playlist(url, f"{datetime.date(date_time)}_{broadcast_id}",
+                    muted_vod = get_muted_vod.get_muted_playlist(url, Path(f"{datetime.date(date_time)}_{broadcast_id}"),
                                                                  file_path = file_path)[0]
                     if play_url(muted_vod, channel_name):
                         logger.info(f"link found (muted): {url} , {muted_vod}")
@@ -107,7 +108,7 @@ def get_vod(channel_name, broadcast_id, timestamp, tracker = "TR", test = "no", 
                                  : urls for urls in all_urls.keys()}
 
                 for future in concurrent.futures.as_completed(future_to_url):
-                    time = all_urls[f"{future_to_url[future]}"]
+                    timestamp = all_urls[f"{future_to_url[future]}"]
                     found_url = future.result()[0]
                     muted = future.result()[1]
                     if found_url != "no valid link":

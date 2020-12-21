@@ -1,5 +1,6 @@
 # encoding: utf-8
 import logging
+from pathlib import Path
 
 import get_stream_data
 import get_vod
@@ -12,7 +13,7 @@ stream_handler.setFormatter(formatter)
 logger.addHandler(stream_handler)
 
 
-def get_vods(channel_name, date, tracker = "TT", test = "yes", file_path = "../output/files", loglevel = "INFO"):
+def get_vods(channel_name, date, tracker = "TT", test = "yes", file_path = Path("../output/files"), loglevel = "INFO"):
     if not isinstance(loglevel, int):
         loglevels = {"NOTSET": 0, "DEBUG": 10, "INFO": 20, "WARNING": 30, "ERROR": 40, "CRITICAL": 50}
         loglevel = loglevels[loglevel.upper()]
@@ -28,7 +29,7 @@ def get_vods(channel_name, date, tracker = "TT", test = "yes", file_path = "../o
         minutes = stream[2]
         title = stream[3]
         categories = stream[4]
-        logger.info("fetching vod links")
+        logger.info(f"fetching vod links for stream {stream_data.index(stream) + 1}")
         vod = get_vod.get_vod(channel_name, broadcast_id, date_time, tracker = tracker, test = test, file_path = file_path)
         data_string = f"DATE: {date_time}, URL: {vod[0]} , MUTED: {vod[1] if vod[1] else 0} , ID: {broadcast_id}, " \
                       f"LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
@@ -54,6 +55,7 @@ def main():
     test = input("enable testing vod playback with mpv to make sure link works yes/no? >> ").strip()
     tracker = input("tracker to use [TT/SC]? >> ").strip().upper()
     vods = get_vods(channel_name, date, tracker, test)
+
     for tag in vods:
         print(tag)
 

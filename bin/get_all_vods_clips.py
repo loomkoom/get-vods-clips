@@ -1,8 +1,8 @@
 # encoding: utf-8
 import logging
-import os
 from datetime import datetime, timedelta
 from math import floor
+from pathlib import Path
 
 import get_clips
 import get_files
@@ -18,7 +18,7 @@ def set_logger(loglevel, logpath, start_time, channel_name):
     logger.setLevel(loglevel)
     formatter = logging.Formatter('[%(asctime)s : %(name)s]: %(message)s')
 
-    file_handler = logging.FileHandler(f"{logpath}/{start_time} {channel_name} Logs.log", encoding = 'utf-8')
+    file_handler = logging.FileHandler(log_path / f"{start_time} {channel_name}.log", encoding = 'utf-8')
     file_handler.setLevel(logging.DEBUG)
     file_handler.setFormatter(formatter)
 
@@ -33,11 +33,8 @@ def set_logger(loglevel, logpath, start_time, channel_name):
 
 def check_dirs(path):
     """Checks if directory exists, if not creates it"""
-    if not os.path.isdir(path):
-        parent_path = "/".join(path.split("/")[:-1])
-        if not os.path.isdir(parent_path):
-            os.mkdir(parent_path)
-        os.mkdir(path)
+    if not Path.is_dir(path):
+        Path.mkdir(path, parents = True)
 
 
 def check_input(channel_name, vods_clips, index, start, end, download, rename, workers, test, logger):
