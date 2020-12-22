@@ -58,10 +58,11 @@ def check_input(channel_name, vods_clips, start, end, download, rename, workers,
 
 def calculate_time(vods_clips, tracker, test, stream_data, index):
     """returns estimated time until finish"""
-    streams = len(stream_data[index + 1:])
+    stream_data = stream_data[index + 1:]
+    streams = len(stream_data)
     estimated_time = timedelta(seconds = 0)
-    total_minutes = sum(map(lambda x: (int(x[2][:2]) * 60 + int(x[2][3:5])) if "h" in x[2] else int(x[2]),
-                            stream_data[index + 1:]))
+    total_minutes = sum(map(lambda x: (int(x[2].split("h")[0]) * 60 + int(x[2].split("h")[1][:-3])) if "h" in x[2] else int(x[2])
+                            , stream_data))
 
     if vods_clips == "vods" or vods_clips == "both":
         if tracker == "SC":
