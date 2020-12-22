@@ -103,12 +103,13 @@ def test_get_vod_latest_play(get_data_stream, tracker):
 
 
 # test get vods date
-def test_get_vods_date(get_data_stream, tracker):
+def test_get_vods_date(get_data_stream):
     stream_data = get_data_stream
     channel_name = stream_data[0]
     stream = choice(stream_data[1])
     date = stream[0].split(" ")[0]
     test = "no"
+    tracker = "TT"
     set_keyboard_input([channel_name, date, test, tracker])
     vods = get_vods_date.main()
     url = vods[0].split(",")[1].strip()[5:].strip("][").replace("'", "")
