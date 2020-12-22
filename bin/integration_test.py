@@ -128,22 +128,22 @@ def test_get_vods_date_play(get_data_stream, tmpdir):
 #     clips = get_clips.get_clips(broadcast_id, time_offset, loglevel = "DEBUG")
 #     assert len(clips) > 1, "no valid clips found"
 #     assert requests.head(clips[1][0], allow_redirects = False).ok, "clip not valid"
-
-
-def test_get_clips_file(get_data_stream, tmpdir):
-    output = tmpdir.mkdir("output")
-    data_path = Path(output.mkdir("data"))
-    stream = choice(get_data_stream[1])
-    broadcast_id, time_offset = stream[1], floor(int(stream[2]) / 2)
-    clips = get_clips.get_clips(broadcast_id, time_offset, file = "yes", data_path = data_path, loglevel = "DEBUG")
-    assert len(clips) > 1, "no valid clips found"
-    assert requests.head(clips[1][0], allow_redirects = False).ok, "clip not valid"
-    assert Path.is_file(data_path / f"{broadcast_id}_clips.txt"), "File not made"
-    with open(f"{data_path}/{broadcast_id}_clips.txt", "r", encoding = "utf8") as file:
-        assert len(file.readline().split(",")) == 2, "data file not correctly formatted"
-        file.seek(0)
-        url = file.readline().split(",")[0].strip()[5:]
-        assert requests.head(url, allow_redirects = False).ok, "clip not valid"
+#
+#
+# def test_get_clips_file(get_data_stream, tmpdir):
+#     output = tmpdir.mkdir("output")
+#     data_path = Path(output.mkdir("data"))
+#     stream = choice(get_data_stream[1])
+#     broadcast_id, time_offset = stream[1], floor(int(stream[2]) / 2)
+#     clips = get_clips.get_clips(broadcast_id, time_offset, file = "yes", data_path = data_path, loglevel = "DEBUG")
+#     assert len(clips) > 1, "no valid clips found"
+#     assert requests.head(clips[1][0], allow_redirects = False).ok, "clip not valid"
+#     assert Path.is_file(data_path / f"{broadcast_id}_clips.txt"), "File not made"
+#     with open(f"{data_path}/{broadcast_id}_clips.txt", "r", encoding = "utf8") as file:
+#         assert len(file.readline().split(",")) == 2, "data file not correctly formatted"
+#         file.seek(0)
+#         url = file.readline().split(",")[0].strip()[5:]
+#         assert requests.head(url, allow_redirects = False).ok, "clip not valid"
 
 
 # test get clips date
