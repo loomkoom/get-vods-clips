@@ -18,18 +18,14 @@ from mock_input_output import set_keyboard_input
 
 # from math import floor
 @pytest.fixture()
-def create_dirs(tmp_path):
-    output = Path("../output")
-    if not Path.is_dir(tmp_path / "../output"):
+def create_dir(tmp_path):
+    output = Path(tmp_path / "../output")
+    if not Path.is_dir(output):
         Path.mkdir(tmp_path / "../output")
-        Path.mkdir(output / "files", exist_ok = True)
         Path.mkdir(output / "data", exist_ok = True)
-        Path.mkdir(output / "logs", exist_ok = True)
-    file_path = Path(output / "files")
     data_path = Path(output / "data")
-    log_path = Path(output / "logs")
 
-    return data_path, file_path, log_path
+    return data_path
 
 
 @pytest.fixture()
@@ -183,8 +179,8 @@ def test_get_vods_date_play(get_data_stream):
 #         assert requests.head(url, allow_redirects = False).ok, "clip not valid"
 
 
-def test_get_clips_date_file(get_data_stream, create_dirs):
-    data_path = create_dirs[0]
+def test_get_clips_date_file(get_data_stream, create_dir):
+    data_path = create_dir
     stream_data = get_data_stream
     channel_name = stream_data[0]
     stream = choice(get_data_stream[1])
@@ -207,8 +203,8 @@ def test_get_clips_date_file(get_data_stream, create_dirs):
 
 # test get_all_vods_clips
 @pytest.mark.parametrize("tracker", ["TT", "SC"])
-def test_get_all_vods_clips(get_data_stream, tracker, create_dirs):
-    data_path = create_dirs[0]
+def test_get_all_vods_clips(get_data_stream, tracker, create_dir):
+    data_path = create_dir
     stream_data = get_data_stream
     channel_name = stream_data[0]
     stream = choice(stream_data[1])
