@@ -109,9 +109,9 @@ def test_get_vods_date(get_data_stream, tracker):
     date = stream[0].split(" ")[0]
     test = "no"
     set_keyboard_input([channel_name, date, test, tracker])
-    vod = get_vods_date.main()
+    vods = get_vods_date.main()
     print(vod)
-    url = vod[0].split(",")[1].strip()[5:].strip("][").replace("'", "")
+    url = vods[0].split(",")[1].strip()[5:].strip("][").replace("'", "")
     if url != "no valid link":
         assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
 
@@ -124,8 +124,8 @@ def test_get_vods_date_play(get_data_stream):
     test = "yes"
     tracker = "TT"
     set_keyboard_input([channel_name, date, test, tracker])
-    vod = get_vods_date.main()
-    url = vod[0].split(",")[1].strip()[5:].strip("][").replace("'", "")
+    vods = get_vods_date.main()
+    url = vods[0].split(",")[1].strip()[5:].strip("][").replace("'", "")
     if url != "no valid link":
         assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
         assert get_vod.play_url(url, channel_name), "Vod not playable"
