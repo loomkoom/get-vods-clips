@@ -12,7 +12,8 @@ def is_muted(url):
     return False
 
 
-def get_muted_playlist(url, file_name = None, file_path = Path("../output/files")):
+def get_muted_playlist(url, file_name = None):
+    file_path = Path("../output/files")
     if file_name is None:
         file_name = Path(url.split("/")[-3])
     if not is_muted(url):
@@ -57,6 +58,7 @@ def main():
     file_name = Path(input("file name to call playlist >> ").strip())
     file, path = get_muted_playlist(url, file_name)
     print(f"playlist saved at '{path / file}'")
+    return file, path
 
 
 if __name__ == "__main__":

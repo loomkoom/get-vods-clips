@@ -13,7 +13,7 @@ stream_handler.setFormatter(formatter)
 logger.addHandler(stream_handler)
 
 
-def get_clips_date(channel_name, date, tracker = "SC", file = "no", workers = 150, data_path = Path("../output/data"), loglevel = "INFO"):
+def get_clips_date(channel_name, date, tracker = "SC", file = "no", workers = 150, loglevel = "INFO"):
     if not isinstance(loglevel, int):
         loglevels = {"NOTSET": 0, "DEBUG": 10, "INFO": 20, "WARNING": 30, "ERROR": 40, "CRITICAL": 50}
         loglevel = loglevels[loglevel.upper()]
@@ -38,6 +38,9 @@ def get_clips_date(channel_name, date, tracker = "SC", file = "no", workers = 15
                           f"TITLE: {title} , CATEGORIES: {categories}\n"
             clips_lst.append(data_string)
         if file == "yes":
+            data_path = Path("../output/data")
+            if not Path.is_dir(data_path):
+                Path.mkdir(data_path, parents = True)
             with open(data_path / f"{file_name}", "w", encoding = 'utf8') as data_log:
                 data_log.writelines(clips_lst)
     return clips_lst
@@ -55,10 +58,11 @@ def main():
     workers = input("worker count (empty for default) >> ").strip()
     if workers == "":
         workers = 150
-    clips = get_clips_date(channel_name, date, file = file, workers = workers)
+    clips = get_clips_date(channel_name, date, file = file, workers = int(workers))
 
     for clip in clips:
         print(clip.replace("\n", ""))
+    return clips
 
 
 if __name__ == "__main__":

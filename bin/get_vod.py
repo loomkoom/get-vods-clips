@@ -59,7 +59,7 @@ def play_url(url, channel_name):
     return not (time_taken >= 2.499)
 
 
-def verify_url(urls, test, channel_name, date_time, broadcast_id, session, file_path = Path("../output/files")):
+def verify_url(urls, test, channel_name, date_time, broadcast_id, session):
     header = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36 OPR/71.0.3770.323', }
     for url in urls:
@@ -71,8 +71,7 @@ def verify_url(urls, test, channel_name, date_time, broadcast_id, session, file_
                         logger.info(f"link found (not muted): {url}")
                         return url, False
                 else:
-                    muted_vod = get_muted_vod.get_muted_playlist(url, Path(f"{datetime.date(date_time)}_{broadcast_id}"),
-                                                                 file_path = file_path)[0]
+                    muted_vod = get_muted_vod.get_muted_playlist(url, Path(f"{datetime.date(date_time)}_{broadcast_id}"))[0]
                     if play_url(muted_vod, channel_name):
                         logger.info(f"link found (muted): {url} , {muted_vod}")
                         return url, muted_vod
@@ -83,8 +82,7 @@ def verify_url(urls, test, channel_name, date_time, broadcast_id, session, file_
     return "no valid link", False
 
 
-def get_vod(channel_name, broadcast_id, timestamp, tracker = "TT", test = "no", file_path = Path("../output/files"), workers = 60,
-            loglevel = "WARNING"):
+def get_vod(channel_name, broadcast_id, timestamp, tracker = "TT", test = "no", workers = 60, loglevel = "WARNING"):
     loglevels = {"NOTSET": 0, "DEBUG": 10, "INFO": 20, "WARNING": 30, "ERROR": 40, "CRITICAL": 50}
     loglevel = loglevels[loglevel.upper()]
     logger.setLevel(loglevel)
@@ -109,7 +107,7 @@ def get_vod(channel_name, broadcast_id, timestamp, tracker = "TT", test = "no", 
                 session.mount('http://', adapter)
                 future_to_url = {executor.submit(verify_url,
                                                  urls.strip("][").replace("'", "").strip(" ").split(","),
-                                                 test, channel_name, date_time, broadcast_id, session = session, file_path = file_path)
+                                                 test, channel_name, date_time, broadcast_id, session = session)
                                  : urls for urls in all_urls.keys()}
 
                 for future in concurrent.futures.as_completed(future_to_url):
@@ -122,7 +120,7 @@ def get_vod(channel_name, broadcast_id, timestamp, tracker = "TT", test = "no", 
     else:
         urls = get_urls(channel_name, broadcast_id, date_time)
         with requests.session() as session:
-            verified = verify_url(urls, test, channel_name, date_time, broadcast_id, session, file_path = file_path)
+            verified = verify_url(urls, test, channel_name, date_time, broadcast_id, session)
             found_url = verified[0]
             muted = verified[1]
             if found_url != "no valid link":

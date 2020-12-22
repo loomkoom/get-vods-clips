@@ -11,7 +11,7 @@ def load_url(url, session):
     return r.ok
 
 
-def get_clips(broadcast_id, time_offset, file = "no", workers = 150, data_path = Path("../output/data"), loglevel = "INFO"):
+def get_clips(broadcast_id, time_offset, file = "no", workers = 150, loglevel = "INFO"):
     loglevels = {"NOTSET": 0, "DEBUG": 10, "INFO": 20, "WARNING": 30, "ERROR": 40, "CRITICAL": 50}
     logger = logging.getLogger(__name__)
     loglevel = loglevels[loglevel.upper()]
@@ -47,6 +47,9 @@ def get_clips(broadcast_id, time_offset, file = "no", workers = 150, data_path =
         output.sort(key = lambda x: x[57:-4])
         if file == "yes":
             file_name = f"{broadcast_id}_clips.txt"
+            data_path = Path("../output/data")
+            if not Path.is_dir(data_path):
+                Path.mkdir(data_path, parents = True)
             with open(data_path / f"{file_name}", "w", encoding = 'utf8') as data_log:
                 for clip in output:
                     data_string = f"URL: {clip[0]} , TIME: {clip[1]}\n"
@@ -68,7 +71,7 @@ def main():
     workers = input("worker count (empty for default) >> ").strip()
     if workers == "":
         workers = 150
-    clips = get_clips(broadcast_id, time_offset, file, workers)
+    clips = get_clips(broadcast_id, time_offset, file, int(workers))
 
     for clip in clips:
         print(clip)

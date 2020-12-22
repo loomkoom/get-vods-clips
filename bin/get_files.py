@@ -41,8 +41,8 @@ def parse_tags(line, vods_clips):
     return data
 
 
-def get_link_data(data_file, vods_clips, data_path):
-    path = data_path
+def get_link_data(data_file, vods_clips):
+    path = Path("../output/data")
     data_file = Path.with_suffix(data_file, ".txt")
     with open(path / data_file, "r", encoding = 'utf8') as file:
         url_data = list()
@@ -53,7 +53,8 @@ def get_link_data(data_file, vods_clips, data_path):
     return url_data, vods_clips
 
 
-def download_file(url, channel_name, file_name, new_name, vods_clips, file_path = Path("../output/files"), muted = None):
+def download_file(url, channel_name, file_name, new_name, vods_clips, muted = None):
+    file_path = Path("../output/files")
     path = Path.resolve(file_path / channel_name / vods_clips)
     muted_path = Path.resolve(Path.cwd() / file_path / channel_name / "playlists")
     if not Path.is_dir(path):
@@ -92,17 +93,18 @@ def download_file(url, channel_name, file_name, new_name, vods_clips, file_path 
             logger.warning("please check if any errors are display and verify your input\n")
 
 
-def get_files(data_file, rename, vods_clips, try_muted = "yes", data_path = Path("../output/data"), file_path = Path("../output/files"),
-              loglevel = "INFO"):
+def get_files(data_file, rename, vods_clips, try_muted = "yes", loglevel = "INFO"):
     loglevels = {"NOTSET": 0, "DEBUG": 10, "INFO": 20, "WARNING": 30, "ERROR": 40, "CRITICAL": 50}
     loglevel = loglevels[loglevel.upper()]
     logger.setLevel(loglevel)
 
     data_file = Path(data_file)
+
     channel_name = data_file.name.split(" ")[0]
     file_names = []
-    link_data = get_link_data(data_file, vods_clips, data_path)
+    link_data = get_link_data(data_file, vods_clips)
     vods_clips = link_data[1]
+    file_path = Path("../output/files")
     path = file_path / channel_name / vods_clips
     for data in link_data[0]:
         date, file_name, url, length, title, _ = data
@@ -115,12 +117,12 @@ def get_files(data_file, rename, vods_clips, try_muted = "yes", data_path = Path
             offset_time = data[5]
             new_name = Path.with_suffix(Path(f"{date}__{title}__{offset_time}-{length}_{file_name}"), ".mp4")
             file_name = Path.with_suffix(file_name, ".mp4")
-            download_file(url, channel_name, file_name, new_name, vods_clips, file_path)
+            download_file(url, channel_name, file_name, new_name, vods_clips)
         if vods_clips == "vods":
             muted = "muted" if len(data[5]) != 1 else "unmuted"
             new_name = Path.with_suffix(Path(f"{date}_{title}_{length}_{file_name}_{muted}"), ".mp4")
             file_name = Path.with_suffix(file_name, ".mp4")
-            download_file(url, channel_name, file_name, new_name, vods_clips, file_path, muted)
+            download_file(url, channel_name, file_name, new_name, vods_clips, muted)
 
         if rename == "yes" and Path.is_file(path / file_name) and not Path.is_file(path / new_name):
             Path.rename(path / file_name, path / new_name)

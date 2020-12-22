@@ -174,6 +174,7 @@ def main():
     if data is not None:
         for stream in data:
             print(stream)
+    return data
 
 
 if __name__ == "__main__":

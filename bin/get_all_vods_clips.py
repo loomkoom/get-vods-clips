@@ -113,28 +113,31 @@ def find_clips(stream, workers, file_name, data_path):
     logger.debug(found_string)
 
 
-def download_links(channel_name, vods_clips, rename, try_muted, file_path, data_path, file_name_vods, file_name_clips):
+def download_links(channel_name, vods_clips, rename, try_muted, file_path, file_name_vods, file_name_clips):
     """Download clips and/or vods listed in the data file"""
     logger = logging.getLogger(__name__)
     abs_file_path = Path.resolve(Path.cwd() / file_path)
     if vods_clips == "vods" or vods_clips == "both":
         logger.info("starting vods download ...")
-        get_files.get_files(file_name_vods, rename, "vods", try_muted, data_path = data_path, file_path = file_path,
+        get_files.get_files(file_name_vods, rename, "vods", try_muted,
                             loglevel = "DEBUG")
         logger.info(f"vods downloaded at '{abs_file_path / channel_name / 'vods'}'\n")
 
     if vods_clips == "clips" or vods_clips == "both":
         logger.info("starting clips download ...")
-        get_files.get_files(file_name_clips, rename, "clips", data_path = data_path, file_path = file_path, loglevel = "DEBUG")
+        get_files.get_files(file_name_clips, rename, "clips", loglevel = "DEBUG")
         logger.info(f"clips downloaded at '{abs_file_path / channel_name / 'clips'}'\n")
 
 
 def get_vods_clips(channel_name, vods_clips, start = "", end = "", tracker = "TT", download = "no", rename = "no",
-                   try_muted = "yes", workers = 150, test = "yes", loglevel = "INFO",
-                   data_path = Path("../output/data"), file_path = Path("../output/files"), log_path = Path("../output/logs")):
+                   try_muted = "yes", workers = 150, test = "yes", loglevel = "INFO"):
+    data_path = Path("../output/data")
+    file_path = Path("../output/files")
+    log_path = Path("../output/logs")
     check_dirs(data_path)
     check_dirs(file_path)
     check_dirs(log_path)
+
     logger = set_logger(loglevel, log_path, channel_name)
     valid_input = check_input(channel_name, vods_clips, start, end, download, rename, workers, test, logger)
     if not bool(valid_input):
@@ -198,7 +201,7 @@ def get_vods_clips(channel_name, vods_clips, start = "", end = "", tracker = "TT
         logger.info(f"clip links located in '{abs_data_path / file_name_clips}'\n")
 
     if download == "yes":
-        download_links(channel_name, vods_clips, rename, try_muted, file_path, data_path, file_name_vods, file_name_clips)
+        download_links(channel_name, vods_clips, rename, try_muted, file_path, file_name_vods, file_name_clips)
 
     return file_names
 
@@ -240,14 +243,13 @@ def main():
         workers = input("worker count (empty for default) >> ").strip()
         if workers == "":
             workers = 150
-        get_vods_clips(channel_name, vods_clips, start = start, end = end, download = download, rename = rename, workers = workers,
+        get_vods_clips(channel_name, vods_clips, start = start, end = end, download = download, rename = rename, workers = int(workers),
                        tracker = tracker)
 
     if vods_clips == "vods":
         test = input("test if vod actually plays with mpv (no false positives but a bit slower) [yes/no]? >>").strip()
         get_vods_clips(channel_name, vods_clips, start = start, end = end, download = download, rename = rename, try_muted = use_muted,
-                       test = test,
-                       tracker = tracker)
+                       test = test, tracker = tracker)
 
     elif vods_clips == "both":
         workers = input("worker count (empty for default) >> ").strip()
@@ -255,8 +257,7 @@ def main():
             workers = 150
         test = input("test if vod actually plays with mpv (no false positives but a bit slower) [yes/no]? >>").strip()
         get_vods_clips(channel_name, vods_clips, start = start, end = end, download = download, rename = rename, try_muted = use_muted,
-                       test = test,
-                       workers = workers, tracker = tracker)
+                       test = test, workers = int(workers), tracker = tracker)
 
 
 if __name__ == "__main__":
