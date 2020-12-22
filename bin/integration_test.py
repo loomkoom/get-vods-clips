@@ -66,32 +66,32 @@ def get_data_stream(get_data_in):
     return channel_name, stream_data
 
 
-# test get vod
-def test_get_vod_latest_no_play(get_data_stream):
-    stream_data = get_data_stream
-    channel_name = stream_data[0]
-    stream = choice(stream_data[1])
-    timestamp, broadcast_id = stream[0], stream[1]
-    vod = get_vod.get_vod(channel_name, broadcast_id, timestamp, loglevel = "DEBUG")
-    urls = vod[0]
-    for url in urls:
-        if url != "no valid link":
-            assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
-
-
-def test_get_vod_latest_play(get_data_stream, tmpdir):
-    output = tmpdir.mkdir("output")
-    file_path = output.mkdir("files")
-    stream_data = get_data_stream
-    channel_name = stream_data[0]
-    stream = choice(stream_data[1])
-    timestamp, broadcast_id = stream[0], stream[1]
-    vod = get_vod.get_vod(channel_name, broadcast_id, timestamp, test = "yes", file_path = Path(file_path), loglevel = "DEBUG")
-    urls = vod[0]
-    for url in urls:
-        if url != "no valid link":
-            assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
-            assert get_vod.play_url(url, channel_name), "Vod not playable"
+# # test get vod
+# def test_get_vod_latest_no_play(get_data_stream):
+#     stream_data = get_data_stream
+#     channel_name = stream_data[0]
+#     stream = choice(stream_data[1])
+#     timestamp, broadcast_id = stream[0], stream[1]
+#     vod = get_vod.get_vod(channel_name, broadcast_id, timestamp, loglevel = "DEBUG")
+#     urls = vod[0]
+#     for url in urls:
+#         if url != "no valid link":
+#             assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
+#
+#
+# def test_get_vod_latest_play(get_data_stream, tmpdir):
+#     output = tmpdir.mkdir("output")
+#     file_path = Path(output.mkdir("files"))
+#     stream_data = get_data_stream
+#     channel_name = stream_data[0]
+#     stream = choice(stream_data[1])
+#     timestamp, broadcast_id = stream[0], stream[1]
+#     vod = get_vod.get_vod(channel_name, broadcast_id, timestamp, test = "yes", file_path = file_path, loglevel = "DEBUG")
+#     urls = vod[0]
+#     for url in urls:
+#         if url != "no valid link":
+#             assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
+#             assert get_vod.play_url(url, channel_name), "Vod not playable"
 
 
 # test get vods date
@@ -122,12 +122,12 @@ def test_get_vods_date_play(get_data_stream, tmpdir):
 
 
 # test get clips
-def test_get_clips(get_data_stream):
-    stream = choice(get_data_stream[1])
-    broadcast_id, time_offset = stream[1], stream[2]
-    clips = get_clips.get_clips(broadcast_id, time_offset, loglevel = "DEBUG")
-    assert len(clips) > 1, "no valid clips found"
-    assert requests.head(clips[1][0], allow_redirects = False).ok, "clip not valid"
+# def test_get_clips(get_data_stream):
+#     stream = choice(get_data_stream[1])
+#     broadcast_id, time_offset = stream[1], stream[2]
+#     clips = get_clips.get_clips(broadcast_id, time_offset, loglevel = "DEBUG")
+#     assert len(clips) > 1, "no valid clips found"
+#     assert requests.head(clips[1][0], allow_redirects = False).ok, "clip not valid"
 
 
 def test_get_clips_file(get_data_stream, tmpdir):
@@ -147,16 +147,16 @@ def test_get_clips_file(get_data_stream, tmpdir):
 
 
 # test get clips date
-def test_get_clips_date(get_data_stream):
-    stream_data = get_data_stream
-    channel_name = stream_data[0]
-    stream = choice(get_data_stream[1])
-    date = stream[0].split(" ")[0]
-    clips = get_clips_date.get_clips_date(channel_name, date, loglevel = "DEBUG")
-    assert len(clips) > 1, "no valid clips found"
-    url = clips[0].split(",")[1].strip()[5:]
-    if url != "no valid clips found":
-        assert requests.head(url, allow_redirects = False).ok, "clip not valid"
+# def test_get_clips_date(get_data_stream):
+#     stream_data = get_data_stream
+#     channel_name = stream_data[0]
+#     stream = choice(get_data_stream[1])
+#     date = stream[0].split(" ")[0]
+#     clips = get_clips_date.get_clips_date(channel_name, date, loglevel = "DEBUG")
+#     assert len(clips) > 1, "no valid clips found"
+#     url = clips[0].split(",")[1].strip()[5:]
+#     if url != "no valid clips found":
+#         assert requests.head(url, allow_redirects = False).ok, "clip not valid"
 
 
 def test_get_clips_date_file(get_data_stream, tmpdir):
