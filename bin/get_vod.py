@@ -149,6 +149,7 @@ def main():
               f"Because of that a file has been created at output/files/{channel_name}/playlists/{vod[1]} with the muted playlist \n")
     else:
         print(f"\nURL: {vod[0]} has been found \n")
+    return vod
 
 
 if __name__ == "__main__":

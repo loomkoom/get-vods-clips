@@ -9,15 +9,15 @@ import pytest
 import requests
 
 import get_all_vods_clips
-# import get_clips
+import get_clips
 import get_clips_date
 import get_stream_data
 import get_vod
 import get_vods_date
-from mock_input_output import set_keyboard_input
+from mock_input import set_keyboard_input
+from math import floor
 
 
-# from math import floor
 @pytest.fixture()
 def get_data_in():
     channels = ["hasanabi", "xqcow", "shroud", "mizkif"]
@@ -72,32 +72,34 @@ def get_data_stream(get_data_in):
     return channel_name, stream_data
 
 
-# # test get vod
-# def test_get_vod_latest_no_play(get_data_stream):
-#     stream_data = get_data_stream
-#     channel_name = stream_data[0]
-#     stream = choice(stream_data[1])
-#     timestamp, broadcast_id = stream[0], stream[1]
-#     vod = get_vod.get_vod(channel_name, broadcast_id, timestamp, loglevel = "DEBUG")
-#     urls = vod[0]
-#     for url in urls:
-#         if url != "no valid link":
-#             assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
-#
-#
-# def test_get_vod_latest_play(get_data_stream, tmpdir):
-#     output = tmpdir.mkdir("../output")
-#     file_path = Path(output.mkdir("files"))
-#     stream_data = get_data_stream
-#     channel_name = stream_data[0]
-#     stream = choice(stream_data[1])
-#     timestamp, broadcast_id = stream[0], stream[1]
-#     vod = get_vod.get_vod(channel_name, broadcast_id, timestamp, test = "yes", file_path = file_path, loglevel = "DEBUG")
-#     urls = vod[0]
-#     for url in urls:
-#         if url != "no valid link":
-#             assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
-#             assert get_vod.play_url(url, channel_name), "Vod not playable"
+# test get vod
+def test_get_vod_latest_no_play(get_data_stream):
+    stream_data = get_data_stream
+    channel_name = stream_data[0]
+    stream = choice(stream_data[1])
+    timestamp, broadcast_id = stream[0], stream[1]
+    vod = get_vod.get_vod(channel_name, broadcast_id, timestamp, loglevel = "DEBUG")
+    urls = vod[0]
+    for url in urls:
+        if url != "no valid link":
+            assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
+
+
+@pytest.mark.parametrize("tracker", ["TT", "SC"])
+def test_get_vod_latest_play(get_data_stream, tracker):
+    stream_data = get_data_stream
+    channel_name = stream_data[0]
+    stream = choice(stream_data[1])
+    timestamp, broadcast_id = stream[0], stream[1]
+    test = "yes"
+    tracker = tracker
+    set_keyboard_input([channel_name, broadcast_id, timestamp, test, tracker])
+    vod = get_vod.main()
+    urls = vod[0]
+    for url in urls:
+        if url != "no valid link":
+            assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
+            assert get_vod.play_url(url, channel_name), "Vod not playable"
 
 
 # test get vods date
@@ -138,22 +140,24 @@ def test_get_vods_date_play(get_data_stream):
 #     clips = get_clips.get_clips(broadcast_id, time_offset, loglevel = "DEBUG")
 #     assert len(clips) > 1, "no valid clips found"
 #     assert requests.head(clips[1][0], allow_redirects = False).ok, "clip not valid"
-#
-#
-# def test_get_clips_file(get_data_stream, tmpdir):
-#     output = tmpdir.mkdir("../output")
-#     data_path = Path(output.mkdir("data"))
-#     stream = choice(get_data_stream[1])
-#     broadcast_id, time_offset = stream[1], floor(int(stream[2]) / 2)
-#     clips = get_clips.get_clips(broadcast_id, time_offset, file = "yes", data_path = data_path, loglevel = "DEBUG")
-#     assert len(clips) > 1, "no valid clips found"
-#     assert requests.head(clips[1][0], allow_redirects = False).ok, "clip not valid"
-#     assert Path.is_file(data_path / f"{broadcast_id}_clips.txt"), "File not made"
-#     with open(f"{data_path}/{broadcast_id}_clips.txt", "r", encoding = "utf8") as file:
-#         assert len(file.readline().split(",")) == 2, "data file not correctly formatted"
-#         file.seek(0)
-#         url = file.readline().split(",")[0].strip()[5:]
-#         assert requests.head(url, allow_redirects = False).ok, "clip not valid"
+
+
+def test_get_clips_file(get_data_stream):
+    data_path = Path("../output/data")
+    stream = choice(get_data_stream[1])
+    broadcast_id, time_offset = stream[1], str(floor(int(stream[2]) / 5))
+    file = "yes"
+    workers = ""
+    set_keyboard_input([broadcast_id, time_offset, file, workers])
+    clips = get_clips.main()
+    assert len(clips) > 1, "no valid clips found"
+    assert requests.head(clips[1][0], allow_redirects = False).ok, "clip not valid"
+    assert Path.is_file(data_path / f"{broadcast_id}_clips.txt"), "File not made"
+    with open(f"{data_path}/{broadcast_id}_clips.txt", "r", encoding = "utf8") as file:
+        assert len(file.readline().split(",")) == 2, "data file not correctly formatted"
+        file.seek(0)
+        url = file.readline().split(",")[0].strip()[5:]
+        assert requests.head(url, allow_redirects = False).ok, "clip not valid"
 
 
 # test get clips date
@@ -175,7 +179,7 @@ def test_get_clips_date_file(get_data_stream):
     channel_name = stream_data[0]
     stream = choice(get_data_stream[1])
     date = stream[0].split(" ")[0]
-    workers = "150"
+    workers = ""
     file = "yes"
     print(f"{channel_name} clips {date}.txt")
     set_keyboard_input([channel_name, date, file, workers])
@@ -202,7 +206,7 @@ def test_get_all_vods_clips(get_data_stream, tracker):
     start, end = date, date
     vods_clips = "both"
     download = "no"
-    workers = "150"
+    workers = ""
     test = "yes"
     set_keyboard_input([channel_name, vods_clips, start, end, download, tracker, workers, test])
     get_all_vods_clips.main()
@@ -225,5 +229,5 @@ def test_get_all_vods_clips(get_data_stream, tracker):
             assert requests.head(url, allow_redirects = False).ok, "link not valid"
 
 
-def end():
+def end_test():
     rmtree(Path("../output/"))

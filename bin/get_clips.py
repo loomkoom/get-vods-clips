@@ -75,6 +75,7 @@ def main():
 
     for clip in clips:
         print(clip)
+    return clips
 
 
 if __name__ == "__main__":
