@@ -1,7 +1,8 @@
 # .coveragerc to control coverage.py
+[run]
+omit = 
+    bin/mpv_py.py
 
 [report]
 exclude_lines =
     if __name__ == .__main__.:
-omit = 
-    mpv_py.py
