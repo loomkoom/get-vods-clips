@@ -225,5 +225,5 @@ def test_get_all_vods_clips(get_data_stream, tracker):
             assert requests.head(url, allow_redirects = False).ok, "link not valid"
 
 
-def teardown():
-    rmtree(Path("../output"))
+def end():
+    rmtree(Path("../output/"))
