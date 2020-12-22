@@ -110,7 +110,7 @@ def test_get_vods_date(get_data_stream, tracker):
     test = "no"
     set_keyboard_input([channel_name, date, test, tracker])
     vods = get_vods_date.main()
-    print(vod)
+    print(vods)
     url = vods[0].split(",")[1].strip()[5:].strip("][").replace("'", "")
     if url != "no valid link":
         assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
