@@ -61,8 +61,7 @@ def calculate_time(vods_clips, tracker, test, stream_data, index):
     stream_data = stream_data[index + 1:]
     streams = len(stream_data)
     estimated_time = timedelta(seconds = 0)
-    total_minutes = sum(map(lambda x: (int(x[2].split("h")[0]) * 60 + int(x[2].split("h")[1][:-3])) if "h" in x[2] else int(x[2])
-                            , stream_data))
+    total_minutes = sum(map(lambda x: int(x[2]), stream_data))
 
     if vods_clips == "vods" or vods_clips == "both":
         if tracker == "SC":
@@ -158,6 +157,7 @@ def get_vods_clips(channel_name, vods_clips, start = "", end = "", tracker = "TT
                 f"[{time_now}]: estimated process time:\t {estimated_time - timedelta(microseconds = estimated_time.microseconds)}  \n")
 
     for index, stream in enumerate(stream_data):
+        logger.debug(f"{index}, {stream}")
         date_time, broadcast_id, minutes, title, categories, = stream
         vod_length = f"{int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min"
         log_string = f"DATE: {date_time}, ID: {broadcast_id}, LENGTH: {vod_length}, " \

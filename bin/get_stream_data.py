@@ -75,7 +75,7 @@ def parse_tags_sc(streams_json, start, end):
     for stream in streams_json["streams"]:
         date_time = stream["stream_created_at"][:-3]
         broadcast_id = stream["stream_id"]
-        length = ceil((float(stream["air_time"]) + 0.1) * 60)
+        length = str(ceil((float(stream["air_time"]) + 0.1) * 60))
         title = stream["stream_status"]
         games = stream["games"]
         categories = str(tuple(game["slug"] for game in games)).replace(",", ";")
