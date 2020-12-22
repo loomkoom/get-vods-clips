@@ -35,7 +35,7 @@ def test_get_stream_data_daterange(get_data_in, tracker):
     assert len(stream_data[0]) == 5, "Stream data incomplete"
 
 
-@pytest.mark.parametrize("tracker", ["TT", "SC"])
+@pytest.mark.parametrize("tracker", ["TT"])
 def test_get_stream_data_all(get_data_in, tracker):
     channel_name = get_data_in[0]
     stream_data = get_stream_data.get_data(channel_name, tracker = tracker, loglevel = "DEBUG")
@@ -43,7 +43,7 @@ def test_get_stream_data_all(get_data_in, tracker):
     assert len(stream_data[0]) == 5, "Stream data incomplete"
 
 
-@pytest.mark.parametrize("tracker", ["TT", "SC"])
+@pytest.mark.parametrize("tracker", ["TT"])
 def test_get_stream_data_start(get_data_in, tracker):
     channel_name, date = get_data_in[0], get_data_in[1][0]
     stream_data = get_stream_data.get_data(channel_name, start = date, tracker = tracker, loglevel = "DEBUG")
@@ -51,7 +51,7 @@ def test_get_stream_data_start(get_data_in, tracker):
     assert len(stream_data[0]) == 5, "Stream data incomplete"
 
 
-@pytest.mark.parametrize("tracker", ["TT", "SC"])
+@pytest.mark.parametrize("tracker", ["TT"])
 def test_get_stream_data_end(get_data_in, tracker):
     channel_name, date = get_data_in[0], get_data_in[1][1]
     stream_data = get_stream_data.get_data(channel_name, end = date, tracker = tracker, loglevel = "DEBUG")
