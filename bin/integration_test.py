@@ -103,7 +103,6 @@ def test_get_vod_latest_play(get_data_stream, tracker):
 
 
 # test get vods date
-@pytest.mark.parametrize("tracker", ["TT", "SC"])
 def test_get_vods_date(get_data_stream, tracker):
     stream_data = get_data_stream
     channel_name = stream_data[0]
@@ -112,7 +111,6 @@ def test_get_vods_date(get_data_stream, tracker):
     test = "no"
     set_keyboard_input([channel_name, date, test, tracker])
     vods = get_vods_date.main()
-    print(vods)
     url = vods[0].split(",")[1].strip()[5:].strip("][").replace("'", "")
     if url != "no valid link":
         assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
@@ -181,7 +179,6 @@ def test_get_clips_date_file(get_data_stream):
     date = stream[0].split(" ")[0]
     workers = ""
     file = "yes"
-    print(f"{channel_name} clips {date}.txt")
     set_keyboard_input([channel_name, date, file, workers])
     clips = get_clips_date.main()
     url = clips[0].split(",")[1].strip()[5:]
