@@ -258,6 +258,7 @@ def main():
         test = input("test if vod actually plays with mpv (no false positives but a bit slower) [yes/no]? >>").strip()
         get_vods_clips(channel_name, vods_clips, start = start, end = end, download = download, rename = rename, try_muted = use_muted,
                        test = test, workers = int(workers), tracker = tracker)
+    logging.shutdown()
 
 
 if __name__ == "__main__":

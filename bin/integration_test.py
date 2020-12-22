@@ -3,6 +3,7 @@ import datetime
 from datetime import timedelta
 from pathlib import Path
 from random import choice
+from shutil import rmtree
 
 import pytest
 import requests
@@ -128,9 +129,6 @@ def test_get_vods_date_play(get_data_stream):
     if url != "no valid link":
         assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
         assert get_vod.play_url(url, channel_name), "Vod not playable"
-    files = Path("../output/*")
-    for file in files:
-        Path.unlink(file, missing_ok = True)
 
 
 # test get clips
@@ -191,9 +189,6 @@ def test_get_clips_date_file(get_data_stream):
         file.seek(0)
         url = file.readline().split(",")[1].strip()[5:]
         assert requests.head(url, allow_redirects = False).ok, "clip not valid"
-    files = Path("../output/*")
-    for file in files:
-        Path.unlink(file, missing_ok = True)
 
 
 # test get_all_vods_clips
@@ -228,6 +223,7 @@ def test_get_all_vods_clips(get_data_stream, tracker):
             url = url.strip("][").strip("'")
         if url != "no valid link":
             assert requests.head(url, allow_redirects = False).ok, "link not valid"
-    files = Path("../output/*")
-    for file in files:
-        Path.unlink(file, missing_ok = True)
+
+
+def teardown():
+    rmtree(Path("../output"))
