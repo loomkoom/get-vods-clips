@@ -18,17 +18,6 @@ from mock_input_output import set_keyboard_input
 
 # from math import floor
 @pytest.fixture()
-def create_dir(tmp_path):
-    output = Path(tmp_path / "../output")
-    if not Path.is_dir(output):
-        Path.mkdir(tmp_path / "../output")
-        Path.mkdir(output / "data", exist_ok = True)
-    data_path = Path(output / "data")
-
-    return data_path
-
-
-@pytest.fixture()
 def get_data_in():
     channels = ["hasanabi", "xqcow", "shroud", "mizkif"]
     channel_name = choice(channels).lower()
@@ -139,6 +128,9 @@ def test_get_vods_date_play(get_data_stream):
     if url != "no valid link":
         assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
         assert get_vod.play_url(url, channel_name), "Vod not playable"
+    files = Path("../output/*")
+    for file in files:
+        Path.unlink(file, missing_ok = True)
 
 
 # test get clips
@@ -179,8 +171,8 @@ def test_get_vods_date_play(get_data_stream):
 #         assert requests.head(url, allow_redirects = False).ok, "clip not valid"
 
 
-def test_get_clips_date_file(get_data_stream, create_dir):
-    data_path = create_dir
+def test_get_clips_date_file(get_data_stream):
+    data_path = Path("../output/data")
     stream_data = get_data_stream
     channel_name = stream_data[0]
     stream = choice(get_data_stream[1])
@@ -199,12 +191,15 @@ def test_get_clips_date_file(get_data_stream, create_dir):
         file.seek(0)
         url = file.readline().split(",")[1].strip()[5:]
         assert requests.head(url, allow_redirects = False).ok, "clip not valid"
+    files = Path("../output/*")
+    for file in files:
+        Path.unlink(file, missing_ok = True)
 
 
 # test get_all_vods_clips
 @pytest.mark.parametrize("tracker", ["TT", "SC"])
-def test_get_all_vods_clips(get_data_stream, tracker, create_dir):
-    data_path = create_dir
+def test_get_all_vods_clips(get_data_stream, tracker):
+    data_path = Path("../output/data")
     stream_data = get_data_stream
     channel_name = stream_data[0]
     stream = choice(stream_data[1])
@@ -233,3 +228,6 @@ def test_get_all_vods_clips(get_data_stream, tracker, create_dir):
             url = url.strip("][").strip("'")
         if url != "no valid link":
             assert requests.head(url, allow_redirects = False).ok, "link not valid"
+    files = Path("../output/*")
+    for file in files:
+        Path.unlink(file, missing_ok = True)
