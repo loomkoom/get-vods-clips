@@ -45,8 +45,8 @@ def check_input(channel_name, vods_clips, start, end, download, rename, workers,
     """checks if input is valid returns 0 or 1"""
     if (len(channel_name) < 4 or
             (not (vods_clips == "clips" or vods_clips == "vods" or vods_clips == "both")) or
-            (not (start == "" or len(start) == 10)) or
-            (not (end == "" or len(end) == 10)) or
+            (not (start == "" or (len(start) == 10 and len(start.split("-")[0]) == 4))) or
+            (not (end == "" or (len(end) == 10 and len(end.split("-")[0]) == 4))) or
             (not (rename == "no" or rename == "yes")) or
             (not (download == "no" or download == "yes")) or
             (not (test == "no" or test == "yes")) or

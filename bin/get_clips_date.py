@@ -19,7 +19,7 @@ def get_clips_date(channel_name, date, tracker = "SC", file = "no", workers = 15
         loglevel = loglevels[loglevel.upper()]
     logger.setLevel(loglevel)
     if (len(channel_name) < 4 or
-            (not (date == "" or len(date) == 10)) or
+            (not (len(date) == 10 and len(date.split("-")[0]) == 4)) or
             (not (file == "yes" or file == "no")) or
             (not (tracker == "TT" or tracker == "SC")) or
             (not isinstance(workers, int))):
