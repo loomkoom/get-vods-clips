@@ -20,7 +20,7 @@ from math import floor
 
 @pytest.fixture()
 def get_data_in():
-    channels = ["hasanabi", "xqcow", "shroud", "mizkif"]
+    channels = ["hasanabi", "xqcow", "shroud"]
     channel_name = choice(channels).lower()
     today = datetime.datetime.today()
     other_day = today - timedelta(days = 7)
@@ -81,8 +81,8 @@ def test_get_vod_latest_no_play(get_data_stream):
     vod = get_vod.get_vod(channel_name, broadcast_id, timestamp, loglevel = "DEBUG")
     urls = vod[0]
     for url in urls:
-
-        assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
+        if url != "no valid link":
+            assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
 
 
 @pytest.mark.parametrize("tracker", ["TT", "SC"])
@@ -97,7 +97,6 @@ def test_get_vod_latest_play(get_data_stream, tracker):
     vod = get_vod.main()
     urls = vod[0]
     for url in urls:
-
         assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
         assert get_vod.play_url(url, channel_name), "Vod not playable"
 
@@ -109,11 +108,10 @@ def test_get_vods_date(get_data_stream):
     stream = choice(stream_data[1])
     date = stream[0].split(" ")[0]
     test = "no"
-    tracker = "TT"
+    tracker = "SC"
     set_keyboard_input([channel_name, date, test, tracker])
     vods = get_vods_date.main()
     url = vods[0].split(",")[1].strip()[5:].strip("][").replace("'", "")
-
     assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
 
 
@@ -123,11 +121,10 @@ def test_get_vods_date_play(get_data_stream):
     stream = choice(stream_data[1])
     date = stream[0].split(" ")[0]
     test = "yes"
-    tracker = "TT"
+    tracker = "SC"
     set_keyboard_input([channel_name, date, test, tracker])
     vods = get_vods_date.main()
     url = vods[0].split(",")[1].strip()[5:].strip("][").replace("'", "")
-
     assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
     assert get_vod.play_url(url, channel_name), "Vod not playable"
 

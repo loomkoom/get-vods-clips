@@ -23,6 +23,9 @@ def get_vods(channel_name, date, tracker = "TT", test = "yes", loglevel = "INFO"
     date = date.split(" ")[0]
     logger.info("fetching stream data")
     stream_data = get_stream_data.get_data(channel_name, date, date, tracker)
+    if len(stream_data) == 0:
+        logger.info(f"found no stream for {channel_name} on {date}")
+        return
     for stream in stream_data:
         logger.debug(stream)
         date_time, broadcast_id, minutes, title, categories = stream
@@ -32,7 +35,6 @@ def get_vods(channel_name, date, tracker = "TT", test = "yes", loglevel = "INFO"
                       f"LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
                       f"TITLE: {title} , CATEGORIES: {categories}\n"
         vods.append(data_string)
-    logger.debug(vods)
     return vods
 
 

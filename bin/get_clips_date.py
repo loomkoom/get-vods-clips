@@ -21,8 +21,11 @@ def get_clips_date(channel_name, date, tracker = "SC", file = "no", workers = 15
 
     file_name = f"{channel_name} clips {date}.txt"
     clips_lst = []
-    logger.info("getting stream data")
+    logger.info("fetching stream data")
     stream_data = get_stream_data.get_data(channel_name, date, date, tracker = tracker)
+    if len(stream_data) == 0:
+        logger.info(f"found no stream for {channel_name} on {date}")
+        return
     for stream in stream_data:
         logger.debug(stream)
         date_time, broadcast_id, minutes, title, categories = stream

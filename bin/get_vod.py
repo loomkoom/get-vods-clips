@@ -48,11 +48,11 @@ def play_url(url, channel_name):
     if not url.startswith("http"):
         url = str(Path.resolve(Path(Path(__file__).parents[1] / "output" / "files" / channel_name / "playlists" / url)))
     player = mpv.MPV(window_minimized = "yes", osc = "no", load_osd_console = "no", load_stats_overlay = "no", profile = "low-latency",
-                     frames = "5", untimed = "yes", demuxer = "lavf", demuxer_lavf_format = "hls", demuxer_thread = "no", cache = "no",
+                     frames = "1", untimed = "yes", demuxer = "lavf", demuxer_lavf_format = "hls", demuxer_thread = "no", cache = "no",
                      ytdl = "no", load_scripts = "no", audio = "no", demuxer_lavf_o = '"protocol_whitelist"="file,https,http,tls,tcp"',
                      video = "no")
     player.play(url)
-    timeout = 2
+    timeout = 2.5
     start = time.time()
     player.wait_for_playback(timeout)
     player.quit()
@@ -117,7 +117,7 @@ def get_vod(channel_name, broadcast_id, timestamp, tracker = "TT", test = "no", 
                     muted = future.result()[1]
                     if found_url != "no valid link":
                         found.append(found_url)
-                        break
+
     else:
         urls = get_urls(channel_name, broadcast_id, date_time)
         with requests.session() as session:
