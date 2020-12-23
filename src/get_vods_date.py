@@ -17,6 +17,12 @@ def get_vods(channel_name, date, tracker = "TT", test = "yes", loglevel = "INFO"
         loglevels = {"NOTSET": 0, "DEBUG": 10, "INFO": 20, "WARNING": 30, "ERROR": 40, "CRITICAL": 50}
         loglevel = loglevels[loglevel.upper()]
     logger.setLevel(loglevel)
+    if (len(channel_name) < 4 or
+            (not (len(date) == 10 and len(date.split("-")[0]) == 4)) or
+            (not (test == "yes" or test == "no")) or
+            (not (tracker == "TT" or tracker == "SC"))):
+        logger.critical("\ninvalid input data, check that date is in the correct format (YYYY-MM-DD)")
+        return
 
     vods = list()
     date = date.split(" ")[0]

@@ -18,6 +18,13 @@ def get_clips_date(channel_name, date, tracker = "SC", file = "no", workers = 15
         loglevels = {"NOTSET": 0, "DEBUG": 10, "INFO": 20, "WARNING": 30, "ERROR": 40, "CRITICAL": 50}
         loglevel = loglevels[loglevel.upper()]
     logger.setLevel(loglevel)
+    if (len(channel_name) < 4 or
+            (not (len(date) == 10 and len(date.split("-")[0]) == 4)) or
+            (not (file == "yes" or file == "no")) or
+            (not (tracker == "TT" or tracker == "SC")) or
+            (not isinstance(workers, int))):
+        logger.critical("\ninvalid input data, check that date is in the correct format (YYYY-MM-DD)")
+        return
 
     file_name = f"{channel_name} clips {date}.txt"
     clips_lst = []
@@ -61,8 +68,10 @@ def main():
         workers = 150
     clips = get_clips_date(channel_name, date, file = file, workers = workers)
 
-    for clip in clips:
-        print(clip.replace("\n", ""))
+    if clips is not None:
+        for clip in clips:
+            print(clip.replace("\n", ""))
+    return clips
 
 
 if __name__ == "__main__":

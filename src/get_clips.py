@@ -73,8 +73,10 @@ def main():
         workers = 150
     clips = get_clips(broadcast_id, time_offset, file, workers)
 
-    for clip in clips:
-        print(clip.replace("\n", ""))
+    if clips is not None:
+        for clip in clips:
+            print(clip)
+    return clips
 
 
 if __name__ == "__main__":

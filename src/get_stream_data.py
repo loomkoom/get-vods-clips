@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from math import ceil
 
 import requests
-from bs4 import BeautifulSoup as soup
+from bs4 import BeautifulSoup
 
 logger = logging.getLogger(__name__)
 formatter = logging.Formatter('[%(asctime)s : %(name)s]: %(message)s')
@@ -14,7 +14,7 @@ stream_handler.setFormatter(formatter)
 logger.addHandler(stream_handler)
 
 
-def get_page(url, output = "html", session = False):
+def get_page(url, output = "html", session = None):
     headers = {
             'Accept'                   : 'text/html,application/xhtml+xml,application/xml;q=0.9,application/json,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
             'Accept-Encoding'          : 'gzip, deflate',
@@ -32,13 +32,13 @@ def get_page(url, output = "html", session = False):
 
     if output == "html":
         html = resp.content
-        page = soup(html, "html.parser")
+        page = BeautifulSoup(html, "html.parser")
     elif output == "json":
         page = resp.json()
     return page
 
 
-def parse_tags_TT(page, start, end):
+def parse_tags_tt(page, start, end):
     stream_data = list()
     streams = page.find("table", id = "streams").tbody.findAll("tr")
     for tr in streams:
@@ -47,7 +47,7 @@ def parse_tags_TT(page, start, end):
                 date_time = (td.get("data-order"),)
                 broadcast_id = (td.get("data-stream"),)
             if td.get("data-order") and not td.get("class"):
-                minutes = (td.get("data-order"),)
+                minutes = td.get("data-order")
             if td.get("class") and "status" in td.get("class"):
                 if td.string:
                     title = (td.string.strip().replace(",", ";"),)
@@ -61,36 +61,40 @@ def parse_tags_TT(page, start, end):
                         categories += category
                 categories = categories[:-2]
                 categories += ")"
-        data = date_time + broadcast_id + minutes + title + (categories,)
+        data = date_time + broadcast_id + (int(minutes) + 12,) + title + (categories,)
         current_date = datetime.fromisoformat(date_time[0]).date()
-        if start < current_date <= end:
+        if start < current_date < end:
             stream_data.append(data)
         if current_date > end:
             break
     return stream_data
 
 
-def parse_tags_SC(streams_json, start, end):
+def parse_tags_sc(streams_json, start, end):
     stream_data = list()
     for stream in streams_json["streams"]:
         date_time = stream["stream_created_at"][:-3]
         broadcast_id = stream["stream_id"]
-        length = ceil((float(stream["air_time"]) + 0.1) * 60)
-        title = stream["stream_status"]
+        length = str(ceil((float(stream["air_time"]) + 0.1) * 60))
+        title = stream["stream_status"].replace(",", ";")
         games = stream["games"]
         categories = str(tuple(game["slug"] for game in games)).replace(",", ";")
         data = (date_time, broadcast_id, length, title, categories)
 
         current_date = datetime.fromisoformat(date_time).date()
-        if start < current_date <= end:
+        if start < current_date < end:
             stream_data.append(data)
     return stream_data
 
 
-def get_data(channel_name, start = "", end = "", tracker = "TT"):
+def get_data(channel_name, start = "", end = "", tracker = "TT", loglevel = "WARNING"):
+    loglevels = {"NOTSET": 0, "DEBUG": 10, "INFO": 20, "WARNING": 30, "ERROR": 40, "CRITICAL": 50}
+    loglevel = loglevels[loglevel.upper()]
+    logger.setLevel(loglevel)
     if (len(channel_name) < 4 or
-            (not (start == "" or len(start) == 10)) or
-            (not (end == "" or len(end) == 10))):
+            (not (start == "" or (len(start) == 10 and len(start.split("-")[0]) == 4))) or
+            (not (end == "" or (len(end) == 10 and len(end.split("-")[0]) == 4))) or
+            (not (tracker == "TT" or tracker == "SC"))):
         logger.critical("\ninvalid input data, check that date is in the correct format (YYYY-MM-DD)")
         return
 
@@ -101,6 +105,7 @@ def get_data(channel_name, start = "", end = "", tracker = "TT"):
         start = datetime.fromisoformat("2000-01-01").date()
     try:
         end = datetime.fromisoformat(end).date()
+        end += timedelta(days = 1)
     except ValueError:
         end = datetime.today().date()
 
@@ -110,7 +115,7 @@ def get_data(channel_name, start = "", end = "", tracker = "TT"):
         page = get_page(url, "html")
         has_streams = page.find("table", id = "streams")
         if has_streams:
-            stream_data = parse_tags_TT(page, start, end)
+            stream_data = parse_tags_tt(page, start, end)
 
     elif tracker == "SC":
 
@@ -139,10 +144,11 @@ def get_data(channel_name, start = "", end = "", tracker = "TT"):
                 data = get_page(url, "json", session)
                 streams_json["streams"].extend(data["streams"])
         if total_streams != 0:
-            stream_data = parse_tags_SC(streams_json, start, end)
+            stream_data = parse_tags_sc(streams_json, start, end)
 
     if stream_data is not None:
         logger.info(f"{len(stream_data)} streams found")
+        stream_data.sort(key = lambda x: datetime.fromisoformat(x[0]))
         return stream_data
     logger.info(f"{channel_name} has no recorded stream history (in this date range)")
     return []
@@ -165,11 +171,12 @@ def main():
     start = input("from date (earliest) YYYY-MM-DD UTC >> ").strip()
     end = input("to date (newest) YYYY-MM-DD UTC >> ").strip()
     tracker = input("tracker to use [TT/SC]? >> ").strip()
-    data = get_data(channel_name, start, end, tracker)
+    data = get_data(channel_name, start, end, tracker, loglevel = "INFO")
 
     if data is not None:
         for stream in data:
             print(stream)
+    return data
 
 
 if __name__ == "__main__":

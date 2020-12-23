@@ -147,7 +147,7 @@ def main():
         try_muted = input("Download muted version when available [yes/no]? >>").strip()
     else:
         try_muted = "no"
-    get_files(data_file, rename, vods_clips, try_muted, loglevel = "DEBUG")
+    get_files(data_file, rename, vods_clips, try_muted, loglevel = "INFO")
 
 
 if __name__ == "__main__":

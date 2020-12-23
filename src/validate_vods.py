@@ -26,7 +26,7 @@ def validate_vods(file_name, new_file_name):
     path = Path("../output/data")
     with open(path / file_name, "r", encoding = 'utf8') as file:
         output = list()
-        streams = list(filter((lambda x: "vod-secure.twitch.tv" in x), file.readlines()))
+        streams = list(filter((lambda x: any(s in x for s in (".twitch.tv", ".cloudfront.net"))), file.readlines()))
         print(f"estimated run time: {timedelta(seconds = 5 * len(streams))}")
         for stream in streams:
             data = stream.split(',')
