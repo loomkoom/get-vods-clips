@@ -34,10 +34,11 @@ def test_sites():
 def test_mpv(url):
     player = mpv.MPV(window_minimized = "yes", osc = "no", load_osd_console = "no", load_stats_overlay = "no", profile = "low-latency",
                      frames = "1", untimed = "yes", demuxer = "lavf", demuxer_lavf_format = "hls", demuxer_thread = "no", cache = "no",
-                     ytdl = "no", load_scripts = "no", audio = "no", demuxer_lavf_o = '"protocol_whitelist"="file,https,http,tls,tcp"')
+                     ytdl = "no", load_scripts = "no", audio = "no", demuxer_lavf_o = '"protocol_whitelist"="file,https,http,tls,tcp"',
+                     video = "no")
     player.play(url)
     start = time.time()
-    player.wait_until_playing(timeout = 5)
+    player.wait_for_playback(timeout = 5)
     player.quit()
     time_taken = time.time() - start
-    assert time_taken < 5
+    assert time_taken < 4.99
