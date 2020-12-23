@@ -6,3 +6,5 @@ omit =
 [report]
 exclude_lines =
     if __name__ == .__main__.:
+omit = 
+    bin/mpv_py.py
