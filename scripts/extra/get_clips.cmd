@@ -1,3 +1,3 @@
 @ECHO OFF
-python ..\..\bin\get_clips.py
+python ..\..\src\get_clips.py
 pause

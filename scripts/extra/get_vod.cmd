@@ -1,3 +1,3 @@
 @ECHO OFF
-python ..\..\bin\get_vod.py
+python ..\..\src\get_vod.py
 pause

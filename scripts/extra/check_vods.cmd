@@ -1,3 +1,3 @@
 @ECHO OFF
-python ..\..\bin\validate_vods.py
+python ..\..\src\validate_vods.py
 pause
