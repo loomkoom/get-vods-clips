@@ -1,6 +1,9 @@
 # encoding: utf-8
 import time
 from datetime import timedelta
+from pathlib import Path
+
+import requests
 
 import mpv_py
 
@@ -19,19 +22,21 @@ def play_url(url):
 
 
 def validate_vods(file_name, new_file_name):
-    file_name = file_name[:-4] if file_name.endswith(".txt") else file_name
-    with open(f"../output/data/{file_name}.txt", "r", encoding = 'utf8') as file:
+    file_name = Path.with_suffix(Path(file_name), ".txt")
+    path = Path("../output/data")
+    with open(path / file_name, "r", encoding = 'utf8') as file:
         output = list()
         streams = list(filter((lambda x: "vod-secure.twitch.tv" in x), file.readlines()))
         print(f"estimated run time: {timedelta(seconds = 5 * len(streams))}")
         for stream in streams:
             data = stream.split(',')
             url = data[1].strip()[5:]
-            played = play_url(url)
-            if played:
-                output.append(stream)
+            if requests.head(url).ok:
+                played = play_url(url)
+                if played:
+                    output.append(stream)
 
-    with open(f"../output/data/{new_file_name}.txt", "w", encoding = 'utf8') as file:
+    with open(path / new_file_name, "w", encoding = 'utf8') as file:
         file.writelines(output)
 
 

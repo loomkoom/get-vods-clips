@@ -1,5 +1,5 @@
 # encoding: utf-8
-import os
+from pathlib import Path
 
 import m3u8
 
@@ -12,27 +12,24 @@ def is_muted(url):
     return False
 
 
-def get_muted_playlist(url, file_name = None, file_path = "../output/files"):
+def get_muted_playlist(url, file_name = None):
+    file_path = Path("../output/files")
     if file_name is None:
-        file_name = url.split("/")[-3]
+        file_name = Path(url.split("/")[-3])
     if not is_muted(url):
         return "stream has no muted parts"
-    file_name = file_name[:-5] if file_name.endswith(".m3u8") else file_name
+    file_name = Path.with_suffix(file_name, ".m3u8")
     channel_name = url.split("_")[1]
-    path = f"{file_path}/{channel_name}/playlists"
-    if not os.path.isdir(file_path):
-        os.mkdir(file_path)
-    if not os.path.isdir(f"{file_path}/{channel_name}"):
-        os.mkdir(f"{file_path}/{channel_name}")
-    if not os.path.isdir(path):
-        os.mkdir(path)
+    path = file_path / channel_name / "playlists"
+    if not Path.is_dir(path):
+        Path.mkdir(path, parents = True)
 
     playlist_url = m3u8.load(url)
-    playlist_url.dump(f"{path}/{file_name}.m3u8")
+    playlist_url.dump(path / file_name)
     full_url = url.split("/")
     url_path = "/".join(full_url[0:-1]) + "/"
 
-    with open(f"{path}/{file_name}.m3u8", 'r+', encoding = 'utf8') as playlist:
+    with open(path / file_name, 'r+', encoding = 'utf8') as playlist:
         input_lines = playlist.readlines()
         output_lines = []
         new_lines = []
@@ -47,9 +44,10 @@ def get_muted_playlist(url, file_name = None, file_path = "../output/files"):
         playlist.truncate(0)
         playlist.seek(0)
         playlist.writelines(new_lines)
-    with open(f"{path}/{file_name}-muted.m3u8", 'w', encoding = 'utf8') as playlist:
+    muted_file = Path(f"{file_name.stem}-muted.m3u8")
+    with open(path / muted_file, 'w', encoding = 'utf8') as playlist:
         playlist.writelines(output_lines)
-    return f"{file_name}-muted.m3u8", path
+    return muted_file.name, path
 
 
 def main():
@@ -57,9 +55,10 @@ def main():
           "-input [playlist url](m3u8) [file_name]\n"
           "-outputs the playlist file as <file_name>-muted.m3u8 in /output/files/channel-name/playlists\n\n")
     url = input("url >> ").strip()
-    file_name = input("file name to call playlist >> ").strip()
+    file_name = Path(input("file name to call playlist >> ").strip())
     file, path = get_muted_playlist(url, file_name)
-    print(f"playlist saved at '{path}/{file}'")
+    print(f"playlist saved at '{path / file}'")
+    return file, path
 
 
 if __name__ == "__main__":

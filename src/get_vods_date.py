@@ -12,7 +12,7 @@ stream_handler.setFormatter(formatter)
 logger.addHandler(stream_handler)
 
 
-def get_vods(channel_name, date, tracker = "TT", test = "yes", file_path = "../output/files", loglevel = "INFO"):
+def get_vods(channel_name, date, tracker = "TT", test = "yes", loglevel = "INFO"):
     if not isinstance(loglevel, int):
         loglevels = {"NOTSET": 0, "DEBUG": 10, "INFO": 20, "WARNING": 30, "ERROR": 40, "CRITICAL": 50}
         loglevel = loglevels[loglevel.upper()]
@@ -53,9 +53,12 @@ def main():
     date = input("date (YYYY-MM-DD UTC) >> ").strip()
     test = input("enable testing vod playback with mpv to make sure link works yes/no? >> ").strip()
     tracker = input("tracker to use [TT/SC]? >> ").strip().upper()
-    vods = get_vods(channel_name, date, tracker, test)
-    for tag in vods:
-        print(tag)
+    vods = get_vods(channel_name, date, tracker, test, "DEBUG")
+
+    if vods is not None:
+        for tag in vods:
+            print(tag)
+    return vods
 
 
 if __name__ == "__main__":

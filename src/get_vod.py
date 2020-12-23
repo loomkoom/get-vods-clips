@@ -1,10 +1,10 @@
 # encoding: utf-8
-from datetime import datetime, timedelta
-import hashlib
-import time
-from pathlib import Path
 import concurrent.futures
+import hashlib
 import logging
+import time
+from datetime import datetime, timedelta
+from pathlib import Path
 
 import requests
 
@@ -33,7 +33,6 @@ def get_urls(channel_name, broadcast_id, date_time):
     final_formatted_string = f"{required_hash}_{formatted_string}"
 
     hosts = ["https://vod-secure.twitch.tv",
-             "https://vod-metro.twitch.tv",
              "https://d2nvs31859zcd8.cloudfront.net",
              "https://d3c27h4odz752x.cloudfront.net",
              "https://dqrpb9wgowsf5.cloudfront.net",
@@ -46,7 +45,7 @@ def get_urls(channel_name, broadcast_id, date_time):
 
 def play_url(url, channel_name):
     if not url.startswith("http"):
-        url = str(Path(__file__).parents[1]).replace('\\', '/') + f"/output/files/{channel_name}/playlists/{url}"
+        url = str(Path.resolve(Path(Path(__file__).parents[1] / "output" / "files" / channel_name / "playlists" / url)))
     player = mpv.MPV(window_minimized = "yes", osc = "no", load_osd_console = "no", load_stats_overlay = "no", profile = "low-latency",
                      frames = "1", untimed = "yes", demuxer = "lavf", demuxer_lavf_format = "hls", demuxer_thread = "no", cache = "no",
                      ytdl = "no", load_scripts = "no", audio = "no", demuxer_lavf_o = '"protocol_whitelist"="file,https,http,tls,tcp"')
@@ -59,7 +58,7 @@ def play_url(url, channel_name):
     return not (time_taken >= 2.499)
 
 
-def verify_url(urls, test, channel_name, date_time, broadcast_id, session, file_path = "../output/files"):
+def verify_url(urls, test, channel_name, date_time, broadcast_id, session):
     header = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36 OPR/71.0.3770.323', }
     for url in urls:
@@ -70,8 +69,7 @@ def verify_url(urls, test, channel_name, date_time, broadcast_id, session, file_
                         logger.info(f"link found (not muted): {url}")
                         return url, False
                 else:
-                    muted_vod = get_muted_vod.get_muted_playlist(url, f"{datetime.date(date_time)}_{broadcast_id}",
-                                                                 file_path = file_path)[0]
+                    muted_vod = get_muted_vod.get_muted_playlist(url, Path(f"{datetime.date(date_time)}_{broadcast_id}"))[0]
                     if play_url(muted_vod, channel_name):
                         logger.info(f"link found (muted): {url} , {muted_vod}")
                         return url, muted_vod
@@ -82,7 +80,11 @@ def verify_url(urls, test, channel_name, date_time, broadcast_id, session, file_
     return "no valid link", False
 
 
-def get_vod(channel_name, broadcast_id, timestamp, tracker = "TR", test = "no", file_path = "../output/files", workers = 60):
+def get_vod(channel_name, broadcast_id, timestamp, tracker = "TT", test = "no", workers = 60, loglevel = "WARNING"):
+    loglevels = {"NOTSET": 0, "DEBUG": 10, "INFO": 20, "WARNING": 30, "ERROR": 40, "CRITICAL": 50}
+    loglevel = loglevels[loglevel.upper()]
+    logger.setLevel(loglevel)
+
     channel_name = channel_name.lower()
     date_time = datetime.fromisoformat(timestamp)
     found = list()
@@ -103,7 +105,7 @@ def get_vod(channel_name, broadcast_id, timestamp, tracker = "TR", test = "no", 
                 session.mount('http://', adapter)
                 future_to_url = {executor.submit(verify_url,
                                                  urls.strip("][").replace("'", "").strip(" ").split(","),
-                                                 test, channel_name, date_time, broadcast_id, session = session, file_path = file_path)
+                                                 test, channel_name, date_time, broadcast_id, session = session)
                                  : urls for urls in all_urls.keys()}
 
                 for future in concurrent.futures.as_completed(future_to_url):
@@ -135,7 +137,7 @@ def main():
     timestamp = input("Enter VOD timestamp (YYYY-MM-DD HH:MM:SS) UTC >> ").strip()
     test = input("enable testing vod playback with mpv to make sure link works yes/no? >> ").strip()
     tracker = input("tracker you got data from twitchtracker/streamcharts [TT/SC]? >> ").strip().upper()
-    vod = get_vod(channel_name, broadcast_id, timestamp, tracker = tracker, test = test)
+    vod = get_vod(channel_name, broadcast_id, timestamp, tracker = tracker, test = test, loglevel = "INFO")
     if test == "no":
         print("playback has not been tested, no guarantee file works")
     if vod[1]:
