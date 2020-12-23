@@ -1,6 +1,5 @@
 # encoding: utf-8
 import logging
-from pathlib import Path
 
 import get_stream_data
 import get_vod

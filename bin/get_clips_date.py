@@ -22,7 +22,7 @@ def get_clips_date(channel_name, date, tracker = "SC", file = "no", workers = 15
             (not (date == "" or len(date) == 10)) or
             (not (file == "yes" or file == "no")) or
             (not (tracker == "TT" or tracker == "SC")) or
-            (not isinstance(int, workers))):
+            (not isinstance(workers, int))):
         logger.critical("\ninvalid input data, check that date is in the correct format (YYYY-MM-DD)")
         return
 
