@@ -1,5 +1,6 @@
 # encoding: utf-8
 import time
+from pathlib import Path
 from shutil import rmtree
 
 import pytest
