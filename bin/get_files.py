@@ -46,7 +46,7 @@ def get_link_data(data_file, vods_clips):
     data_file = Path.with_suffix(data_file, ".txt")
     with open(path / data_file, "r", encoding = 'utf8') as file:
         url_data = list()
-        streams = list(filter((lambda x: ".twitch.tv" in x), file.readlines()))
+        streams = list(filter((lambda x: any(s in x for s in (".twitch.tv", ".cloudfront.net"))), file.readlines()))
         for stream in streams:
             data = parse_tags(stream, vods_clips)
             url_data.append(data)

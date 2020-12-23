@@ -81,8 +81,8 @@ def test_get_vod_latest_no_play(get_data_stream):
     vod = get_vod.get_vod(channel_name, broadcast_id, timestamp, loglevel = "DEBUG")
     urls = vod[0]
     for url in urls:
-        if url != "no valid link":
-            assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
+
+        assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
 
 
 @pytest.mark.parametrize("tracker", ["TT", "SC"])
@@ -97,9 +97,9 @@ def test_get_vod_latest_play(get_data_stream, tracker):
     vod = get_vod.main()
     urls = vod[0]
     for url in urls:
-        if url != "no valid link":
-            assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
-            assert get_vod.play_url(url, channel_name), "Vod not playable"
+
+        assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
+        assert get_vod.play_url(url, channel_name), "Vod not playable"
 
 
 # test get vods date
@@ -113,8 +113,8 @@ def test_get_vods_date(get_data_stream):
     set_keyboard_input([channel_name, date, test, tracker])
     vods = get_vods_date.main()
     url = vods[0].split(",")[1].strip()[5:].strip("][").replace("'", "")
-    if url != "no valid link":
-        assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
+
+    assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
 
 
 def test_get_vods_date_play(get_data_stream):
@@ -127,9 +127,9 @@ def test_get_vods_date_play(get_data_stream):
     set_keyboard_input([channel_name, date, test, tracker])
     vods = get_vods_date.main()
     url = vods[0].split(",")[1].strip()[5:].strip("][").replace("'", "")
-    if url != "no valid link":
-        assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
-        assert get_vod.play_url(url, channel_name), "Vod not playable"
+
+    assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
+    assert get_vod.play_url(url, channel_name), "Vod not playable"
 
 
 # test get clips
@@ -214,8 +214,8 @@ def test_get_all_vods_clips(get_data_stream, tracker):
         file.seek(0)
         url = file.readline().split(",")[1].strip()[5:]
         url = url.strip("'")
-        if url != "no valid link":
-            assert requests.head(url, allow_redirects = False).ok, "link not valid"
+
+        assert requests.head(url, allow_redirects = False).ok, "link not valid"
     assert Path.is_file(data_path / f"{channel_name} vods {date} - {date}.txt"), "File not made"
     with open(data_path / f"{channel_name} vods {date} - {date}.txt", "r", encoding = "utf8") as file:
         assert len(file.readline().split(",")) == 7, "data file not correctly formatted"
@@ -223,8 +223,8 @@ def test_get_all_vods_clips(get_data_stream, tracker):
         url = file.readline().split(",")[1].strip()[5:]
         if "[" in url:
             url = url.strip("][").strip("'")
-        if url != "no valid link":
-            assert requests.head(url, allow_redirects = False).ok, "link not valid"
+
+        assert requests.head(url, allow_redirects = False).ok, "link not valid"
 
 
 def end_test():

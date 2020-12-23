@@ -49,11 +49,12 @@ def play_url(url, channel_name):
         url = str(Path(__file__).parents[1]).replace('\\', '/') + f"/output/files/{channel_name}/playlists/{url}"
     player = mpv.MPV(window_minimized = "yes", osc = "no", load_osd_console = "no", load_stats_overlay = "no", profile = "low-latency",
                      frames = "1", untimed = "yes", demuxer = "lavf", demuxer_lavf_format = "hls", demuxer_thread = "no", cache = "no",
-                     ytdl = "no", load_scripts = "no", audio = "no", demuxer_lavf_o = '"protocol_whitelist"="file,https,http,tls,tcp"')
+                     ytdl = "no", load_scripts = "no", audio = "no", demuxer_lavf_o = '"protocol_whitelist"="file,https,http,tls,tcp"',
+                     video = "no")
     player.play(url)
     timeout = 2.5
     start = time.time()
-    player.wait_until_playing(timeout)
+    player.wait_for_playback(timeout)
     player.quit()
     time_taken = time.time() - start
     return not (time_taken >= 2.499)

@@ -2,6 +2,7 @@
 import time
 from datetime import timedelta
 from pathlib import Path
+import requests
 
 import mpv_py
 
@@ -24,14 +25,15 @@ def validate_vods(file_name, new_file_name):
     path = Path("../output/data")
     with open(path / file_name, "r", encoding = 'utf8') as file:
         output = list()
-        streams = list(filter((lambda x: "vod-secure.twitch.tv" in x), file.readlines()))
+        streams = list(filter((lambda x: any(s in x for s in (".twitch.tv", ".cloudfront.net"))), file.readlines()))
         print(f"estimated run time: {timedelta(seconds = 5 * len(streams))}")
         for stream in streams:
             data = stream.split(',')
             url = data[1].strip()[5:]
-            played = play_url(url)
-            if played:
-                output.append(stream)
+            if requests.head(url).ok:
+                played = play_url(url)
+                if played:
+                    output.append(stream)
 
     with open(path / new_file_name, "w", encoding = 'utf8') as file:
         file.writelines(output)
