@@ -22,15 +22,17 @@ def get_vods(channel_name, date, tracker = "TT", test = "yes", loglevel = "INFO"
     date = date.split(" ")[0]
     logger.info("fetching stream data")
     stream_data = get_stream_data.get_data(channel_name, date, date, tracker)
+    if len(stream_data) == 0:
+        logger.info(f"{tracker} found no stream for {channel_name} on {date}")
+        return
     for stream in stream_data:
-        date_time = stream[0]
-        broadcast_id = stream[1]
-        minutes = stream[2]
-        title = stream[3]
-        categories = stream[4]
-        logger.info("fetching vod links")
-        vod = get_vod.get_vod(channel_name, broadcast_id, date_time, tracker = tracker, test = test, file_path = file_path)
-        data_string = f"DATE: {date_time}, URL: {vod[0]} , MUTED: {vod[1] if vod[1] else 0} , ID: {broadcast_id}, " \
+        logger.debug(stream)
+        date_time, broadcast_id, minutes, title, categories = stream
+        logger.info(f"fetching vod links for stream {stream_data.index(stream) + 1}")
+        vod = get_vod.get_vod(channel_name, broadcast_id, date_time, tracker = tracker, test = test)
+        vod_url = str(vod[0]).strip('][').replace("'", "")
+        muted_url = str(vod[1]).strip('][').replace("'", "")
+        data_string = f"DATE: {date_time}, URL: {vod_url} , MUTED: {muted_url if muted_url else 0} , ID: {broadcast_id}, " \
                       f"LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
                       f"TITLE: {title} , CATEGORIES: {categories}\n"
         vods.append(data_string)

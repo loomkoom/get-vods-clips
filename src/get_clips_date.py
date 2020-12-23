@@ -21,15 +21,15 @@ def get_clips_date(channel_name, date, tracker = "SC", file = "no", workers = 15
 
     file_name = f"{channel_name} clips {date}.txt"
     clips_lst = []
-    logger.info("getting stream data")
+    logger.info("fetching stream data")
     stream_data = get_stream_data.get_data(channel_name, date, date, tracker = tracker)
+    if len(stream_data) == 0:
+        logger.info(f"{tracker} found no stream for {channel_name} on {date}")
+        return
     for stream in stream_data:
-        date_time = stream[0]
-        broadcast_id = stream[1]
-        minutes = stream[2]
-        title = stream[3]
-        categories = stream[4]
-        logger.info(f"getting getting clips for stream {stream_data.index(stream) + 1}")
+        logger.debug(stream)
+        date_time, broadcast_id, minutes, title, categories = stream
+        logger.info(f"fetching clips for stream {stream_data.index(stream) + 1}")
         clips = get_clips.get_clips(broadcast_id, minutes, workers)
 
         for clip in clips:
@@ -43,6 +43,7 @@ def get_clips_date(channel_name, date, tracker = "SC", file = "no", workers = 15
                 Path.mkdir(data_path, parents = True)
             with open(data_path / f"{file_name}", "w", encoding = 'utf8') as data_log:
                 data_log.writelines(clips_lst)
+    logger.debug(clips_lst)
     return clips_lst
 
 
