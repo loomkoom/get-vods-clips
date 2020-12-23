@@ -129,7 +129,7 @@ length = 30 (minutes) <br>
 
 [codecov-url]: https://codecov.io/gh/loomkoom/get-vods-clips
 
-[action-url]: https://github.com/loomkoom/get-vods-clips/workflows/Tests/badge.svg?branch=dev
+[action-url]: https://github.com/loomkoom/get-vods-clips/workflows/test/badge.svg?branch=dev
 
 [contributors-shield]: https://img.shields.io/github/contributors/loomkoom/get-vods-clips.svg?style=flat-square
 
