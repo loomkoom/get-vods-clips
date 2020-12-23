@@ -6,12 +6,12 @@ from shutil import rmtree
 import pytest
 import requests
 
-from .mock_input import set_keyboard_input
-from .. import get_all_vods_clips
-from .. import get_clips_date
-from .. import get_stream_data
-from .. import get_vods_date
-from .. import mpv_py as mpv
+from mock_input import set_keyboard_input
+import get_all_vods_clips
+import get_clips_date
+import get_stream_data
+import get_vods_date
+import mpv_py as mpv
 
 
 def test_sites():

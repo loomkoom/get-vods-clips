@@ -4,10 +4,10 @@ from datetime import datetime, timedelta
 from math import floor
 from pathlib import Path
 
-from . import get_clips
-from . import get_files
-from . import get_stream_data
-from . import get_vod
+import get_clips
+import get_files
+import get_stream_data
+import get_vod
 
 
 def set_logger(loglevel, log_path, channel_name):

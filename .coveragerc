@@ -1,10 +1,18 @@
 # .coveragerc to control coverage.py
 [run]
 omit = 
-    bin/mpv_py.py
+    src/mpv_py.py
+    src/validate_vods.py
+    src/UI_mainwindow.py
+    src/app_mainwindow.py
+    src/app_model.py
 
 [report]
 exclude_lines =
     if __name__ == .__main__.:
 omit = 
-    bin/mpv_py.py
+    src/mpv_py.py
+    src/validate_vods.py
+    src/UI_mainwindow.py
+    src/app_mainwindow.py
+    src/app_model.py

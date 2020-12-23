@@ -2,8 +2,8 @@
 import logging
 from pathlib import Path
 
-from . import get_clips
-from . import get_stream_data
+import get_clips
+import get_stream_data
 
 logger = logging.getLogger(__name__)
 formatter = logging.Formatter('%(message)s')

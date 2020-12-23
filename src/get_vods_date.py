@@ -1,8 +1,8 @@
 # encoding: utf-8
 import logging
 
-from . import get_stream_data
-from . import get_vod
+import get_stream_data
+import get_vod
 
 logger = logging.getLogger(__name__)
 formatter = logging.Formatter('%(message)s')
@@ -61,7 +61,7 @@ def main():
     date = input("date (YYYY-MM-DD UTC) >> ").strip()
     test = input("enable testing vod playback with mpv to make sure link works yes/no? >> ").strip()
     tracker = input("tracker to use [TT/SC]? >> ").strip().upper()
-    vods = get_vods(channel_name, date, tracker, test)
+    vods = get_vods(channel_name, date, tracker, test,"DEBUG")
 
     if vods is not None:
         for tag in vods:
@@ -70,4 +70,4 @@ def main():
 
 
 if __name__ == "__main__":
-    print(main())
+    main()

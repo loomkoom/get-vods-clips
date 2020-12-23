@@ -8,8 +8,8 @@ from pathlib import Path
 
 import requests
 
-from . import get_muted_vod
-from . import mpv_py as mpv
+import get_muted_vod
+import mpv_py as mpv
 
 logger = logging.getLogger(__name__)
 formatter = logging.Formatter('[%(asctime)s : %(name)s]: %(message)s')
@@ -95,7 +95,7 @@ def get_vod(channel_name, broadcast_id, timestamp, tracker = "TT", test = "no", 
 
     if len(timestamp.split(" ")[1].split(":")) == 2:
         if tracker == "SC":
-            secs, mins = 600, 5
+            secs, mins = 720, 6
         else:
             secs, mins = 60, 0
         dates = [date_time - timedelta(minutes = mins) for i in range(secs)]

@@ -9,13 +9,13 @@ from shutil import rmtree
 import pytest
 import requests
 
-from .mock_input import set_keyboard_input
-from .. import get_all_vods_clips
-from .. import get_clips
-from .. import get_clips_date
-from .. import get_stream_data
-from .. import get_vod
-from .. import get_vods_date
+from mock_input import set_keyboard_input
+import get_all_vods_clips
+import get_clips
+import get_clips_date
+import get_stream_data
+import get_vod
+import get_vods_date
 
 
 @pytest.fixture()

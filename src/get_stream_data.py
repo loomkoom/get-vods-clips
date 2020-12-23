@@ -47,7 +47,7 @@ def parse_tags_tt(page, start, end):
                 date_time = (td.get("data-order"),)
                 broadcast_id = (td.get("data-stream"),)
             if td.get("data-order") and not td.get("class"):
-                minutes = (td.get("data-order"),)
+                minutes = td.get("data-order")
             if td.get("class") and "status" in td.get("class"):
                 if td.string:
                     title = (td.string.strip().replace(",", ";"),)
@@ -61,9 +61,9 @@ def parse_tags_tt(page, start, end):
                         categories += category
                 categories = categories[:-2]
                 categories += ")"
-        data = date_time + broadcast_id + minutes + title + (categories,)
+        data = date_time + broadcast_id + (int(minutes)+12,) + title + (categories,)
         current_date = datetime.fromisoformat(date_time[0]).date()
-        if start < current_date <= end:
+        if start < current_date < end:
             stream_data.append(data)
         if current_date > end:
             break
@@ -82,7 +82,7 @@ def parse_tags_sc(streams_json, start, end):
         data = (date_time, broadcast_id, length, title, categories)
 
         current_date = datetime.fromisoformat(date_time).date()
-        if start < current_date <= end:
+        if start < current_date < end:
             stream_data.append(data)
     return stream_data
 
@@ -105,6 +105,7 @@ def get_data(channel_name, start = "", end = "", tracker = "TT", loglevel = "WAR
         start = datetime.fromisoformat("2000-01-01").date()
     try:
         end = datetime.fromisoformat(end).date()
+        end += timedelta(days = 1)
     except ValueError:
         end = datetime.today().date()
 
@@ -170,7 +171,7 @@ def main():
     start = input("from date (earliest) YYYY-MM-DD UTC >> ").strip()
     end = input("to date (newest) YYYY-MM-DD UTC >> ").strip()
     tracker = input("tracker to use [TT/SC]? >> ").strip()
-    data = get_data(channel_name, start, end, tracker, loglevel = "INFO")
+    data = get_data(channel_name, start, end, tracker, loglevel = "DEBUG")
 
     if data is not None:
         for stream in data:
