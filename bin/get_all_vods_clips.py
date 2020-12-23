@@ -147,7 +147,7 @@ def get_vods_clips(channel_name, vods_clips, start = "", end = "", tracker = "TT
     stream_data = get_stream_data.get_data(channel_name, start, end, tracker = tracker)
     streams = len(stream_data)
     if streams == 0:
-        logger.info(f"{channel_name} has no recorded stream history")
+        logger.info(f"{tracker} found no recorded stream history for {channel_name} (in this date range)")
         return
 
     start = stream_data[0][0][:10]

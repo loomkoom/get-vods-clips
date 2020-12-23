@@ -18,13 +18,20 @@ def get_clips_date(channel_name, date, tracker = "SC", file = "no", workers = 15
         loglevels = {"NOTSET": 0, "DEBUG": 10, "INFO": 20, "WARNING": 30, "ERROR": 40, "CRITICAL": 50}
         loglevel = loglevels[loglevel.upper()]
     logger.setLevel(loglevel)
+    if (len(channel_name) < 4 or
+            (not (date == "" or len(date) == 10)) or
+            (not (file == "yes" or file == "no")) or
+            (not (tracker == "TT" or tracker == "SC")) or
+            (not isinstance(int, workers))):
+        logger.critical("\ninvalid input data, check that date is in the correct format (YYYY-MM-DD)")
+        return
 
     file_name = f"{channel_name} clips {date}.txt"
     clips_lst = []
     logger.info("fetching stream data")
     stream_data = get_stream_data.get_data(channel_name, date, date, tracker = tracker)
     if len(stream_data) == 0:
-        logger.info(f"found no stream for {channel_name} on {date}")
+        logger.info(f"{tracker} found no stream for {channel_name} on {date}")
         return
     for stream in stream_data:
         logger.debug(stream)

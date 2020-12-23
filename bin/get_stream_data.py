@@ -93,7 +93,8 @@ def get_data(channel_name, start = "", end = "", tracker = "TT", loglevel = "WAR
     logger.setLevel(loglevel)
     if (len(channel_name) < 4 or
             (not (start == "" or len(start) == 10)) or
-            (not (end == "" or len(end) == 10))):
+            (not (end == "" or len(end) == 10)) or
+            (not (tracker == "TT" or tracker == "SC"))):
         logger.critical("\ninvalid input data, check that date is in the correct format (YYYY-MM-DD)")
         return
 

@@ -18,13 +18,19 @@ def get_vods(channel_name, date, tracker = "TT", test = "yes", loglevel = "INFO"
         loglevels = {"NOTSET": 0, "DEBUG": 10, "INFO": 20, "WARNING": 30, "ERROR": 40, "CRITICAL": 50}
         loglevel = loglevels[loglevel.upper()]
     logger.setLevel(loglevel)
+    if (len(channel_name) < 4 or
+            (not (date == "" or len(date) == 10)) or
+            (not (test == "yes" or test == "no")) or
+            (not (tracker == "TT" or tracker == "SC"))):
+        logger.critical("\ninvalid input data, check that date is in the correct format (YYYY-MM-DD)")
+        return
 
     vods = list()
     date = date.split(" ")[0]
     logger.info("fetching stream data")
     stream_data = get_stream_data.get_data(channel_name, date, date, tracker)
     if len(stream_data) == 0:
-        logger.info(f"found no stream for {channel_name} on {date}")
+        logger.info(f"{tracker} found no stream for {channel_name} on {date}")
         return
     for stream in stream_data:
         logger.debug(stream)
