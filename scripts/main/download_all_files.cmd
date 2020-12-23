@@ -1,3 +1,3 @@
 @ECHO OFF
-python -m ..\..\bin\get_files.py
+python ..\..\src\get_files.py
 pause

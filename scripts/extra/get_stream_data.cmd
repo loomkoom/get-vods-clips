@@ -1,3 +1,3 @@
 @ECHO OFF
-python ..\..\bin\get_stream_data.py
+python ..\..\src\get_stream_data.py
 pause
