@@ -218,8 +218,6 @@ def test_get_all_vods_clips(get_data_stream, tracker):
         assert len(file.readline().split(",")) == 7, "data file not correctly formatted"
         file.seek(0)
         url = file.readline().split(",")[1].strip(" ").split(" ")[1]
-        if "[" in url:
-            url = url.strip("][").strip("'")
         assert requests.head(url, allow_redirects = False).ok, "link not valid"
 
 
