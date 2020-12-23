@@ -4,10 +4,10 @@ from datetime import datetime, timedelta
 from math import floor
 from pathlib import Path
 
-import get_clips
-import get_files
-import get_stream_data
-import get_vod
+from . import get_clips
+from . import get_files
+from . import get_stream_data
+from . import get_vod
 
 
 def set_logger(loglevel, log_path, channel_name):
@@ -41,13 +41,16 @@ def check_dirs(path):
         Path.mkdir(path, parents = True)
 
 
-def check_input(channel_name, vods_clips, start, end, download, rename, workers, test, logger):
+def check_input(channel_name, vods_clips, start, end, tracker, download, rename, try_muted, workers, test):
     """checks if input is valid returns 0 or 1"""
+    logger = logging.getLogger(__name__)
     if (len(channel_name) < 4 or
             (not (vods_clips == "clips" or vods_clips == "vods" or vods_clips == "both")) or
             (not (start == "" or (len(start) == 10 and len(start.split("-")[0]) == 4))) or
             (not (end == "" or (len(end) == 10 and len(end.split("-")[0]) == 4))) or
             (not (rename == "no" or rename == "yes")) or
+            (not (try_muted == "no" or try_muted == "yes")) or
+            (not (tracker == "TT" or tracker == "SC")) or
             (not (download == "no" or download == "yes")) or
             (not (test == "no" or test == "yes")) or
             (not isinstance(workers, int))):
@@ -85,8 +88,10 @@ def find_vod(stream, channel_name, tracker, test, file_name, data_path):
     date_time, broadcast_id, minutes, title, categories, = stream
 
     vod = get_vod.get_vod(channel_name, broadcast_id, date_time, tracker = tracker, test = test)
-    vod_string = f"VOD: URL: {str(vod[0]).strip('][')} , MUTED: {vod[1] if vod[1] else 0}"
-    data_string = f"DATE: {date_time}, URL: {vod[0]} , MUTED: {vod[1] if vod[1] else 0} , ID: {broadcast_id}, " \
+    vod_url = str(vod[0]).strip('][').replace("'", "")
+    muted_url = str(vod[1]).strip('][').replace("'", "")
+    vod_string = f"VOD: URL: {vod_url} , MUTED: {muted_url if muted_url else 0}"
+    data_string = f"DATE: {date_time}, URL: {vod_url} , MUTED: {muted_url if bool(muted_url) else 0} , ID: {broadcast_id}, " \
                   f"LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
                   f"TITLE: {title} , CATEGORIES: {categories} \n"
 
@@ -139,7 +144,7 @@ def get_vods_clips(channel_name, vods_clips, start = "", end = "", tracker = "TT
     check_dirs(log_path)
 
     logger = set_logger(loglevel, log_path, channel_name)
-    valid_input = check_input(channel_name, vods_clips, start, end, download, rename, workers, test, logger)
+    valid_input = check_input(channel_name, vods_clips, start, end, tracker, download, rename, try_muted, workers, test)
     if not bool(valid_input):
         return
 
@@ -257,7 +262,7 @@ def main():
             workers = 150
         test = input("test if vod actually plays with mpv (no false positives but a bit slower) [yes/no]? >>").strip()
         get_vods_clips(channel_name, vods_clips, start = start, end = end, download = download, rename = rename, try_muted = use_muted,
-                       test = test, workers = int(workers), tracker = tracker)
+                       test = test, workers = workers, tracker = tracker)
     logging.shutdown()
 
 

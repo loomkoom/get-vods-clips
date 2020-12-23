@@ -8,8 +8,8 @@ from pathlib import Path
 
 import requests
 
-import get_muted_vod
-import mpv_py as mpv
+from . import get_muted_vod
+from . import mpv_py as mpv
 
 logger = logging.getLogger(__name__)
 formatter = logging.Formatter('[%(asctime)s : %(name)s]: %(message)s')
@@ -91,6 +91,7 @@ def get_vod(channel_name, broadcast_id, timestamp, tracker = "TT", test = "no", 
     channel_name = channel_name.lower()
     date_time = datetime.fromisoformat(timestamp)
     found = list()
+    muted = list()
 
     if len(timestamp.split(" ")[1].split(":")) == 2:
         if tracker == "SC":
@@ -114,18 +115,20 @@ def get_vod(channel_name, broadcast_id, timestamp, tracker = "TT", test = "no", 
                 for future in concurrent.futures.as_completed(future_to_url):
                     timestamp = all_urls[f"{future_to_url[future]}"]
                     found_url = future.result()[0]
-                    muted = future.result()[1]
+                    muted_url = future.result()[1]
                     if found_url != "no valid link":
                         found.append(found_url)
+                        muted.append(muted_url)
 
     else:
         urls = get_urls(channel_name, broadcast_id, date_time)
         with requests.session() as session:
             verified = verify_url(urls, test, channel_name, date_time, broadcast_id, session)
             found_url = verified[0]
-            muted = verified[1]
+            muted_url = verified[1]
             if found_url != "no valid link":
                 found.append(found_url)
+                muted.append(muted_url)
     if len(found) == 0:
         found.append("no valid link")
     return found, muted

@@ -2,8 +2,8 @@
 import logging
 from pathlib import Path
 
-import get_clips
-import get_stream_data
+from . import get_clips
+from . import get_stream_data
 
 logger = logging.getLogger(__name__)
 formatter = logging.Formatter('%(message)s')
@@ -66,10 +66,11 @@ def main():
     workers = input("worker count (empty for default) >> ").strip()
     if workers == "":
         workers = 150
-    clips = get_clips_date(channel_name, date, file = file, workers = int(workers))
+    clips = get_clips_date(channel_name, date, file = file, workers = workers)
 
-    for clip in clips:
-        print(clip.replace("\n", ""))
+    if clips is not None:
+        for clip in clips:
+            print(clip.replace("\n", ""))
     return clips
 
 

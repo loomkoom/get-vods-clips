@@ -1,8 +1,8 @@
 # encoding: utf-8
 import logging
 
-import get_stream_data
-import get_vod
+from . import get_stream_data
+from . import get_vod
 
 logger = logging.getLogger(__name__)
 formatter = logging.Formatter('%(message)s')
@@ -36,7 +36,9 @@ def get_vods(channel_name, date, tracker = "TT", test = "yes", loglevel = "INFO"
         date_time, broadcast_id, minutes, title, categories = stream
         logger.info(f"fetching vod links for stream {stream_data.index(stream) + 1}")
         vod = get_vod.get_vod(channel_name, broadcast_id, date_time, tracker = tracker, test = test)
-        data_string = f"DATE: {date_time}, URL: {vod[0]} , MUTED: {vod[1] if vod[1] else 0} , ID: {broadcast_id}, " \
+        vod_url = str(vod[0]).strip('][').replace("'", "")
+        muted_url = str(vod[1]).strip('][').replace("'", "")
+        data_string = f"DATE: {date_time}, URL: {vod_url} , MUTED: {muted_url if muted_url else 0} , ID: {broadcast_id}, " \
                       f"LENGTH: {int(minutes) // 60}h{(int(minutes) - (int(minutes) // 60) * 60)}min, " \
                       f"TITLE: {title} , CATEGORIES: {categories}\n"
         vods.append(data_string)
@@ -61,8 +63,9 @@ def main():
     tracker = input("tracker to use [TT/SC]? >> ").strip().upper()
     vods = get_vods(channel_name, date, tracker, test)
 
-    for tag in vods:
-        print(tag)
+    if vods is not None:
+        for tag in vods:
+            print(tag)
     return vods
 
 

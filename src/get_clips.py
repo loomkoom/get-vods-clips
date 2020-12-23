@@ -71,10 +71,11 @@ def main():
     workers = input("worker count (empty for default) >> ").strip()
     if workers == "":
         workers = 150
-    clips = get_clips(broadcast_id, time_offset, file, int(workers))
+    clips = get_clips(broadcast_id, time_offset, file, workers)
 
-    for clip in clips:
-        print(clip)
+    if clips is not None:
+        for clip in clips:
+            print(clip)
     return clips
 
 

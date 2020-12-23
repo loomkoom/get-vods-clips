@@ -1,6 +1,7 @@
 # encoding: utf-8
 import datetime
 from datetime import timedelta
+from math import floor
 from pathlib import Path
 from random import choice
 from shutil import rmtree
@@ -8,14 +9,13 @@ from shutil import rmtree
 import pytest
 import requests
 
-import get_all_vods_clips
-import get_clips
-import get_clips_date
-import get_stream_data
-import get_vod
-import get_vods_date
-from mock_input import set_keyboard_input
-from math import floor
+from .mock_input import set_keyboard_input
+from .. import get_all_vods_clips
+from .. import get_clips
+from .. import get_clips_date
+from .. import get_stream_data
+from .. import get_vod
+from .. import get_vods_date
 
 
 @pytest.fixture()
@@ -29,18 +29,6 @@ def get_data_in():
 
 
 # test get stream data
-@pytest.mark.parametrize("channel_name, date_1, date_2, tracker",
-                         [("Has", "2020-12-12", "2020-12-12", "TT"),
-                          ("sdmlfksmld", "2020-12-12", "2020-12-12", "SC"),
-                          ("Hasanabi", "12-12-2000", "2020-12-12", "TT"),
-                          ("Hasanabi", "2020-12-12", "12-12-2000", "TT"),
-                          ("Hasanabi", "2020-12-12", "2020-12-12", "xx")])
-def test_get_stream_data_invalid_data(channel_name, date_1, date_2, tracker):
-    set_keyboard_input([channel_name, date_1, date_2, tracker])
-    stream_data = get_stream_data.main()
-    assert stream_data is None
-
-
 @pytest.mark.parametrize("tracker", ["TT", "SC"])
 def test_get_stream_data_daterange(get_data_in, tracker):
     channel_name, date_1, date_2 = get_data_in[0], get_data_in[1][0], get_data_in[1][1]
@@ -106,25 +94,14 @@ def test_get_vod_latest_play(get_data_stream, tracker):
     test = "yes"
     tracker = tracker
     set_keyboard_input([channel_name, broadcast_id, timestamp, test, tracker])
-    vod = get_vod.main()
-    urls = vod[0]
-    for url in urls:
+    vods = get_vod.main()
+    urls, muted_urls = vods
+    for url, muted_url in zip(urls, muted_urls):
         assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
-        assert get_vod.play_url(url, channel_name), "Vod not playable"
+        assert get_vod.play_url(url, channel_name) or get_vod.play_url(muted_url, channel_name), "Vod not playable"
 
 
 # test get vods date
-@pytest.mark.parametrize("channel_name, date, test, tracker",
-                         [("Has", "2020-12-12", "yes", "TT"),
-                          ("Hasanabi", "12-12-2000", "yes", "TT"),
-                          ("Hasanabi", "2020-12-12", "xx", "TT"),
-                          ("Hasanabi", "2020-12-12", "yes", "xx")])
-def test_get_vods_date_invalid_data(channel_name, date, test, tracker):
-    set_keyboard_input([channel_name, date, test, tracker])
-    vods = get_vods_date.main()
-    assert vods is None
-
-
 def test_get_vods_date(get_data_stream):
     stream_data = get_data_stream
     channel_name = stream_data[0]
@@ -134,7 +111,7 @@ def test_get_vods_date(get_data_stream):
     tracker = "SC"
     set_keyboard_input([channel_name, date, test, tracker])
     vods = get_vods_date.main()
-    url = vods[0].split(",")[1].strip()[5:].strip("][").replace("'", "")
+    url = vods[0].split(",")[1].strip(" ").split(" ")[1]
     assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
 
 
@@ -147,9 +124,10 @@ def test_get_vods_date_play(get_data_stream):
     tracker = "SC"
     set_keyboard_input([channel_name, date, test, tracker])
     vods = get_vods_date.main()
-    url = vods[0].split(",")[1].strip()[5:].strip("][").replace("'", "")
+    url = vods[0].split(",")[1].strip(" ").split(" ")[1]
+    muted_url = vods[0].split(",")[2].strip(" ").split(" ")[1]
     assert requests.head(url, allow_redirects = False).ok, "4xx vod url response"
-    assert get_vod.play_url(url, channel_name), "Vod not playable"
+    assert get_vod.play_url(url, channel_name) or get_vod.play_url(muted_url, channel_name), "Vod not playable"
 
 
 # test get clips
@@ -175,23 +153,11 @@ def test_get_clips_file(get_data_stream):
     with open(f"{data_path}/{broadcast_id}_clips.txt", "r", encoding = "utf8") as file:
         assert len(file.readline().split(",")) == 2, "data file not correctly formatted"
         file.seek(0)
-        url = file.readline().split(",")[0].strip()[5:]
+        url = file.readline().split(",")[0].strip(" ").split(" ")[1]
         assert requests.head(url, allow_redirects = False).ok, "clip not valid"
 
 
 # test get clips date
-@pytest.mark.parametrize("channel_name, date, tracker, file, workers",
-                         [("Has", "2020-12-12", "yes", "TT", "150"),
-                          ("Hasanabi", "12-12-2000", "yes", "TT", "150"),
-                          ("Hasanabi", "2020-12-12", "xx", "TT", "150"),
-                          ("Hasanabi", "2020-12-12", "yes", "xx", "150"),
-                          ("Hasanabi", "2020-12-12", "yes", "TT", "xx")])
-def test_get_vods_date_invalid_data(channel_name, date, tracker, file, workers):
-    set_keyboard_input([channel_name, date, tracker, file, workers])
-    clips = get_clips_date.main()
-    assert clips is None
-
-
 # def test_get_clips_date(get_data_stream):
 #     stream_data = get_data_stream
 #     channel_name = stream_data[0]
@@ -214,32 +180,18 @@ def test_get_clips_date_file(get_data_stream):
     file = "yes"
     set_keyboard_input([channel_name, date, file, workers])
     clips = get_clips_date.main()
-    url = clips[0].split(",")[1].strip()[5:]
+    url = clips[0].split(",")[1].strip(" ").split(" ")[1]
     assert len(clips) > 1, "no valid clips found"
     assert requests.head(url, allow_redirects = False).ok, "clip not valid"
     assert Path.is_file(data_path / f"{channel_name} clips {date}.txt"), "File not made"
     with open(data_path / f"{channel_name} clips {date}.txt", "r", encoding = "utf8") as file:
         assert len(file.readline().split(",")) == 7, "data file not correctly formatted"
         file.seek(0)
-        url = file.readline().split(",")[1].strip()[5:]
+        url = file.readline().split(",")[1].strip(" ").split(" ")[1]
         assert requests.head(url, allow_redirects = False).ok, "clip not valid"
 
 
 # test get_all_vods_clips
-@pytest.mark.parametrize("channel_name, vods_clips, start, end, download, tracker, workers, test",
-                         [("Has", "both", "2020-12-12", "2020-12-12", "yes", "TT", "150", "yes"),
-                          ("Hasanabi", "xx", "2020-12-12", "2020-12-12", "yes", "TT", "150", "yes"),
-                          ("Hasanabi", "both", "12-12-2000", "2020-12-12", "yes", "TT", "150", "yes"),
-                          ("Hasanabi", "both", "2020-12-12", "12-12-2000", "yes", "TT", "150", "yes"),
-                          ("Hasanabi", "both", "2020-12-12", "2020-12-12", "xx", "TT", "150", "yes"),
-                          ("Hasanabi", "both", "2020-12-12", "2020-12-12", "yes", "xx", "xx", "yes"),
-                          ("Hasanabi", "both", "2020-12-12", "2020-12-12", "yes", "TT", "150", "xx"), ])
-def test_get_all_vods_clips_invalid_data(channel_name, vods_clips, start, end, download, tracker, workers, test):
-    set_keyboard_input([channel_name, vods_clips, start, end, download, tracker, workers, test])
-    ret = get_all_vods_clips.main()
-    assert ret is None
-
-
 @pytest.mark.parametrize("tracker", ["TT", "SC"])
 def test_get_all_vods_clips(get_data_stream, tracker):
     data_path = Path("../output/data")
@@ -258,14 +210,14 @@ def test_get_all_vods_clips(get_data_stream, tracker):
     with open(data_path / f"{channel_name} clips {date} - {date}.txt", "r", encoding = "utf8") as file:
         assert len(file.readline().split(",")) == 7, "data file not correctly formatted"
         file.seek(0)
-        url = file.readline().split(",")[1].strip()[5:]
+        url = file.readline().split(",")[1].strip(" ").split(" ")[1]
         url = url.strip("'")
         assert requests.head(url, allow_redirects = False).ok, "link not valid"
     assert Path.is_file(data_path / f"{channel_name} vods {date} - {date}.txt"), "File not made"
     with open(data_path / f"{channel_name} vods {date} - {date}.txt", "r", encoding = "utf8") as file:
         assert len(file.readline().split(",")) == 7, "data file not correctly formatted"
         file.seek(0)
-        url = file.readline().split(",")[1].strip()[5:]
+        url = file.readline().split(",")[1].strip(" ").split(" ")[1]
         if "[" in url:
             url = url.strip("][").strip("'")
         assert requests.head(url, allow_redirects = False).ok, "link not valid"
